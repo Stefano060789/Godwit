@@ -21,6 +21,7 @@ import redshankImage from "../assets/birds/redshank.svg";
 import owlImage from "../assets/birds/owl.svg";
 import waxwingImage from "../assets/birds/waxwing.svg";
 import woodpeckerImage from "../assets/birds/woodpecker.svg";
+import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 
 export const FLOCK = [
   {
@@ -60,7 +61,9 @@ export const FLOCK = [
     key: "magpie",
     name: "Magpie",
     role: "Gathers everything into one nest",
-    detail: "Builds each QR code as a menu: one or more polls, an info card, and a donation ask, plus rotations and prize draws.",
+    detail: DONATION_FEATURE_ENABLED
+      ? "Builds each QR code as a menu: one or more polls, an info card, and a donation ask, plus rotations and prize draws."
+      : "Builds each QR code as a menu: one or more polls, an info card, plus rotations and prize draws.",
     icon: "\u2728",
     image: magpieImage,
     color: "#8b78d6",

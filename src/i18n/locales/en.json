@@ -51,7 +51,8 @@
     "howItWorksTitle": "From a QR code to a better decision.",
     "steps": {
       "step1Title": "Place a QR code",
-      "step1Detail": "Use one branded QR poster at a table, counter, room, or event entrance - for a poll, an info card, or a venue-support payment.",
+      "step1Detail": "Use one branded QR poster at a table, counter, room, or event entrance - for a poll or an info card.",
+      "step1DetailWithDonations": "Use one branded QR poster at a table, counter, room, or event entrance - for a poll, an info card, or a venue-support payment.",
       "step2Title": "Collect feedback in seconds",
       "step2Detail": "Guests scan, choose an answer, and submit. No download or account is needed.",
       "step3Title": "Turn responses into growth",
@@ -82,7 +83,8 @@
       "redshankDetail": "Routes low-score feedback to a private message before it ever reaches Google, Booking, or Tripadvisor.",
       "magpieName": "Magpie",
       "magpieRole": "Gathers everything into one nest",
-      "magpieDetail": "Builds each QR code into a menu — bundle several polls, an info card, and a venue-support payment under one code, plus rotations and prize draws.",
+      "magpieDetail": "Builds each QR code into a menu — bundle several polls and an info card under one code, plus rotations and prize draws.",
+      "magpieDetailWithDonations": "Builds each QR code into a menu — bundle several polls, an info card, and a venue-support payment under one code, plus rotations and prize draws.",
       "flamingoName": "Flamingo",
       "flamingoRole": "Puts your best side forward",
       "flamingoDetail": "Shows off your strongest feedback in a polished, public-facing display guests actually enjoy reading.",
@@ -92,6 +94,7 @@
       "waxwingName": "Waxwing",
       "waxwingRole": "The premium overview",
       "waxwingDetail": "Pulls trends from every poll and QR location into one dashboard, plus redemption tracking and automated nurture emails for workspaces ready to grow faster.",
+      "waxwingDetailWithDonations": "Pulls trends from every poll and QR location into one dashboard, plus redemption tracking, venue support, and automated nurture emails for workspaces ready to grow faster.",
       "owlName": "Owl",
       "owlRole": "Watches over the nest",
       "owlDetail": "Keeps an eye on your brand, your team's access, and your plan, quietly, until something needs your attention."

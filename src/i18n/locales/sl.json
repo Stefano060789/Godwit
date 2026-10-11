@@ -25,6 +25,16 @@
     "note": "Narejeno za lokale, dogodke, gostinstvo, trgovine, umetnike, ustvarjalce in ekipe na terenu.",
     "howItWorksEyebrow": "Preprost krog",
     "howItWorksTitle": "Od kode QR do boljše odločitve.",
+    "steps": {
+      "step1Detail": "Uporabite označen plakat QR na mizi, pultu, v sobi ali pri vhodu na dogodek – za anketo ali informativno kartico.",
+      "step1DetailWithDonations": "Uporabite označen plakat QR na mizi, pultu, v sobi ali pri vhodu na dogodek – za anketo, informativno kartico ali prošnjo za prispevek."
+    },
+    "flock": {
+      "magpieDetail": "Vsako kodo QR spremeni v meni z več anketami in informativno kartico ter izmenjavo vsebin in nagradnimi žrebanji.",
+      "magpieDetailWithDonations": "Vsako kodo QR spremeni v meni z več anketami, informativno kartico in možnostjo plačila za podporo lokalu ter izmenjavo vsebin in nagradnimi žrebanji.",
+      "waxwingDetail": "Ponuja nagradna žrebanja, sledenje unovčenim nagradam in samodejna e-poštna sporočila za delovne prostore, pripravljene na hitrejšo rast.",
+      "waxwingDetailWithDonations": "Ponuja nagradna žrebanja, sledenje unovčenim nagradam, donacije in samodejna e-poštna sporočila za delovne prostore, pripravljene na hitrejšo rast."
+    },
     "finalEyebrow": "Ste pripravljeni izmeriti odziv?",
     "finalTitle": "Zaženite svojo prvo kampanjo povratnih informacij prek kode QR.",
     "finalCopy": "Nastavite delovni prostor, ustvarite kampanjo in spremenite odzive strank v naslednjo odločitev.",

@@ -8,7 +8,12 @@ import FlockAvatar from "../components/FlockAvatar";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 
 const stepKeys = [
-  { number: "01", titleKey: "steps.step1Title", detailKey: "steps.step1Detail" },
+  {
+    number: "01",
+    titleKey: "steps.step1Title",
+    detailKey: "steps.step1Detail",
+    donationsDetailKey: "steps.step1DetailWithDonations"
+  },
   { number: "02", titleKey: "steps.step2Title", detailKey: "steps.step2Detail" },
   { number: "03", titleKey: "steps.step3Title", detailKey: "steps.step3Detail" }
 ];
@@ -26,10 +31,22 @@ const flockKeys = [
   { key: "robin", nameKey: "flock.robinName", roleKey: "flock.robinRole", detailKey: "flock.robinDetail" },
   { key: "tern", nameKey: "flock.ternName", roleKey: "flock.ternRole", detailKey: "flock.ternDetail" },
   { key: "flamingo", nameKey: "flock.flamingoName", roleKey: "flock.flamingoRole", detailKey: "flock.flamingoDetail" },
-  { key: "waxwing", nameKey: "flock.waxwingName", roleKey: "flock.waxwingRole", detailKey: "flock.waxwingDetail" },
+  {
+    key: "waxwing",
+    nameKey: "flock.waxwingName",
+    roleKey: "flock.waxwingRole",
+    detailKey: "flock.waxwingDetail",
+    donationsDetailKey: "flock.waxwingDetailWithDonations"
+  },
   { key: "redshank", nameKey: "flock.redshankName", roleKey: "flock.redshankRole", detailKey: "flock.redshankDetail" },
   { key: "owl", nameKey: "flock.owlName", roleKey: "flock.owlRole", detailKey: "flock.owlDetail" },
-  { key: "magpie", nameKey: "flock.magpieName", roleKey: "flock.magpieRole", detailKey: "flock.magpieDetail" }
+  {
+    key: "magpie",
+    nameKey: "flock.magpieName",
+    roleKey: "flock.magpieRole",
+    detailKey: "flock.magpieDetail",
+    donationsDetailKey: "flock.magpieDetailWithDonations"
+  }
 ];
 
 export default function Landing() {
@@ -88,7 +105,7 @@ export default function Landing() {
             <article key={step.number} className="landing-step">
               <span>{step.number}</span>
               <h3>{t(step.titleKey)}</h3>
-              <p>{t(step.detailKey)}</p>
+              <p>{t(DONATION_FEATURE_ENABLED && step.donationsDetailKey ? step.donationsDetailKey : step.detailKey)}</p>
             </article>
           ))}
         </div>
@@ -124,7 +141,7 @@ export default function Landing() {
               <FlockAvatar bird={FLOCK.find((member) => member.key === bird.key)} size={44} className="landing-flock-badge" />
               <h3>{t(bird.nameKey)}</h3>
               <p className="landing-flock-role">{t(bird.roleKey)}</p>
-              <p>{t(bird.detailKey)}</p>
+              <p>{t(DONATION_FEATURE_ENABLED && bird.donationsDetailKey ? bird.donationsDetailKey : bird.detailKey)}</p>
             </button>
           ))}
         </div>
