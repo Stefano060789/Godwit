@@ -41,6 +41,7 @@ export default async function handler(request, response) {
       googlePlacesApiKey: Boolean(process.env.GOOGLE_PLACES_API_KEY)
     },
     aiFeatures: {
+      geminiApiKey: Boolean(process.env.GEMINI_API_KEY),
       openAiApiKey: Boolean(process.env.OPENAI_API_KEY)
     },
     monitoring: {

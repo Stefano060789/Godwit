@@ -55,7 +55,8 @@ describe("creator-outreach regenerate action", () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role";
     process.env.SUPABASE_ANON_KEY = "anon-key";
     process.env.CREATOR_EMAILS = "bonomistefano@outlook.it";
-    process.env.OPENAI_API_KEY = "test-openai-key";
+    process.env.GEMINI_API_KEY = "test-gemini-key";
+    delete process.env.OPENAI_API_KEY;
     vi.mocked(getPublicBusinessWebsiteContext).mockResolvedValue({
       text: "Persönliche Immobilienberatung und aktuelle Wohnangebote in Vienna.",
       status: "found",
@@ -70,7 +71,8 @@ describe("creator-outreach regenerate action", () => {
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
       const method = options.method || "GET";
-      if (href === "https://api.openai.com/v1/chat/completions") {
+      if (href === "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions") {
+        expect(options.headers.Authorization).toBe("Bearer test-gemini-key");
         return jsonResponse({
           choices: [{ message: { content: JSON.stringify(generated) } }]
         });
@@ -120,6 +122,7 @@ describe("creator-outreach regenerate action", () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role";
     process.env.SUPABASE_ANON_KEY = "anon-key";
     process.env.CREATOR_EMAILS = "bonomistefano@outlook.it";
+    delete process.env.GEMINI_API_KEY;
     delete process.env.OPENAI_API_KEY;
 
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
@@ -147,6 +150,7 @@ describe("creator-outreach regenerate action", () => {
     await handler(req, res);
 
     expect(res.statusCode).toBe(503);
+    expect(res.body.error).toContain("GEMINI_API_KEY");
     expect(res.body.error).toContain("OPENAI_API_KEY");
   });
 

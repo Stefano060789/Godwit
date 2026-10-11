@@ -948,7 +948,7 @@ export default function Creator() {
                         <p className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words text-sm text-slate-300">
                           {contact.message || (outreachGeneration[contact.id] === "generating"
                             ? "Generating a new draft from the business's published information…"
-                            : "No AI draft retained. Select Regenerate to create a new personalized message.")}
+                            : "No AI draft retained. Select Generate with OpenAI to create a new personalized message.")}
                         </p>
                         <div className="mt-3 flex flex-wrap gap-2">
                           <button
@@ -959,7 +959,7 @@ export default function Creator() {
                           >
                             Save subject
                           </button>
-                          <button type="button" disabled={outreachActionLoading} onClick={() => runOutreachAction("regenerate", contact.id, { language: outreachLanguage })} className="flex-1 rounded border border-teal-300/60 px-3 py-2 text-sm font-semibold text-teal-200 disabled:opacity-50">{outreachGeneration[contact.id] === "generating" ? "Generating…" : "Regenerate"}</button>
+                          <button type="button" disabled={outreachActionLoading} onClick={() => runOutreachAction("regenerate", contact.id, { language: outreachLanguage, preferredProvider: "openai" })} className="flex-1 rounded border border-teal-300/60 px-3 py-2 text-sm font-semibold text-teal-200 disabled:opacity-50">{outreachGeneration[contact.id] === "generating" ? "Generating…" : "Generate with OpenAI"}</button>
                           <button type="button" disabled={outreachActionLoading || !contact.subject || !contact.message || (subjectEdits[contact.id] !== undefined && subjectEdits[contact.id] !== (contact.subject || ""))} onClick={() => sendOutreachMessage(contact.id, String(recipientEmails[contact.id] ?? contact.contact_email ?? "").trim())} className="flex-1 rounded bg-emerald-300 px-3 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">Send message</button>
                           <button type="button" disabled={outreachActionLoading} onClick={() => discardOutreachLocation(contact.id)} className="flex-1 rounded border border-red-400/60 px-3 py-2 text-sm font-semibold text-red-200 disabled:opacity-50">Discard location</button>
                         </div>

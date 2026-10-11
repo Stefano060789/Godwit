@@ -94,7 +94,8 @@ export default async function handler(request, response) {
         website: contact.website,
         previousMessage: contact.message,
         language,
-        variation: request.body?.variation
+        variation: request.body?.variation,
+        preferredProvider: request.body?.preferredProvider
       });
       const fallback = generated.languageValid === false
         ? {
@@ -126,7 +127,9 @@ export default async function handler(request, response) {
         personalizationNote,
         aiProvider: generationSource === "template"
           ? "Template fallback"
-          : process.env.GEMINI_API_KEY?.trim() ? "Gemini" : "OpenAI",
+          : request.body?.preferredProvider === "openai"
+            ? "OpenAI"
+            : process.env.GEMINI_API_KEY?.trim() ? "Gemini" : "OpenAI",
         aiGeneratedAt: new Date().toISOString()
       });
     }
