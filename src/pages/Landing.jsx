@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 import godwitLockup from "../assets/godwit-logo-lockup.svg";
 import { FLOCK } from "../lib/flock";
 import FlockAvatar from "../components/FlockAvatar";
+import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 
 const stepKeys = [
   { number: "01", titleKey: "steps.step1Title", detailKey: "steps.step1Detail" },
@@ -16,7 +17,9 @@ const outcomeKeys = [
   { titleKey: "outcomes.conversionTitle", detailKey: "outcomes.conversionDetail" },
   { titleKey: "outcomes.growthTitle", detailKey: "outcomes.growthDetail" },
   { titleKey: "outcomes.publicTitle", detailKey: "outcomes.publicDetail" },
-  { titleKey: "outcomes.donationsTitle", detailKey: "outcomes.donationsDetail" }
+  ...(DONATION_FEATURE_ENABLED
+    ? [{ titleKey: "outcomes.donationsTitle", detailKey: "outcomes.donationsDetail" }]
+    : [])
 ];
 
 const flockKeys = [

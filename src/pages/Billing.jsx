@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import { supabase } from "../lib/supabase";
 import { loadWorkspaceProfile } from "../lib/workspaceProfile";
 import { PLAN_FEATURES, planLabel } from "../lib/entitlements";
+import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 
 const PLANS = [
   { key: "free", amount: "EUR 0", recurring: false },
@@ -15,7 +16,7 @@ const COMPARISON_ROWS = [
   { rowKey: "pollLimit", format: (value) => value },
   { rowKey: "campaignLimit", format: (value) => value },
   { rowKey: "seatLimit", format: (value) => value },
-  { rowKey: "donations" },
+  ...(DONATION_FEATURE_ENABLED ? [{ rowKey: "donations" }] : []),
   { rowKey: "csvExport" },
   { rowKey: "auditLog" },
   { rowKey: "weeklyReport" },

@@ -341,7 +341,7 @@ export default function Admin() {
   // Do a live status check rather than waiting on the account.updated webhook, which is
   // usually near-instant but not guaranteed to have arrived before the redirect completes.
   useEffect(() => {
-    if (!workspaceUserId) return;
+    if (!DONATION_FEATURE_ENABLED || !workspaceUserId) return;
     const donationsParam = new URLSearchParams(location.search).get("donations");
     if (donationsParam !== "connected" && donationsParam !== "refresh") return;
     refreshStripeConnectStatus()
@@ -606,7 +606,7 @@ export default function Admin() {
       }
       if (reviewItems.length > 0) setQrCampaignItems((current) => [...current, ...reviewItems]);
       setSelectedQrReviewPlatforms([]);
-      setQrWizardStep(5);
+      setQrWizardStep(DONATION_FEATURE_ENABLED ? 5 : 6);
     } catch (error) {
       alert(error.message);
     }
@@ -737,6 +737,10 @@ export default function Admin() {
   }
 
   async function handleAddDonationItem(campaignId) {
+    if (!DONATION_FEATURE_ENABLED) {
+      alert(t("admin.engagement.donations.notEnabled"));
+      return;
+    }
     if (!donationSettings.is_enabled) {
       alert("Set up and enable donation settings first, in Settings.");
       return;
@@ -954,6 +958,10 @@ export default function Admin() {
   }
 
   async function refreshStripeStatusHandler() {
+    if (!DONATION_FEATURE_ENABLED) {
+      setStripeConnectError(t("admin.engagement.donations.notEnabled"));
+      return;
+    }
     setStripeConnectError("");
     setStripeConnectBusy(true);
     try {
@@ -1650,7 +1658,9 @@ export default function Admin() {
                   <button onClick={changePersona} className="text-xs text-slate-400 underline">{t("admin.overview.chooseDifferentPath")}</button>
                 </div>
                 <div className="mt-3 space-y-2">
-                  {persona.steps.map((step, index) => {
+                  {persona.steps
+                    .filter((step) => DONATION_FEATURE_ENABLED || step.featureFlag !== "donations")
+                    .map((step, index) => {
                     const isLocked = step.feature && !entitlements[step.feature];
                     return (
                     <div key={step.title} className="flex flex-wrap items-center justify-between gap-2 rounded border border-slate-700 bg-gray-900 p-3">
@@ -1679,9 +1689,11 @@ export default function Admin() {
           <p className="text-sm font-semibold">{t("admin.overview.setupLinks.title")}</p>
           <p className="mt-1 text-xs text-slate-400">{t("admin.overview.setupLinks.body")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <button onClick={() => setActiveTab("engagement")} className="rounded bg-teal-500 px-3 py-1.5 text-xs font-semibold text-slate-950">
-              {t("admin.overview.setupLinks.donations")}
-            </button>
+            {DONATION_FEATURE_ENABLED && (
+              <button onClick={() => setActiveTab("engagement")} className="rounded bg-teal-500 px-3 py-1.5 text-xs font-semibold text-slate-950">
+                {t("admin.overview.setupLinks.donations")}
+              </button>
+            )}
             <button onClick={() => setActiveTab("settings")} className="rounded border border-teal-500 px-3 py-1.5 text-xs font-semibold text-teal-300">
               {t("admin.overview.setupLinks.reviews")}
             </button>
@@ -2219,7 +2231,7 @@ export default function Admin() {
                   </div>
                 )}
 
-                {qrWizardStep === 5 && qrWizardCampaign && (
+                {DONATION_FEATURE_ENABLED && qrWizardStep === 5 && qrWizardCampaign && (
                   <div className="space-y-3">
                     <h3 className="text-lg font-bold text-[#f4f7fb]">{t("admin.engagement.wizard.step5Title")}</h3>
                     <p className="text-xs text-[#93a3c2]">{t("admin.engagement.items.sectionDonationHint")}</p>
@@ -2340,7 +2352,7 @@ export default function Admin() {
                     const itemPollIds = new Set(items.filter((item) => item.item_type === "poll").map((item) => item.poll_id));
                     const pollCount = itemPollIds.size + (campaign.poll_id && !itemPollIds.has(campaign.poll_id) ? 1 : 0);
                     const infoCount = items.filter((item) => item.item_type === "info").length;
-                    const hasDonation = items.some((item) => item.item_type === "donation");
+                    const hasDonation = DONATION_FEATURE_ENABLED && items.some((item) => item.item_type === "donation");
                     const rewardCount = items.filter((item) => item.item_type === "reward").length;
                     if (pollCount <= 1 && infoCount === 0 && !hasDonation && rewardCount === 0) {
                       return <p className="mt-2 text-xs text-slate-500">{t("admin.engagement.campaigns.summaryEmpty")}</p>;
@@ -2526,6 +2538,7 @@ export default function Admin() {
                       </div>
 
                       {/* DONATION */}
+                      {DONATION_FEATURE_ENABLED && (
                       <div className="rounded-lg border border-amber-700 bg-amber-950/10 p-3">
                         <p className="text-sm font-bold text-amber-300">💛 {t("admin.engagement.items.sectionDonation")}</p>
                         <p className="mt-0.5 text-xs text-slate-400">{t("admin.engagement.items.sectionDonationHint")}</p>
@@ -2558,6 +2571,7 @@ export default function Admin() {
                           </p>
                         )}
                       </div>
+                      )}
 
                       {/* REWARD & PRIZE */}
                       <div className="rounded-lg border border-fuchsia-700 bg-fuchsia-950/10 p-3">
@@ -2870,7 +2884,7 @@ export default function Admin() {
 
       {activeTab === "settings" && (
       <>
-      <details id="donation-settings" className="mb-6 border rounded bg-gray-900">
+      {DONATION_FEATURE_ENABLED && <details id="donation-settings" className="mb-6 border rounded bg-gray-900">
         <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.engagement.donations.title")}</summary>
         <div className="px-4 pb-4 space-y-3">
           <div className="rounded border border-amber-700 bg-amber-950/30 p-3 text-sm text-amber-200">
@@ -2972,7 +2986,7 @@ export default function Admin() {
             {t("admin.engagement.donations.feeNote")}
           </p>
         </div>
-      </details>
+      </details>}
       <details id="review-platform-settings" className="mb-6 border rounded bg-gray-900" open>
         <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.settings.workspace.reviewPlatforms.title")}</summary>
         <div className="px-4 pb-4">

@@ -5,7 +5,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <div class="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6 py-16">
       <div class="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-indigo-950/40 backdrop-blur-sm">
         <p class="mb-3 inline-flex rounded-full border border-indigo-500/40 bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">
-          iVote
+          Godwit
         </p>
         <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl">
           Build faster with Tailwind in Vite

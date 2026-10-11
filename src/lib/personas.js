@@ -28,7 +28,8 @@ export const PERSONAS = [
       {
         title: "Turn on tips from fans",
         detail: "Let people support you directly with a card or wallet payment. Godwit keeps a 9% platform fee, you keep the rest.",
-        tab: "engagement"
+        tab: "engagement",
+        featureFlag: "donations"
       },
       {
         title: "Build your fan list",

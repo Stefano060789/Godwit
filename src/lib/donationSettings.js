@@ -1,4 +1,9 @@
 import { supabase } from "./supabase";
+import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
+
+function requireDonationFeature() {
+  if (!DONATION_FEATURE_ENABLED) throw new Error("Donations are not enabled yet.");
+}
 
 function isMissingCategoryColumn(error) {
   return error?.code === "42703" || error?.message?.includes("donation_settings.category");
@@ -35,6 +40,7 @@ export async function loadDonationSettings(workspaceId) {
 // ever written server-side (by the onboarding/status-refresh endpoints and the account.updated
 // webhook), never from a plain form submit.
 export async function saveDonationSettings(workspaceId, settings) {
+  requireDonationFeature();
   const values = {
     workspace_id: workspaceId,
     is_enabled: Boolean(settings.is_enabled),
@@ -56,6 +62,7 @@ export async function saveDonationSettings(workspaceId, settings) {
 }
 
 async function callCheckoutEndpoint(body) {
+  requireDonationFeature();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.access_token) throw new Error("Sign in to manage donations.");
   const response = await fetch("/api/create-checkout-session", {

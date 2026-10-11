@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 
 export async function loadQrCampaignItems() {
   const { data, error } = await supabase
@@ -44,6 +45,7 @@ export async function addQrCampaignInfoItem(campaignId, { title, body, linkUrl, 
 // by every QR code) - a donation item only optionally carries its own
 // title/body to override the default "Support this venue" copy per QR code.
 export async function addQrCampaignDonationItem(campaignId, { title, body } = {}) {
+  if (!DONATION_FEATURE_ENABLED) throw new Error("Donations are not enabled yet.");
   const { data, error } = await supabase
     .from("qr_campaign_items")
     .insert({
