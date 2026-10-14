@@ -1,7 +1,8 @@
 # Public website visit counter
 
 Apply `supabase/20261007_website_visits.sql` in the Supabase SQL editor before
-deploying the application. It depends on the existing `is_creator()` function.
+deploying the application. The migration is safe to run again if the tables
+already exist. It depends on the existing `is_creator()` function.
 No new environment variables are required.
 
 The Creator page shows total visits, today's visits (UTC), and visits over the

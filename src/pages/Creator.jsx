@@ -634,29 +634,37 @@ export default function Creator() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-teal-300">Creator</p>
           <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Godwit overview</h1>
-          <p className="mt-2 text-sm text-slate-400">Operational totals across all venues. No guest answer content or payment data is exposed here.</p>
+          <p className="mt-2 max-w-2xl text-sm text-slate-400">A quick view of platform health, website traffic, and outreach tasks. Guest answers and payment data are not shown here.</p>
         </div>
         {error && <p className="rounded border border-red-500/50 bg-red-950/30 p-3 text-red-200">{error}</p>}
         <section className="rounded-lg border border-slate-700 bg-slate-900 p-4" aria-labelledby="website-visits-heading">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 id="website-visits-heading" className="text-lg font-bold">Public website visits</h2>
+            <div>
+              <h2 id="website-visits-heading" className="text-lg font-bold">Public website visits</h2>
+              <p className="mt-1 text-sm text-slate-400">Anonymous visits from people who accepted measurement consent.</p>
+            </div>
             <button type="button" onClick={loadWebsiteVisits} disabled={websiteVisitsLoading} className="rounded border border-slate-600 px-3 py-2 text-sm font-semibold disabled:opacity-50">
-              {websiteVisitsLoading ? "Loading..." : "Refresh visits"}
+              {websiteVisitsLoading ? "Refreshing..." : "Refresh"}
             </button>
           </div>
           {websiteVisitsError && <p role="alert" className="creator-send-feedback is-error mt-3">Website counter unavailable: {websiteVisitsError} Confirm the website-visits database migration has been applied.</p>}
+          {websiteVisitsLoading && !websiteVisits && <p className="mt-4 text-sm text-slate-400">Loading visit totals...</p>}
+          {!websiteVisitsLoading && !websiteVisitsError && !websiteVisits && <p className="mt-4 text-sm text-slate-400">No visit totals are available yet. Refresh after the website-visits migration is installed.</p>}
           {websiteVisits && (
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
               {[["total", "Total visits"], ["today", "Today (UTC)"], ["last_30_days", "Last 30 days"]].map(([key, label]) => (
-                <div key={key}>
+                <div key={key} className="rounded-md border border-slate-700 bg-slate-950/50 p-3">
                   <p className="text-sm text-slate-400">{label}</p>
-                  <p className="text-2xl font-bold">{Number(websiteVisits[key]).toLocaleString()}</p>
+                  <p className="mt-1 text-2xl font-bold text-teal-300">{Number(websiteVisits[key] || 0).toLocaleString()}</p>
                 </div>
               ))}
             </div>
           )}
-          <p className="mt-3 text-sm text-slate-400">Consented visits to the homepage, Essentials, privacy, terms, and support pages. Counted once per browser-tab session per UTC day; not unique people. Signed-in users, dashboard activity, and QR voting pages are excluded. Tracking starts after installation; past visits cannot be recovered.</p>
-          {websiteVisits?.since && <p className="mt-1 text-sm text-slate-400">First recorded visit: {websiteVisits.since}.</p>}
+          <details className="mt-3 text-sm text-slate-400">
+            <summary className="cursor-pointer text-slate-300">How this is counted</summary>
+            <p className="mt-2">Visits to the homepage, Essentials, privacy, terms, and support pages are counted once per browser tab per UTC day. Signed-in users, dashboard activity, and QR or voting pages are excluded. Tracking starts after the database migration is installed; past visits cannot be recovered.</p>
+            {websiteVisits?.since && <p className="mt-1">First recorded visit: {websiteVisits.since}.</p>}
+          </details>
         </section>
         {overview && (
           <>

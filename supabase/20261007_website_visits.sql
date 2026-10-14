@@ -1,11 +1,11 @@
 -- Anonymous, consented public-website sessions, counted once per tab per UTC day.
-create table public.website_visit_sessions (
+create table if not exists public.website_visit_sessions (
   visit_date date not null default (now() at time zone 'UTC')::date,
   session_id uuid not null,
   primary key (visit_date, session_id)
 );
 
-create table public.website_visit_totals (
+create table if not exists public.website_visit_totals (
   visit_date date primary key,
   visits bigint not null default 0 check (visits >= 0)
 );
@@ -14,7 +14,7 @@ alter table public.website_visit_sessions enable row level security;
 alter table public.website_visit_totals enable row level security;
 revoke all on public.website_visit_sessions, public.website_visit_totals from anon, authenticated;
 
-create function public.record_website_visit(visitor_session uuid)
+create or replace function public.record_website_visit(visitor_session uuid)
 returns void
 language plpgsql
 security definer
@@ -44,7 +44,7 @@ begin
 end;
 $$;
 
-create function public.creator_website_visits()
+create or replace function public.creator_website_visits()
 returns jsonb
 language plpgsql
 security definer
