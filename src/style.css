@@ -1305,6 +1305,137 @@ textarea {
   font-size: 0.9rem;
 }
 
+.landing-egg {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(36px, 7vw, 96px);
+  align-items: center;
+  padding: 84px max(24px, calc((100vw - 1120px) / 2));
+  color: #173b3a;
+  background:
+    radial-gradient(620px 420px at 8% 0%, rgba(242, 199, 68, 0.22), transparent 68%),
+    linear-gradient(145deg, #fffdf8, #e5f0e9);
+}
+
+.landing-egg h2 {
+  max-width: 12ch;
+  margin: 0;
+  color: #173b3a;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 3.4vw, 3.4rem);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.landing-egg-lede {
+  max-width: 510px;
+  margin: 20px 0;
+  color: #46625e;
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.landing-egg-access {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.landing-egg-access > span:not(.landing-egg-access-caption) {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid rgba(15, 118, 110, 0.28);
+  border-radius: 50%;
+  color: #0f766e;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.landing-egg-access > span:nth-child(2) {
+  border: 0;
+  color: #78918b;
+  background: transparent;
+}
+
+.landing-egg-access-caption {
+  margin-left: 4px;
+  color: #46625e;
+  font-size: 0.88rem;
+}
+
+.landing-egg-action {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border-radius: 3px;
+  color: #fff;
+  background: #0f766e;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.landing-egg-action:hover {
+  transform: translateY(-2px);
+  color: #fff;
+  background: #0b5f59;
+}
+
+.landing-egg-action:focus-visible {
+  outline: 3px solid #cb971e;
+  outline-offset: 4px;
+}
+
+.landing-egg-features {
+  overflow: hidden;
+  border: 1px solid rgba(23, 59, 58, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 24px 64px rgba(23, 59, 58, 0.12);
+}
+
+.landing-egg-feature {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 16px;
+  padding: 24px;
+  border-bottom: 1px solid rgba(23, 59, 58, 0.1);
+}
+
+.landing-egg-feature-number {
+  color: #0f766e;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.landing-egg-feature h3 {
+  margin: 0 0 6px;
+  color: #173b3a;
+  font-size: 1.08rem;
+}
+
+.landing-egg-feature p {
+  margin: 0;
+  color: #46625e;
+  line-height: 1.55;
+}
+
+.landing-egg-control {
+  margin: 0;
+  padding: 18px 24px;
+  color: #46625e;
+  background: rgba(229, 240, 233, 0.75);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
 .landing-section,
 .landing-outcomes,
 .landing-final {
@@ -1656,6 +1787,53 @@ textarea {
   color: #46625e;
 }
 
+:root[data-theme="dark"] .landing-egg {
+  color: #e2e8f0;
+  background:
+    radial-gradient(620px 420px at 8% 0%, rgba(242, 199, 68, 0.12), transparent 68%),
+    linear-gradient(145deg, #10252d, #173b3a);
+}
+
+:root[data-theme="dark"] .landing-egg h2,
+:root[data-theme="dark"] .landing-egg-feature h3 {
+  color: #fff8e8;
+}
+
+:root[data-theme="dark"] .landing-egg-lede,
+:root[data-theme="dark"] .landing-egg-access-caption,
+:root[data-theme="dark"] .landing-egg-feature p,
+:root[data-theme="dark"] .landing-egg-control {
+  color: #cbd5e1;
+}
+
+:root[data-theme="dark"] .landing-egg-access > span:not(.landing-egg-access-caption) {
+  border-color: rgba(94, 234, 212, 0.25);
+  color: #99f6e4;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+:root[data-theme="dark"] .landing-egg-access > span:nth-child(2) {
+  color: #94a3b8;
+  background: transparent;
+}
+
+:root[data-theme="dark"] .landing-egg-features {
+  border-color: rgba(226, 232, 240, 0.14);
+  background: rgba(15, 23, 42, 0.5);
+}
+
+:root[data-theme="dark"] .landing-egg-feature {
+  border-bottom-color: rgba(226, 232, 240, 0.12);
+}
+
+:root[data-theme="dark"] .landing-egg-feature-number {
+  color: #5eead4;
+}
+
+:root[data-theme="dark"] .landing-egg-control {
+  background: rgba(15, 23, 42, 0.48);
+}
+
 :root:not([data-theme="dark"]) .landing-admin-action {
   background: var(--action-primary);
   color: #ffffff;
@@ -1772,6 +1950,7 @@ textarea {
 
   .landing-steps,
   .landing-outcomes,
+  .landing-egg,
   .landing-flock-grid {
     grid-template-columns: 1fr;
   }

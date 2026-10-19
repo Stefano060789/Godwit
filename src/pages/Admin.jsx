@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
 import { appendAuditLog, readAuditLog, readPollMeta, savePollMeta, isPollClosed } from "../lib/pollMeta";
 import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
+import { buildEggUrl } from "../lib/eggs";
+import EggAiSetup from "../components/EggAiSetup";
 import {
   loadQrCampaignItems,
   addQrCampaignPollItem,
@@ -88,6 +90,11 @@ export default function Admin() {
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState("viewer");
   const [qrCampaigns, setQrCampaigns] = useState([]);
+  const [eggAccessCounts, setEggAccessCounts] = useState({});
+  const [eggAccessTrackingError, setEggAccessTrackingError] = useState("");
+  const [editingEggId, setEditingEggId] = useState(null);
+  const [eggEditName, setEggEditName] = useState("");
+  const [eggEditPlacement, setEggEditPlacement] = useState("");
   const [qrCampaignItems, setQrCampaignItems] = useState([]);
   const [actionTasks, setActionTasks] = useState([]);
   const [itemFormCampaignId, setItemFormCampaignId] = useState(null);
@@ -108,6 +115,7 @@ export default function Admin() {
   const [qrWizardOpen, setQrWizardOpen] = useState(false);
   const [qrWizardStep, setQrWizardStep] = useState(1);
   const [qrWizardCampaign, setQrWizardCampaign] = useState(null);
+  const [eggAccessChoice, setEggAccessChoice] = useState("both");
   const [qrWizardActionId, setQrWizardActionId] = useState("");
   const [qrWizardTaskTitle, setQrWizardTaskTitle] = useState("");
   const [qrWizardTaskDescription, setQrWizardTaskDescription] = useState("");
@@ -245,14 +253,15 @@ export default function Admin() {
         setTeamMembers(await readWorkspaceMembers(profile.id));
         setQrCampaigns(await loadQrCampaigns());
         setQrCampaignItems(await loadQrCampaignItems());
-        const [rulesResult, alertsResult, tasksResult, reportsResult, messagesResult, contentReportsResult, actionTasksResult] = await Promise.all([
+        const [rulesResult, alertsResult, tasksResult, reportsResult, messagesResult, contentReportsResult, actionTasksResult, eggAccessResult] = await Promise.all([
           supabase.from("feedback_alert_rules").select("*").order("created_at", { ascending: false }),
           supabase.from("feedback_alerts").select("*").order("created_at", { ascending: false }).limit(30),
           supabase.from("feedback_recovery_tasks").select("*").order("created_at", { ascending: false }).limit(30),
           supabase.from("weekly_report_settings").select("recipient_email, is_enabled").eq("workspace_id", profile.id).maybeSingle(),
           supabase.from("organizer_messages").select("*").order("created_at", { ascending: false }).limit(30),
           supabase.from("content_reports").select("*").order("created_at", { ascending: false }),
-          supabase.from("woodpecker_tasks").select("*, qr_campaigns!woodpecker_tasks_campaign_id_fkey(name)").eq("workspace_id", profile.id).order("created_at", { ascending: false })
+          supabase.from("woodpecker_tasks").select("*, qr_campaigns!woodpecker_tasks_campaign_id_fkey(name)").eq("workspace_id", profile.id).order("created_at", { ascending: false }),
+          supabase.rpc("get_workspace_egg_access_metrics")
         ]);
         if (!rulesResult.error) setAlertRules(rulesResult.data || []);
         if (!alertsResult.error) setFeedbackAlerts(alertsResult.data || []);
@@ -261,6 +270,16 @@ export default function Admin() {
         if (!messagesResult.error) setOrganizerMessages(messagesResult.data || []);
         if (!contentReportsResult.error) setContentReports(contentReportsResult.data || []);
         if (!actionTasksResult.error) setActionTasks(actionTasksResult.data || []);
+        if (eggAccessResult.error) {
+          console.error("Egg access analytics are unavailable. Apply the Eggs NFC attribution migration.", eggAccessResult.error);
+          setEggAccessTrackingError(t("admin.engagement.campaigns.migrationRequired"));
+        } else {
+          setEggAccessTrackingError("");
+          setEggAccessCounts(Object.fromEntries((eggAccessResult.data || []).map((row) => [
+            String(row.campaign_id),
+            { qr: Number(row.qr_access_count || 0), nfc: Number(row.nfc_access_count || 0) }
+          ])));
+        }
 
         setNurtureSettings(await loadLeadNurtureSettings(profile.id));
         setWinbackSettings(await loadWinbackSettings(profile.id));
@@ -454,6 +473,7 @@ export default function Admin() {
   // action, not two.
   function openQrWizard() {
     setQrWizardCampaign(null);
+    setEggAccessChoice("both");
     setQrWizardStep(1);
     setSelectedQrReviewPlatforms([]);
     setQrWizardActionId("");
@@ -466,6 +486,7 @@ export default function Admin() {
   function closeQrWizard() {
     setQrWizardOpen(false);
     setQrWizardCampaign(null);
+    setEggAccessChoice("both");
     setQrWizardStep(1);
     setQrWizardActionId("");
     setQrWizardTaskTitle("");
@@ -475,7 +496,7 @@ export default function Admin() {
 
   async function handleCreateCampaignFromWizard() {
     if (!newCampaignName.trim()) {
-      alert("Give the QR code a name.");
+      alert(t("admin.engagement.campaigns.nameRequired"));
       return;
     }
     try {
@@ -508,7 +529,7 @@ export default function Admin() {
       setQrWizardStep(2);
     } catch (error) {
       console.error(error);
-      alert(error.message || "Unable to create QR campaign. Run the ROI migration first.");
+      alert(error.message || "Unable to create Egg. Run the ROI migration first.");
     }
   }
 
@@ -639,6 +660,41 @@ export default function Admin() {
       return;
     }
     setQrCampaigns((current) => current.filter((item) => item.id !== campaignId));
+  }
+
+  function beginEditEgg(campaign) {
+    setEditingEggId(campaign.id);
+    setEggEditName(campaign.name || "");
+    setEggEditPlacement(campaign.placement_label || "");
+  }
+
+  async function saveEggDetails(campaignId) {
+    const name = eggEditName.trim();
+    if (!name) {
+      alert(t("admin.engagement.campaigns.nameRequired"));
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("qr_campaigns")
+      .update({
+        name,
+        placement_label: eggEditPlacement.trim() || null
+      })
+      .eq("id", campaignId)
+      .select("id, name, placement_label")
+      .single();
+
+    if (error) {
+      console.error(error);
+      alert(error.message || t("admin.engagement.campaigns.saveFailed"));
+      return;
+    }
+
+    setQrCampaigns((current) => current.map((campaign) => campaign.id === campaignId
+      ? { ...campaign, name: data.name, placement_label: data.placement_label }
+      : campaign));
+    setEditingEggId(null);
   }
 
   async function reassignQrCampaignPoll(campaignId, nextPollId) {
@@ -2011,6 +2067,11 @@ export default function Admin() {
         <div className="px-4 pb-4">
           <p className="mb-3 text-sm text-slate-400">{t("admin.engagement.campaigns.description")}</p>
           <p className="mb-4 text-xs text-slate-500">{t("admin.engagement.campaigns.tip")}</p>
+          {eggAccessTrackingError && (
+            <p className="mb-4 rounded border border-amber-700 bg-amber-950/40 p-3 text-sm text-amber-200" role="alert">
+              {eggAccessTrackingError}
+            </p>
+          )}
           <button onClick={openQrWizard} className="mb-4 bg-violet-600 text-white px-5 py-3 rounded font-semibold">
             {t("admin.engagement.campaigns.createButton")}
           </button>
@@ -2048,6 +2109,29 @@ export default function Admin() {
                       {t("admin.engagement.campaigns.placementLabel")}
                       <input value={newCampaignPlacement} onChange={(event) => setNewCampaignPlacement(event.target.value)} className="qr-wizard-input mt-1 w-full border p-2 rounded text-black" placeholder={t("admin.engagement.campaigns.placementPlaceholder")} />
                     </label>
+                    <fieldset className="space-y-2">
+                      <legend className="text-sm font-semibold text-[#dbe3f0]">{t("admin.engagement.wizard.accessMethodTitle")}</legend>
+                      <p className="text-xs text-[#93a3c2]">{t("admin.engagement.wizard.accessMethodHint")}</p>
+                      {["qr", "nfc", "both"].map((method) => (
+                        <label
+                          key={method}
+                          className={`flex cursor-pointer gap-3 rounded border p-3 ${eggAccessChoice === method ? "border-[#f2c744] bg-[#182742]" : "border-[#2c3f66] bg-[#10203a]"}`}
+                        >
+                          <input
+                            type="radio"
+                            name="egg-access-method"
+                            value={method}
+                            checked={eggAccessChoice === method}
+                            onChange={() => setEggAccessChoice(method)}
+                            className="mt-1 accent-[#f2c744]"
+                          />
+                          <span>
+                            <span className="block text-sm font-semibold text-[#f4f7fb]">{t(`admin.engagement.wizard.accessMethods.${method}.title`)}</span>
+                            <span className="mt-1 block text-xs text-[#93a3c2]">{t(`admin.engagement.wizard.accessMethods.${method}.description`)}</span>
+                          </span>
+                        </label>
+                      ))}
+                    </fieldset>
                     <div className="qr-wizard-customer-content rounded-lg border border-[#cbd5c4] bg-[#f0f1e9] p-3">
                       <p className="text-sm font-semibold text-[#173b3a]">{t("admin.engagement.wizard.customerContentTitle")}</p>
                       <p className="mt-1 text-xs text-[#607170]">{t("admin.engagement.wizard.customerContentHint")}</p>
@@ -2252,38 +2336,63 @@ export default function Admin() {
                 )}
 
                 {qrWizardStep === 6 && qrWizardCampaign && (() => {
-                  const wizardUrl = `${window.location.origin}/qr/${qrWizardCampaign.token}`;
+                  const wizardUrl = buildEggUrl(window.location.origin, qrWizardCampaign.token, "qr");
+                  const nfcUrl = buildEggUrl(window.location.origin, qrWizardCampaign.token, "nfc");
+                  const showQr = eggAccessChoice !== "nfc";
+                  const showNfc = eggAccessChoice !== "qr";
                   return (
                     <div className="space-y-3 text-center">
                       <h3 className="text-lg font-bold text-[#f4f7fb]">{t("admin.engagement.wizard.step6Title")}</h3>
-                      <div className="flex justify-center">
-                        <img src={getCampaignQrImageUrl(wizardUrl, 220)} alt={t("admin.engagement.campaigns.qrAlt", { name: qrWizardCampaign.name })} className="h-40 w-40 rounded border border-[#24345c] bg-white p-2" />
-                      </div>
-                      <p className="truncate text-xs text-[#8ab4f8]">{wizardUrl}</p>
-                      <div className="text-left">
-                        <label className="mb-1 block text-xs font-semibold text-[#c3cede]">{t("admin.polls.card.printFormat")}</label>
-                        <select value={qrPrintFormat} onChange={(event) => setQrPrintFormat(event.target.value)} className="w-full border p-2 rounded text-black">
-                          <option value="letter">{t("admin.polls.card.formats.letter")}</option>
-                          <option value="a4">{t("admin.polls.card.formats.a4")}</option>
-                          <option value="a5">{t("admin.polls.card.formats.a5")}</option>
-                          <option value="a6">{t("admin.polls.card.formats.a6")}</option>
-                          <option value="a3">{t("admin.polls.card.formats.a3")}</option>
-                          <option value="postcard">{t("admin.polls.card.formats.postcard")}</option>
-                          <option value="beerHolder">{t("admin.polls.card.formats.beerHolder")}</option>
-                          <option value="ticket">{t("admin.polls.card.formats.ticket")}</option>
-                        </select>
-                      </div>
-                      <div className="flex justify-center gap-2">
-                        <button onClick={() => downloadCampaignQr(qrWizardCampaign, wizardUrl)} className="rounded bg-[#f2c744] px-4 py-2 font-semibold text-[#0b1a33] hover:bg-[#e3b93c]">
-                          {t("admin.polls.card.downloadQr")}
-                        </button>
-                        <button onClick={() => printCampaignQr(qrWizardCampaign, wizardUrl)} className="rounded bg-[#0f766e] px-4 py-2 font-semibold text-[#f8fafc] hover:bg-[#0d6259]">
-                          {t("admin.polls.card.printQr")}
-                        </button>
-                        <button onClick={() => openQrModifier(qrWizardCampaign, wizardUrl)} className="rounded bg-violet-600 px-4 py-2 font-semibold text-white hover:bg-violet-700">
-                          {t("admin.polls.card.modifyQr")}
-                        </button>
-                      </div>
+                      <p className="text-sm text-[#c3cede]">{t("admin.engagement.wizard.accessMethodSelected", { method: t(`admin.engagement.wizard.accessMethods.${eggAccessChoice}.title`) })}</p>
+                      {showQr && (
+                        <div className="space-y-3 rounded border border-[#2c3f66] bg-[#10203a] p-3">
+                          <h4 className="font-semibold text-[#f4f7fb]">{t("admin.engagement.wizard.qrSetupTitle")}</h4>
+                          <div className="flex justify-center">
+                            <img src={getCampaignQrImageUrl(wizardUrl, 220)} alt={t("admin.engagement.campaigns.qrAlt", { name: qrWizardCampaign.name })} className="h-40 w-40 rounded border border-[#24345c] bg-white p-2" />
+                          </div>
+                          <p className="truncate text-xs text-[#8ab4f8]">{wizardUrl}</p>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(wizardUrl)} className="rounded border border-[#385277] px-3 py-2 text-sm font-semibold text-[#dbe3f0] hover:bg-[#1f3252]">
+                            {t("admin.engagement.campaigns.copyLink")}
+                          </button>
+                          <div className="text-left">
+                            <label className="mb-1 block text-xs font-semibold text-[#c3cede]">{t("admin.polls.card.printFormat")}</label>
+                            <select value={qrPrintFormat} onChange={(event) => setQrPrintFormat(event.target.value)} className="w-full border p-2 rounded text-black">
+                              <option value="letter">{t("admin.polls.card.formats.letter")}</option>
+                              <option value="a4">{t("admin.polls.card.formats.a4")}</option>
+                              <option value="a5">{t("admin.polls.card.formats.a5")}</option>
+                              <option value="a6">{t("admin.polls.card.formats.a6")}</option>
+                              <option value="a3">{t("admin.polls.card.formats.a3")}</option>
+                              <option value="postcard">{t("admin.polls.card.formats.postcard")}</option>
+                              <option value="beerHolder">{t("admin.polls.card.formats.beerHolder")}</option>
+                              <option value="ticket">{t("admin.polls.card.formats.ticket")}</option>
+                            </select>
+                          </div>
+                          <div className="flex flex-wrap justify-center gap-2">
+                            <button onClick={() => downloadCampaignQr(qrWizardCampaign, wizardUrl)} className="rounded bg-[#f2c744] px-4 py-2 font-semibold text-[#0b1a33] hover:bg-[#e3b93c]">
+                              {t("admin.polls.card.downloadQr")}
+                            </button>
+                            <button onClick={() => printCampaignQr(qrWizardCampaign, wizardUrl)} className="rounded bg-[#0f766e] px-4 py-2 font-semibold text-[#f8fafc] hover:bg-[#0d6259]">
+                              {t("admin.polls.card.printQr")}
+                            </button>
+                            <button onClick={() => openQrModifier(qrWizardCampaign, wizardUrl)} className="rounded bg-violet-600 px-4 py-2 font-semibold text-white hover:bg-violet-700">
+                              {t("admin.polls.card.modifyQr")}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {showNfc && (
+                        <div className="space-y-2 rounded border border-violet-800 bg-violet-950/30 p-3 text-left">
+                          <h4 className="font-semibold text-[#f4f7fb]">{t("admin.engagement.wizard.nfcSetupTitle")}</h4>
+                          <p className="break-all text-xs text-violet-200">{nfcUrl}</p>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(nfcUrl)} className="rounded bg-violet-700 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-600">
+                            {t("admin.engagement.campaigns.copyNfcLink")}
+                          </button>
+                          <p className="text-xs text-[#c3cede]">{t("admin.engagement.wizard.nfcSetupHint")}</p>
+                        </div>
+                      )}
+                      {eggAccessChoice !== "both" && (
+                        <p className="text-xs text-[#93a3c2]">{t("admin.engagement.wizard.changeMethodLater")}</p>
+                      )}
 
                       <div className="border-t border-[#24345c] pt-3">
                         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#f2c744]">{t("admin.engagement.wizard.previewTitle")}</p>
@@ -2304,23 +2413,57 @@ export default function Admin() {
           )}
           <div className="space-y-2">
             {qrCampaigns.length === 0 ? <p className="text-gray-400">{t("admin.engagement.campaigns.noCampaigns")}</p> : qrCampaigns.map((campaign) => {
-              const url = `${window.location.origin}/qr/${campaign.token}`;
+              const url = buildEggUrl(window.location.origin, campaign.token, "qr");
+              const nfcUrl = buildEggUrl(window.location.origin, campaign.token, "nfc");
+              const accessCounts = eggAccessCounts[String(campaign.id)] || { qr: 0, nfc: 0 };
+              const previewUrl = new URL(url);
+              previewUrl.searchParams.set("preview", "1");
               return (
                 <div key={campaign.id} className="gap-3 border border-gray-700 rounded p-3">
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-semibold">{campaign.name}</p>
+                      <p className="font-semibold"><span className="text-amber-300">Egg</span> · {campaign.name}</p>
                       <p className="text-xs text-gray-400">
                         {campaign.poll_id ? (
                           <button type="button" onClick={() => goToPoll(campaign.poll_id)} className="font-semibold text-teal-300 underline">{t("admin.polls.card.pollNumber", { id: campaign.poll_id })}</button>
                         ) : t("admin.engagement.campaigns.noDefaultPoll")}
                         {" · "}{campaign.placement_label || t("admin.engagement.scanner.unlabeledPlacement")}{campaign.variant_label ? ` · ${campaign.variant_label}` : ""} · {campaign.is_active ? t("admin.engagement.campaigns.active") : t("admin.engagement.campaigns.paused")}
                       </p>
-                      <p className="truncate text-xs text-blue-300">{url}</p>
+                      <p className="truncate text-xs text-blue-300">QR · {url}</p>
+                      <p className="truncate text-xs text-violet-300">NFC · {nfcUrl}</p>
+                      <p className="text-xs text-slate-500">{t("admin.engagement.campaigns.nfcInstruction")}</p>
                     </div>
-                    <button onClick={() => navigator.clipboard.writeText(url)} className="shrink-0 rounded bg-[#0f766e] px-3 py-2 font-semibold text-[#f8fafc] hover:bg-[#0d6259]">{t("admin.engagement.campaigns.copyLink")}</button>
-                    <button onClick={() => handleDeleteQrCampaign(campaign.id, campaign.name)} className="shrink-0 rounded border border-[#c0392b] bg-white px-3 py-2 font-semibold text-[#c0392b] hover:bg-[#fdeceb]">{t("admin.engagement.campaigns.delete")}</button>
+                    <div className="flex flex-wrap gap-2">
+                      <button onClick={() => navigator.clipboard.writeText(url)} className="shrink-0 rounded bg-[#0f766e] px-3 py-2 font-semibold text-[#f8fafc] hover:bg-[#0d6259]">{t("admin.engagement.campaigns.copyLink")}</button>
+                      <button onClick={() => navigator.clipboard.writeText(nfcUrl)} className="shrink-0 rounded bg-violet-700 px-3 py-2 font-semibold text-white hover:bg-violet-600">{t("admin.engagement.campaigns.copyNfcLink")}</button>
+                      <button onClick={() => beginEditEgg(campaign)} className="shrink-0 rounded border border-slate-500 px-3 py-2 font-semibold text-slate-200 hover:bg-slate-800">{t("admin.engagement.campaigns.editEgg")}</button>
+                      <button onClick={() => handleDeleteQrCampaign(campaign.id, campaign.name)} className="shrink-0 rounded border border-[#c0392b] bg-white px-3 py-2 font-semibold text-[#c0392b] hover:bg-[#fdeceb]">{t("admin.engagement.campaigns.delete")}</button>
+                    </div>
                   </div>
+
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400" aria-label="Egg access counts">
+                    <span>{t("admin.engagement.campaigns.qrAccessCount", { count: accessCounts.qr })}</span>
+                    <span>{t("admin.engagement.campaigns.nfcAccessCount", { count: accessCounts.nfc })}</span>
+                  </div>
+
+                  {editingEggId === campaign.id && (
+                    <div className="mt-3 grid gap-2 rounded border border-slate-700 bg-slate-950/60 p-3 sm:grid-cols-2">
+                      <label className="text-xs font-semibold text-slate-300">
+                        {t("admin.engagement.campaigns.nameLabel")}
+                        <input value={eggEditName} maxLength={120} onChange={(event) => setEggEditName(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm text-black" />
+                      </label>
+                      <label className="text-xs font-semibold text-slate-300">
+                        {t("admin.engagement.campaigns.placementLabel")}
+                        <input value={eggEditPlacement} maxLength={80} onChange={(event) => setEggEditPlacement(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm text-black" />
+                      </label>
+                      <div className="flex gap-2 sm:col-span-2">
+                        <button onClick={() => saveEggDetails(campaign.id)} className="rounded bg-teal-600 px-3 py-2 text-sm font-semibold text-white">{t("admin.engagement.campaigns.saveEgg")}</button>
+                        <button onClick={() => setEditingEggId(null)} className="rounded border border-slate-600 px-3 py-2 text-sm font-semibold text-slate-200">{t("admin.engagement.campaigns.cancelEditEgg")}</button>
+                      </div>
+                    </div>
+                  )}
+
+                  <EggAiSetup campaign={campaign} t={t} />
 
                   <div className="mt-2 flex items-center gap-3">
                     <img
@@ -2330,7 +2473,7 @@ export default function Admin() {
                     />
                     <div className="flex flex-wrap gap-2">
                       <button
-                        onClick={() => window.open(`${url}?preview=1`, "_blank", "noopener,noreferrer")}
+                        onClick={() => window.open(previewUrl.toString(), "_blank", "noopener,noreferrer")}
                         className="bg-violet-600 text-white px-3 py-1.5 rounded text-sm font-semibold"
                       >
                         {t("admin.engagement.campaigns.viewVisitorExperience")}

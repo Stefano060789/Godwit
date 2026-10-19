@@ -38,6 +38,8 @@ Set secrets in **Vercel → godwit → Settings → Environment Variables**. Do 
 - `CREATOR_EMAILS` (optional additional server-side allowlist)
 - `VITE_CREATOR_EMAILS` (optional additional client-side allowlist)
 - `CRON_SECRET` (protects scheduled-job endpoints)
+- `CLAUDE_API_KEY` (server-only; required for the optional Egg AI assistant)
+- `CLAUDE_HAIKU_MODEL` (optional server-side model override; defaults to `claude-haiku-4-5`)
 
 The current Creator email allowlist includes `bonomistefano@outlook.it` and `afelix470@gmail.com` in the application. The Supabase allowlist is database-backed; run the migration listed above for the additional user.
 

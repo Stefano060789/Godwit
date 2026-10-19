@@ -6,8 +6,10 @@ import { reassignManagedCampaignPoll, resolveManagedQrToken } from "../lib/qrMan
 import DonationCard from "../components/DonationCard";
 import InlinePollVote from "../components/InlinePollVote";
 import OrganizerMessageCard from "../components/OrganizerMessageCard";
+import EggAiAssistant from "../components/EggAiAssistant";
 import { accessibilityTagIcon, accessibilityTagLabel } from "../lib/accessibilityTags";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
+import { normalizeEggAccessMethod } from "../lib/eggs";
 
 export default function QrRedirect() {
   const navigate = useNavigate();
@@ -18,11 +20,21 @@ export default function QrRedirect() {
   // even when the workspace owner is already signed in.
   const isPreview = searchParams.get("preview") === "1";
   const isManageMode = searchParams.get("manage") === "1";
+  const accessMethod = normalizeEggAccessMethod(searchParams.get("via"));
   const [menu, setMenu] = useState(null);
   const [manage, setManage] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    async function recordEggAccess(campaignId) {
+      if (isPreview || !campaignId) return;
+      const { error: accessError } = await supabase.rpc("record_egg_access", {
+        target_campaign_id: campaignId,
+        target_access_method: accessMethod
+      });
+      if (accessError) console.error("Unable to record Egg access:", accessError);
+    }
+
     async function resolveQr() {
       const {
         data: { user }
@@ -48,9 +60,22 @@ export default function QrRedirect() {
       const { data: woodpeckerTasks, error: woodpeckerError } = await supabase
         .rpc("get_public_woodpecker_portal", { target_token: token });
       const hasWoodpeckerTasks = !woodpeckerError && Array.isArray(woodpeckerTasks) && woodpeckerTasks.length > 0;
+      let eggAiEnabled = false;
+      try {
+        const aiConfigResponse = await fetch("/api/egg-ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "config", token })
+        });
+        if (!aiConfigResponse.ok) throw new Error(`Egg AI settings request failed (${aiConfigResponse.status}).`);
+        eggAiEnabled = (await aiConfigResponse.json()).enabled === true;
+      } catch (aiConfigError) {
+        console.error("Unable to load Egg AI settings:", aiConfigError);
+      }
+      eggAiEnabled = eggAiEnabled && !isPreview;
 
       if (!itemsError && Array.isArray(visibleItems) && visibleItems.length > 0) {
-        await supabase.rpc("record_qr_scan", { target_campaign_id: visibleItems[0].campaign_id });
+        await recordEggAccess(visibleItems[0].campaign_id);
 
         // If this QR code carries just one poll and nothing else (no info card, donation, or
         // reward), skip the intermediate "menu" screen entirely - land directly on the
@@ -64,7 +89,7 @@ export default function QrRedirect() {
             .single();
           singlePollHasMessage = singlePoll?.allow_organizer_messages === true;
         }
-        if (visibleItems.length === 1 && visibleItems[0].item_type === "poll" && !singlePollHasMessage) {
+        if (visibleItems.length === 1 && visibleItems[0].item_type === "poll" && !singlePollHasMessage && !eggAiEnabled) {
           navigate(`/vote/${visibleItems[0].poll_id}?campaign=${visibleItems[0].campaign_id}`, { replace: true });
           return;
         }
@@ -82,16 +107,15 @@ export default function QrRedirect() {
           portalMessage: visibleItems[0].portal_message,
           items: visibleItems,
           branding,
-          hasWoodpeckerTasks
+          hasWoodpeckerTasks,
+          aiEnabled: eggAiEnabled
         });
         return;
       }
 
       if (hasWoodpeckerTasks) {
         const taskCampaignId = woodpeckerTasks[0]?.campaign_id;
-        if (taskCampaignId) {
-          await supabase.rpc("record_qr_scan", { target_campaign_id: taskCampaignId });
-        }
+        await recordEggAccess(taskCampaignId);
         navigate(`/qr/${token}/tasks`, { replace: true });
         return;
       }
@@ -101,12 +125,36 @@ export default function QrRedirect() {
         .maybeSingle();
 
       if (!campaignError && campaign?.poll_id) {
-        await supabase.rpc("record_qr_scan", { target_campaign_id: campaign.campaign_id });
+        await recordEggAccess(campaign.campaign_id);
         const { data: campaignPoll } = await supabase
           .rpc("get_public_poll", { target_poll_id: campaign.poll_id })
           .single();
-        if (campaignPoll?.allow_organizer_messages !== true) {
+        if (campaignPoll?.allow_organizer_messages !== true && !eggAiEnabled) {
           navigate(`/vote/${campaign.poll_id}?campaign=${campaign.campaign_id}`, { replace: true });
+          return;
+        }
+        if (eggAiEnabled) {
+          const branding = getPollBranding(campaignPoll ? {
+            brand_name: campaignPoll.brand_name,
+            brand_logo_url: campaignPoll.brand_logo_url,
+            brand_primary_color: campaignPoll.brand_primary_color,
+            brand_accent_color: campaignPoll.brand_accent_color
+          } : null);
+          setMenu({
+            campaignId: campaign.campaign_id,
+            portalTitle: null,
+            portalMessage: null,
+            items: [{
+              item_id: `default-${campaign.campaign_id}`,
+              campaign_id: campaign.campaign_id,
+              item_type: "poll",
+              poll_id: campaign.poll_id,
+              poll_question: campaignPoll?.question
+            }],
+            branding,
+            hasWoodpeckerTasks,
+            aiEnabled: true
+          });
           return;
         }
       }
@@ -126,7 +174,7 @@ export default function QrRedirect() {
     }
 
     resolveQr();
-  }, [navigate, token, isPreview]);
+  }, [navigate, token, isPreview, accessMethod]);
 
   async function changeAssignedPoll(nextPollId) {
     if (!manage || !nextPollId) return;
@@ -178,7 +226,7 @@ export default function QrRedirect() {
   }
 
   if (menu) {
-    const { portalTitle, portalMessage, items, branding, hasWoodpeckerTasks } = menu;
+    const { portalTitle, portalMessage, items, branding, hasWoodpeckerTasks, aiEnabled } = menu;
     return (
       <main className="qr-portal" style={{ backgroundColor: branding.accentColor }}>
         <section className="qr-portal-card qr-portal-menu">
@@ -189,14 +237,22 @@ export default function QrRedirect() {
           <div className="qr-portal-menu-list">
             {items.map((item) => {
               if (item.item_type === "poll") {
-                return <InlinePollVote key={item.item_id} item={item} branding={branding} />;
+                return (
+                  <div key={item.item_id} id={`egg-option-${item.item_id}`}>
+                    <InlinePollVote item={item} branding={branding} />
+                  </div>
+                );
               }
               if (item.item_type === "donation") {
-                return <DonationCard key={item.item_id} item={item} campaignToken={token} />;
+                return (
+                  <div key={item.item_id} id={`egg-option-${item.item_id}`}>
+                    <DonationCard item={item} campaignToken={token} />
+                  </div>
+                );
               }
               if (item.item_type === "reward") {
                 return (
-                  <div key={item.item_id} className="qr-portal-menu-item qr-portal-menu-reward">
+                  <div key={item.item_id} id={`egg-option-${item.item_id}`} className="qr-portal-menu-item qr-portal-menu-reward">
                     <span className="qr-portal-menu-item-title">🎁 {item.title}</span>
                     {item.body && <p className="qr-portal-menu-item-body">{item.body}</p>}
                     {item.reward_code && (
@@ -217,7 +273,7 @@ export default function QrRedirect() {
                 );
               }
               return (
-                <div key={item.item_id} className="qr-portal-menu-item qr-portal-menu-info">
+                <div key={item.item_id} id={`egg-option-${item.item_id}`} className="qr-portal-menu-item qr-portal-menu-info">
                   {item.image_url && (
                     <img src={item.image_url} alt={item.title || ""} className="qr-portal-menu-item-image" />
                   )}
@@ -272,6 +328,7 @@ export default function QrRedirect() {
                 />
               ) : null;
             })()}
+            {aiEnabled && <EggAiAssistant token={token} />}
           </div>
         </section>
       </main>

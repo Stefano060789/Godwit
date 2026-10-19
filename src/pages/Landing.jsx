@@ -27,6 +27,12 @@ const outcomeKeys = [
     : [])
 ];
 
+const eggFeatureKeys = [
+  { key: "access", titleKey: "eggFeatures.accessTitle", detailKey: "eggFeatures.accessDetail" },
+  { key: "assistant", titleKey: "eggFeatures.assistantTitle", detailKey: "eggFeatures.assistantDetail" },
+  { key: "guidance", titleKey: "eggFeatures.guidanceTitle", detailKey: "eggFeatures.guidanceDetail" }
+];
+
 const flockKeys = [
   { key: "robin", nameKey: "flock.robinName", roleKey: "flock.robinRole", detailKey: "flock.robinDetail" },
   { key: "tern", nameKey: "flock.ternName", roleKey: "flock.ternRole", detailKey: "flock.ternDetail" },
@@ -94,6 +100,34 @@ export default function Landing() {
         </div>
       </section>
 
+      <section className="landing-egg" aria-labelledby="egg-feature-title">
+        <div className="landing-egg-copy">
+          <p className="landing-eyebrow">{t("eggFeatures.eyebrow")}</p>
+          <h2 id="egg-feature-title">{t("eggFeatures.title")}</h2>
+          <p className="landing-egg-lede">{t("eggFeatures.lede")}</p>
+          <div className="landing-egg-access" aria-label={t("eggFeatures.accessibilityLabel")}>
+            <span>QR</span>
+            <span aria-hidden="true">+</span>
+            <span>NFC</span>
+            <span className="landing-egg-access-caption">{t("eggFeatures.sameExperience")}</span>
+          </div>
+          <Link to={isSignedIn ? "/admin?tab=engagement" : "/register"} className="landing-egg-action">
+            {t("eggFeatures.cta")}
+          </Link>
+        </div>
+        <div className="landing-egg-features">
+          {eggFeatureKeys.map((feature, index) => (
+            <article key={feature.key} className="landing-egg-feature">
+              <span className="landing-egg-feature-number">0{index + 1}</span>
+              <div>
+                <h3>{t(feature.titleKey)}</h3>
+                <p>{t(feature.detailKey)}</p>
+              </div>
+            </article>
+          ))}
+          <p className="landing-egg-control">{t("eggFeatures.control")}</p>
+        </div>
+      </section>
 
       <section className="landing-section" aria-labelledby="how-it-works-title">
         <div className="landing-section-heading">

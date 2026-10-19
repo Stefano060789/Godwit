@@ -66,4 +66,27 @@ describe("public landing donation messaging", () => {
     expect(magpie.detail).toContain("polls");
     expect(magpie.detail).toContain("prize draws");
   });
+
+  it("explains Eggs, QR and NFC access, and the guided AI assistant on the public landing page", async () => {
+    const i18n = createInstance();
+    await i18n.use(initReactI18next).init({
+      lng: "en",
+      fallbackLng: "en",
+      resources: { en: { translation: en } },
+      interpolation: { escapeValue: false }
+    });
+    const markup = renderToStaticMarkup(
+      createElement(
+        I18nextProvider,
+        { i18n },
+        createElement(MemoryRouter, null, createElement(Landing))
+      )
+    );
+
+    expect(markup).toContain(en.landing.eggFeatures.title);
+    expect(markup).toContain(en.landing.eggFeatures.accessDetail);
+    expect(markup).toContain(en.landing.eggFeatures.assistantDetail);
+    expect(markup).toContain(en.landing.eggFeatures.guidanceDetail);
+    expect(markup).toContain('href="/register"');
+  });
 });
