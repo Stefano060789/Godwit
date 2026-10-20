@@ -343,6 +343,62 @@ describe("creator-outreach regenerate action", () => {
     )).toBe(true);
   });
 
+  it("saves a manually verified business contact email", async () => {
+    process.env.SUPABASE_URL = "https://supabase.test";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role";
+    process.env.SUPABASE_ANON_KEY = "anon-key";
+    process.env.CREATOR_EMAILS = "bonomistefano@outlook.it";
+    const requests = [];
+    vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      const method = options.method || "GET";
+      requests.push({ href, method, body: options.body ? JSON.parse(options.body) : null });
+      if (href.includes("/auth/v1/user")) return jsonResponse({ email: "bonomistefano@outlook.it" });
+      if (href.includes("/rest/v1/creator_outreach_contacts?id=eq.contact-1") && method === "GET") {
+        return jsonResponse([{ id: "contact-1", business_review_status: "pending" }]);
+      }
+      if (href.includes("/rest/v1/creator_outreach_contacts?id=eq.contact-1") && method === "PATCH") {
+        return new Response(null, { status: 204 });
+      }
+      throw new Error(`Unexpected request: ${method} ${href}`);
+    }));
+
+    const req = makeRequest({
+      body: { action: "save-email", contactId: "contact-1", email: "  Info@Example.com  " }
+    });
+    const res = makeResponse();
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ email: "info@example.com" });
+    expect(requests.some(({ method, body }) =>
+      method === "PATCH" && body.contact_email === "info@example.com"
+    )).toBe(true);
+  });
+
+  it("rejects invalid manual contact emails without updating the prospect", async () => {
+    process.env.SUPABASE_URL = "https://supabase.test";
+    process.env.SUPABASE_ANON_KEY = "anon-key";
+    process.env.CREATOR_EMAILS = "bonomistefano@outlook.it";
+    const fetchMock = vi.fn(async (url) => {
+      if (String(url).includes("/auth/v1/user")) {
+        return jsonResponse({ email: "bonomistefano@outlook.it" });
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const req = makeRequest({
+      body: { action: "save-email", contactId: "contact-1", email: "not-an-email" }
+    });
+    const res = makeResponse();
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toContain("valid business contact email");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("does not approve a prospect without a generated message", async () => {
     process.env.SUPABASE_URL = "https://supabase.test";
     process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role";

@@ -24,3 +24,38 @@ export function groupOutreachContactsByCountry(contacts) {
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([country, groupedContacts]) => ({ country, contacts: groupedContacts }));
 }
+
+export function getPublicEmailLookupMessage(result) {
+  const websiteStatus = result.websiteStatus || result.status;
+  if (result.searchStatus === "not_configured") {
+    const websiteDetail = websiteStatus === "no_website"
+      ? "No website is listed"
+      : websiteStatus === "not_found"
+        ? "No email was published on the listed website"
+        : `The listed website could not be checked (${websiteStatus})`;
+    return `${websiteDetail}. Add SERPAPI_API_KEY to the deployed API to search public web results.`;
+  }
+  if (result.status === "not_found") {
+    const websiteDetail = websiteStatus === "no_website"
+      ? "No website is listed"
+      : websiteStatus === "not_found"
+        ? "No email was published on the listed website"
+        : `The listed website could not be checked (${websiteStatus})`;
+    return `${websiteDetail}, and no public email was found in web results. No address was guessed.`;
+  }
+  if (websiteStatus === "no_website") return "No website is listed for this business.";
+  if (websiteStatus === "not_found") return "No public email was found on the listed website.";
+  return `The listed website could not be checked (${websiteStatus}).`;
+}
+
+export function getPublicEmailSearchUrl(contact) {
+  const query = [
+    contact.company_name,
+    contact.city,
+    contact.country,
+    "business contact email"
+  ].filter(Boolean).join(" ");
+  const url = new URL("https://www.google.com/search");
+  url.searchParams.set("q", query);
+  return url.href;
+}

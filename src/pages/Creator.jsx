@@ -7,6 +7,8 @@ import { getOutreachLanguageLabel, OUTREACH_LANGUAGES } from "../../lib/cron/out
 import { RESEARCH_BUSINESS_TYPES, RESEARCH_COUNTRIES } from "../../lib/cron/researchOptions.js";
 import {
   filterHiddenOutreachContacts,
+  getPublicEmailLookupMessage,
+  getPublicEmailSearchUrl,
   getOutreachContactIds,
   groupOutreachContactsByCountry
 } from "../lib/outreachDisplay.js";
@@ -318,28 +320,24 @@ export default function Creator() {
         }));
         return;
       }
+      setSearchedEmailContactIds((current) => new Set([...current, contactId]));
       if (result.email) {
-        const source = result.source === "web_search" ? " in public web search results" : " on the official website";
+        const source = result.source === "web_search" ? "Public web search results" : "Official website";
         setRecipientEmails((current) => ({ ...current, [contactId]: result.email }));
         setOutreachContacts((current) => current.map((contact) => contact.id === contactId
           ? { ...contact, contact_email: result.email }
           : contact));
         setOutreachFeedback((current) => ({
           ...current,
-          [contactId]: { text: `Found public business email${source}: ${result.email}`, isError: false }
+          [contactId]: {
+            text: `Found public business email: ${result.email} (${source.toLowerCase()}).`,
+            isError: false,
+            sourceUrl: result.sourceUrl,
+            sourceLabel: source
+          }
         }));
       } else {
-        const websiteStatus = result.websiteStatus || result.status;
-        const websiteDetail = websiteStatus === "no_website"
-          ? "no website is listed"
-          : websiteStatus === "not_found"
-            ? "no email was found on the listed website"
-            : `the listed website could not be checked (${websiteStatus})`;
-        const text = result.searchStatus === "not_configured"
-          ? `The lookup stopped because ${websiteDetail}; public web search is not configured. Add SERPAPI_API_KEY to the Vercel environment to enable it.`
-          : result.status === "not_found"
-            ? `No public business email appeared in web search results, and ${websiteDetail}. The agent won't guess.`
-            : `No email was found; ${websiteDetail}.`;
+        const text = getPublicEmailLookupMessage(result);
         setOutreachFeedback((current) => ({
           ...current,
           [contactId]: { text, isError: true }
@@ -387,6 +385,24 @@ export default function Creator() {
       const results = Array.isArray(result.results) ? result.results : [];
       const found = results.filter((item) => item.email);
       const foundById = new Map(found.map((item) => [item.id, item.email]));
+      setOutreachFeedback((current) => ({
+        ...current,
+        ...Object.fromEntries(results.map((item) => {
+          if (item.email) {
+            const source = item.source === "web_search" ? "Public web search results" : "Official website";
+            return [item.id, {
+              text: `Found public business email: ${item.email} (${source.toLowerCase()}).`,
+              isError: false,
+              sourceUrl: item.sourceUrl,
+              sourceLabel: source
+            }];
+          }
+          return [item.id, {
+            text: getPublicEmailLookupMessage(item),
+            isError: true
+          }];
+        }))
+      }));
       setSearchedEmailContactIds((current) => new Set([
         ...current,
         ...results.map((item) => item.id)
@@ -395,12 +411,58 @@ export default function Creator() {
       setOutreachContacts((current) => current.map((contact) => foundById.has(contact.id)
         ? { ...contact, contact_email: foundById.get(contact.id) }
         : contact));
-      if (results.some((item) => item.searchStatus === "not_configured")) {
-        throw new Error("Public web search is not configured in the deployed API. Confirm SERPAPI_API_KEY is set for Production and redeploy.");
-      }
-      setMessage(`Checked ${results.length} blank business email${results.length === 1 ? "" : "s"}; found ${found.length}. Search another batch to continue.`);
+      const notConfigured = results.some((item) => item.searchStatus === "not_configured");
+      setMessage(
+        `Checked ${results.length} listings; found ${found.length} public email${found.length === 1 ? "" : "s"}. ` +
+        (notConfigured
+          ? "Website checks still ran, but SERPAPI_API_KEY is not configured for web search."
+          : "See each listing for its result and source.")
+      );
     } catch (searchError) {
       setError(searchError instanceof Error ? searchError.message : "Business email search failed.");
+    } finally {
+      setOutreachActionLoading(false);
+    }
+  }
+
+  async function saveOutreachEmail(contactId) {
+    const email = String(recipientEmails[contactId] || "").trim();
+    if (!isValidRecipientEmail(email)) {
+      setOutreachFeedback((current) => ({
+        ...current,
+        [contactId]: { text: "Enter a valid business contact email before saving.", isError: true }
+      }));
+      return;
+    }
+    setOutreachActionLoading(true);
+    try {
+      const session = await getCreatorSession();
+      const response = await fetch("/api/creator-outreach", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: ["Bearer", session?.access_token || ""].join(" ")
+        },
+        body: JSON.stringify({ action: "save-email", contactId, email })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not save the contact email.");
+      setRecipientEmails((current) => ({ ...current, [contactId]: result.email }));
+      setOutreachContacts((current) => current.map((contact) => contact.id === contactId
+        ? { ...contact, contact_email: result.email }
+        : contact));
+      setOutreachFeedback((current) => ({
+        ...current,
+        [contactId]: { text: "Business contact email saved for this prospect.", isError: false }
+      }));
+    } catch (saveError) {
+      setOutreachFeedback((current) => ({
+        ...current,
+        [contactId]: {
+          text: saveError instanceof Error ? saveError.message : "Could not save the contact email.",
+          isError: true
+        }
+      }));
     } finally {
       setOutreachActionLoading(false);
     }
@@ -627,6 +689,10 @@ export default function Creator() {
     outreachPageStart + OUTREACH_PAGE_SIZE
   );
   const outreachGroups = groupOutreachContactsByCountry(visibleOutreachContacts);
+  const prospectsWithEmail = outreachContacts.filter((contact) => contact.contact_email).length;
+  const emailsRemaining = outreachContacts.filter((contact) =>
+    !contact.contact_email && !searchedEmailContactIds.has(contact.id)
+  ).length;
 
   return (
     <Layout theme="workspace">
@@ -711,7 +777,18 @@ export default function Creator() {
             <section className="creator-outreach min-w-0 space-y-4 rounded-lg border border-slate-700 bg-slate-950/50 p-3 sm:p-4">
               <div>
                 <h2 className="text-xl font-bold">Godwit outreach</h2>
-                <p className="mt-1 text-sm text-slate-400">Review each prospect and its draft. Choosing Send message sends that email immediately.</p>
+                <p className="mt-1 max-w-3xl text-sm text-slate-400">
+                  Find a public business email, generate a tailored draft, then review both before sending. Email search never guesses an address; choosing Send message sends immediately.
+                </p>
+                <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+                  <p className="rounded border border-slate-700 bg-slate-950/60 p-2"><strong className="text-teal-200">1. Find prospects</strong><span className="mt-1 block text-slate-400">Choose a country and business type, then research.</span></p>
+                  <p className="rounded border border-slate-700 bg-slate-950/60 p-2"><strong className="text-teal-200">2. Find contact emails</strong><span className="mt-1 block text-slate-400">Check the official website and public search, or search manually.</span></p>
+                  <p className="rounded border border-slate-700 bg-slate-950/60 p-2"><strong className="text-teal-200">3. Review and reach out</strong><span className="mt-1 block text-slate-400">Generate the email, verify details, and send only when ready.</span></p>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-3 text-sm" aria-live="polite">
+                  <span className="rounded-full border border-emerald-400/40 px-3 py-1 text-emerald-200">{prospectsWithEmail} with a contact email</span>
+                  <span className="rounded-full border border-slate-600 px-3 py-1 text-slate-300">{emailsRemaining} not yet checked</span>
+                </div>
                 <div className="creator-research-panel mt-4 grid min-w-0 gap-4 rounded-lg border border-slate-700 bg-slate-900/70 p-3 sm:p-4 lg:grid-cols-2">
                   <fieldset>
                     <legend className="font-semibold">Countries</legend>
@@ -819,16 +896,19 @@ export default function Creator() {
                         Restore cleaned prospects
                       </button>
                     )}
-                    {outreachContacts.some((contact) => !contact.contact_email && !searchedEmailContactIds.has(contact.id)) && (
+                    {emailsRemaining > 0 && (
                       <button
                         type="button"
                         disabled={outreachActionLoading}
                         onClick={findMissingOutreachEmails}
                         className="rounded border border-teal-300/60 px-3 py-2 text-sm font-semibold text-teal-200 disabled:opacity-50"
                       >
-                        Search next 5 blank emails
+                        Find emails for next 5 ({emailsRemaining} remaining)
                       </button>
                     )}
+                    <p className="max-w-xl text-xs text-slate-400">
+                      Batch lookup checks up to five prospects at a time. Website checks work without a search key; public web search also needs SERPAPI_API_KEY in Vercel.
+                    </p>
                     {(researchCountries.length === 0 || researchBusinessTypes.length === 0) && (
                       <span className="text-sm text-amber-200">Select at least one country and one business type.</span>
                     )}
@@ -932,11 +1012,28 @@ export default function Creator() {
                           />
                           {!contact.contact_email && (
                             <span className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs font-normal text-slate-400">
-                              <span>The agent checks the listed website and relevant public search results. It leaves this blank rather than guessing if no email is published.</span>
-                              <button type="button" disabled={outreachActionLoading} onClick={() => findOutreachEmail(contact.id)} className="font-semibold text-teal-300 underline disabled:opacity-50">Search for email</button>
+                              <span>Checks the listed website and public results when configured. No address is guessed.</span>
+                              <span className="flex flex-wrap gap-x-3 gap-y-1">
+                                <button type="button" disabled={outreachActionLoading} onClick={() => findOutreachEmail(contact.id)} className="font-semibold text-teal-300 underline disabled:opacity-50">
+                                  {searchedEmailContactIds.has(contact.id) ? "Retry automatic search" : "Search website and public results"}
+                                </button>
+                                <a href={getPublicEmailSearchUrl(contact)} target="_blank" rel="noreferrer" className="font-semibold text-teal-300 underline">
+                                  Search the web manually
+                                </a>
+                              </span>
                             </span>
                           )}
                         </label>
+                        {recipientEmails[contact.id] && recipientEmails[contact.id] !== (contact.contact_email || "") && (
+                          <button
+                            type="button"
+                            disabled={outreachActionLoading || !isValidRecipientEmail(recipientEmails[contact.id])}
+                            onClick={() => saveOutreachEmail(contact.id)}
+                            className="mt-2 rounded border border-teal-300/60 px-3 py-1.5 text-xs font-semibold text-teal-200 disabled:opacity-50"
+                          >
+                            Save contact email
+                          </button>
+                        )}
                         <label className="mt-2 block text-sm font-medium text-slate-300">
                           Email subject
                           <input
@@ -978,9 +1075,19 @@ export default function Creator() {
                           </p>
                         )}
                         {outreachFeedback[contact.id] && (
-                          <p role="status" aria-live="polite" className={`creator-send-feedback mt-3 ${outreachFeedback[contact.id].isError ? "is-error" : "is-success"}`}>
-                            {outreachFeedback[contact.id].text}
-                          </p>
+                          <div role="status" aria-live="polite" className={`creator-send-feedback mt-3 ${outreachFeedback[contact.id].isError ? "is-error" : "is-success"}`}>
+                            <p>{outreachFeedback[contact.id].text}</p>
+                            {outreachFeedback[contact.id].sourceUrl && (
+                              <a
+                                className="mt-1 inline-block break-all underline"
+                                href={outreachFeedback[contact.id].sourceUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Verify email on {outreachFeedback[contact.id].sourceLabel}
+                              </a>
+                            )}
+                          </div>
                         )}
                     </div>
                     </article>

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   filterHiddenOutreachContacts,
+  getPublicEmailLookupMessage,
+  getPublicEmailSearchUrl,
   getOutreachContactIds,
   groupOutreachContactsByCountry,
   isReviewedOutreachContact
@@ -14,6 +16,35 @@ describe("outreach display filtering", () => {
       business_review_status: "pending",
       message_review_status: "pending"
     })).toBe(false);
+  });
+
+  describe("public email discovery helpers", () => {
+    it("explains when web search is unavailable rather than saying no email exists", () => {
+      expect(getPublicEmailLookupMessage({
+        email: null,
+        status: "not_found",
+        websiteStatus: "not_found",
+        searchStatus: "not_configured"
+      })).toContain("Add SERPAPI_API_KEY");
+    });
+
+    it("summarizes an unsuccessful lookup without implying the email is guessed", () => {
+      expect(getPublicEmailLookupMessage({
+        email: null,
+        status: "not_found",
+        websiteStatus: "no_website"
+      })).toContain("No address was guessed");
+    });
+
+    it("builds a direct web search for a business and its location", () => {
+      const url = new URL(getPublicEmailSearchUrl({
+        company_name: "Example Hotel",
+        city: "Vienna",
+        country: "Austria"
+      }));
+      expect(url.origin).toBe("https://www.google.com");
+      expect(url.searchParams.get("q")).toBe("Example Hotel Vienna Austria business contact email");
+    });
   });
 
   it("always hides reviewed items and filters locally cleaned prospects", () => {

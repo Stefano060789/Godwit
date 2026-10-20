@@ -153,6 +153,25 @@ export default async function handler(request, response) {
       });
       return response.status(200).json({ subject });
     }
+    if (action === "save-email") {
+      const contactId = String(request.body?.contactId || "");
+      const email = String(request.body?.email || "").trim().toLowerCase();
+      if (!contactId) return response.status(400).json({ error: "contactId is required." });
+      if (!isValidOutreachEmail(email)) {
+        return response.status(400).json({ error: "Enter a valid business contact email address." });
+      }
+      const contacts = await supabaseGet(
+        `creator_outreach_contacts?id=eq.${encodeURIComponent(contactId)}&status=in.(draft,approved)&select=id,business_review_status`
+      );
+      const contact = contacts[0];
+      if (!contact || contact.business_review_status === "rejected") {
+        return response.status(404).json({ error: "Outreach location not found." });
+      }
+      await supabasePatch(`creator_outreach_contacts?id=eq.${encodeURIComponent(contactId)}`, {
+        contact_email: email
+      });
+      return response.status(200).json({ email });
+    }
     if (action === "clear-research") {
       const deletedRows = await supabaseRequest(
         "creator_outreach_contacts?status=in.(draft,approved)&or=(business_review_status.neq.rejected,business_review_status.is.null)&select=id",
