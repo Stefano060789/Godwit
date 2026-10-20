@@ -19,6 +19,7 @@ import { runStripeReconciliation } from "../lib/cron/stripeReconciliationJob.js"
 import { runDsarProcessing } from "../lib/cron/dsarJob.js";
 import { runCheckGmailReplies } from "../lib/cron/gmailReplyMonitorJob.js";
 import { runResearchGodwitProspects } from "../lib/cron/researchGodwitProspectsJob.js";
+import { getSystemStatus } from "../lib/cron/systemStatus.js";
 import { captureError } from "../lib/errorReporting.js";
 
 const JOBS = {
@@ -30,7 +31,8 @@ const JOBS = {
   "stripe-reconciliation": { run: runStripeReconciliation, methods: ["GET"] },
   "process-dsar": { run: runDsarProcessing, methods: ["GET"] },
   "check-gmail-replies": { run: runCheckGmailReplies, methods: ["GET"] },
-  "research-godwit-prospects": { run: runResearchGodwitProspects, methods: ["GET"] }
+  "research-godwit-prospects": { run: runResearchGodwitProspects, methods: ["GET"] },
+  "system-status": { run: getSystemStatus, methods: ["GET"] }
 };
 
 export default async function handler(request, response) {

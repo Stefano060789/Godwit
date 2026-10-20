@@ -39,6 +39,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/system-status",
+      "destination": "/api/cron?job=system-status"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
