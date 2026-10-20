@@ -15,19 +15,19 @@
     "getStarted": "立即开始"
   },
   "landing": {
-    "eyebrow": "面向真实场所的二维码反馈",
-    "title": "将每个实体场所变成可衡量的反馈渠道。",
-    "lede": "Godwit 帮助场所把一次简单的二维码扫描转化为反馈、活动洞察以及基于同意的后续联系。",
+    "eyebrow": "Egg 助力实体场所连接客户",
+    "title": "一个 Egg，更多连接方式。",
+    "lede": "Godwit 通过可重复使用的 Egg，为商家提供客户反馈、实用信息和可选 AI 引导，并支持二维码或 NFC 开启。",
     "workspaceDashboard": "控制台",
     "createWorkspace": "开始使用 Godwit",
     "workspaceLogin": "登录 Godwit",
     "note": "专为场所、活动、酒店、零售及线下团队打造。",
     "howItWorksEyebrow": "简单的循环",
-    "howItWorksTitle": "从二维码到更好的决策。",
+    "howItWorksTitle": "从 Egg 开始，打造更好的客户体验。",
     "steps": {
-      "step1Title": "放置一个二维码",
-      "step1Detail": "在桌台、柜台、房间或活动入口处使用一张带品牌标识的二维码海报，用于投票或信息卡。",
-      "step1DetailWithDonations": "在桌台、柜台、房间或活动入口处使用一张带品牌标识的二维码海报，用于投票、信息卡或捐赠请求。",
+      "step1Title": "创建并放置 Egg",
+      "step1Detail": "为 Egg 设置投票或信息，然后通过二维码、NFC 标签或两者分享。",
+      "step1DetailWithDonations": "为 Egg 设置投票、信息或场所支持，然后通过二维码、NFC 标签或两者分享。",
       "step2Title": "几秒钟内收集反馈",
       "step2Detail": "访客扫码、选择答案并提交,无需下载应用或注册账户。",
       "step3Title": "把反馈转化为增长",
@@ -47,7 +47,7 @@
     },
     "flockEyebrow": "一个产品,一整个鸟群",
     "flockTitle": "Godwit 的每个部分都有自己的个性。",
-    "flockLede": "七位各司其职的专才协同工作——每一位都以一种鸟类命名,各自专注做好一件事。",
+    "flockLede": "认识 Godwit 的贴心向导，每位都有明确的职责，帮助你轻松管理业务。",
     "flock": {
       "robinName": "Robin",
       "robinRole": "你友好的第一位向导",
@@ -55,10 +55,10 @@
       "redshankName": "Redshank",
       "redshankRole": "及早发现问题",
       "redshankDetail": "在低分反馈到达 Google、Booking 或 Tripadvisor 之前,先将其转入私信。",
-      "magpieName": "Magpie",
-      "magpieRole": "汇集分散的信息",
-      "magpieDetail": "将每个二维码组织成菜单，整合多个投票和信息卡，并支持内容轮换和抽奖。",
-      "magpieDetailWithDonations": "将每个二维码组织成菜单，整合多个投票、信息卡和场所支持付款，并支持内容轮换和抽奖。",
+      "eggName": "Egg",
+      "eggRole": "一个触点，多种连接方式",
+      "eggDetail": "将投票、信息和任务整合到一个可重复使用的目的地，通过二维码或 NFC 开启。",
+      "eggDetailWithDonations": "将投票、信息、任务和场所支持整合到一个可重复使用的目的地，通过二维码或 NFC 开启。",
       "flamingoName": "Flamingo",
       "flamingoRole": "展现你最好的一面",
       "flamingoDetail": "以优雅的公开展示方式呈现你最出色的反馈,让访客乐于阅读。",
@@ -74,8 +74,8 @@
       "owlDetail": "默默关注你的品牌、团队权限和套餐——直到需要你留意的时候才会提醒你。"
     },
     "finalEyebrow": "准备好衡量现场氛围了吗?",
-    "finalTitle": "启动你的第一场二维码反馈活动。",
-    "finalCopy": "设置你的工作空间,创建一场二维码反馈活动,把顾客的回复变成你的下一个决策依据。",
+    "finalTitle": "创建你的第一个 Egg。",
+    "finalCopy": "设置工作区，创建 Egg，并将客户回复转化为下一步行动。",
     "openDashboard": "打开控制台"
   },
   "vote": {
@@ -186,7 +186,7 @@
     },
     "rows": {
       "pollLimit": "有效投票数量上限",
-      "campaignLimit": "有效二维码活动",
+      "campaignLimit": "有效 Egg 数量",
       "seatLimit": "团队席位数",
       "donations": "捐赠",
       "csvExport": "CSV 导出",
@@ -209,7 +209,7 @@
     "nav": {
       "overview": "新手指南",
       "polls": "投票",
-      "engagement": "二维码",
+      "engagement": "Egg",
       "connection": "客户关系",
       "feedback": "反馈",
       "settings": "设置"
@@ -217,7 +217,7 @@
     "tabDescriptions": {
       "overview": "工作区一览：快捷操作、本周活动和关键数据。",
       "polls": "搜索、分享和管理您创建的每一个问题。",
-      "engagement": "一个二维码不止对应一个投票：将投票、信息卡片和捐赠请求整合到同一个二维码下。",
+      "engagement": "创建可重复使用的 Egg，整合投票、信息、任务和可选 AI 引导，并通过二维码或 NFC 开启。",
       "connection": "把一次二维码扫描变成持续的客户关系。",
       "feedback": "投票者留言、评价认领请求、情感分析和挽回任务。",
       "settings": "品牌、团队权限、开发者 API 和最近活动。"
@@ -232,7 +232,7 @@
         "description": "搜索、筛选并查看每个投票的表现。"
       },
       "engagement": {
-        "label": "创建二维码",
+        "label": "创建 Egg",
         "description": "将投票、信息卡片和捐赠整合到一个印刷二维码下。"
       },
       "connection": {
@@ -328,9 +328,9 @@
         "starts": "开始：{{date}}",
         "ends": "结束：{{date}}",
         "created": "创建于：{{date}}",
-        "linkedQrCodes": "已关联的二维码",
+        "linkedQrCodes": "已关联的 Egg",
         "notLinked": "尚未关联任何二维码。",
-        "setOneUp": "在二维码标签页中设置一个",
+        "setOneUp": "在 Eggs 标签页中创建",
         "tokenTitle": "令牌：{{token}}",
         "viewResults": "查看结果",
         "hideQr": "隐藏 QR",
@@ -431,8 +431,8 @@
     },
     "engagement": {
       "intro": {
-        "eyebrow": "二维码可以承载什么",
-        "title": "一个印刷二维码，三种内容类型。",
+        "eyebrow": "投票与 Egg 如何配合",
+        "title": "一个 Egg，多种连接方式。",
         "body": "二维码不仅仅是通往单个投票的快捷方式。扫描后，投票者可以看到一个或多个投票、一张信息卡（菜单、营业时间、简介、展览说明等），以及一个捐赠请求——全部都在同一个二维码里。请先在下方设置捐赠，然后在 \"QR 活动\" 中创建二维码本身。"
       },
       "scanner": {
@@ -481,13 +481,13 @@
         "delete": "删除"
       },
       "campaigns": {
-        "title": "二维码活动",
-        "description": "为每个投放位置创建一个可长期使用的二维码，以衡量扫描次数、回复数以及选择接收后续联系的潜在客户。每个二维码都会以下方的默认投票开始，但您可以在任意活动中打开 \"此二维码中的项目\"，添加更多投票、信息卡或捐赠请求。",
+        "title": "Egg",
+        "description": "为客户创建可重复使用的体验入口。添加投票、信息、奖励或任务，并通过二维码或 NFC 打开同一个 Egg。",
         "tip": "提示：登录后打开一个印刷二维码，即可查看它的名称和投票，并直接修改。",
         "namePlaceholder": "大厅海报、收据、桌牌",
-        "createButton": "创建活动二维码",
+        "createButton": "创建 Egg",
         "placementPlaceholder": "投放位置标签：大厅、收据、桌子",
-        "customizeWelcome": "自定义二维码欢迎界面",
+        "customizeWelcome": "自定义客户欢迎界面",
         "welcomeHeadlinePlaceholder": "欢迎标题（可选）",
         "welcomeMessagePlaceholder": "简短欢迎语（可选）",
         "bulkGenerate": "一次生成多个二维码",
@@ -496,7 +496,7 @@
         "assignLater": "稍后分配",
         "bulkGenerateButton": "生成二维码",
         "bulkGenerateNote": "会创建 \"桌子 1\"、\"桌子 2\"…… 您稍后可以逐个扫描或打开它们，为其分配或更改投票。",
-        "noCampaigns": "尚无已跟踪的二维码活动。",
+        "noCampaigns": "还没有 Egg，请在上方创建第一个。",
         "noDefaultPoll": "没有默认投票",
         "active": "启用中",
         "paused": "已暂停",
@@ -507,8 +507,8 @@
         "changePoll": "更改投票：",
         "orRotate": "或轮换：",
         "noRotation": "不轮换",
-        "itemsOnQr": "此二维码中的项目 ({{count}})",
-        "itemsHint": "在此添加一个或多个投票、信息卡和捐赠请求，把这个二维码变成一个菜单：扫描后会一次显示下方列出的全部内容，而不是直接前往某一个投票。"
+        "itemsOnQr": "管理此 Egg 的体验 ({{count}})",
+        "itemsHint": "为此 Egg 添加投票、信息卡、奖励和任务。客户可通过二维码或 NFC 打开相同体验。"
       },
       "wizard": {
         "stepOf": "第 {{step}} 步，共 {{total}} 步",
@@ -555,7 +555,7 @@
         "createButton": "创建轮换",
         "noRotations": "暂无投票轮换。",
         "rotationSummary": "{{name}} · {{frequency}} · {{count}} 个投票",
-        "assignHint": "在上方使用“或轮换”将轮换分配给二维码活动。"
+        "assignHint": "在上方使用“或轮换”将轮换分配给 Egg。"
       },
       "redemptions": {
         "title": "奖励兑换",

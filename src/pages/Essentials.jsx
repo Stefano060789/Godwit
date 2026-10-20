@@ -14,9 +14,9 @@ const STEPS = [
   },
   {
     number: "2",
-    title: "Print or share the QR code",
-    detail: "Every poll gets a QR code. Put it on a table, counter, receipt, or door. It never needs to be reprinted, even if you change the question later.",
-    action: { to: "/admin", label: "Go to your dashboard" }
+    title: "Create and share an Egg",
+    detail: "Add your poll to an Egg, then share it with a QR code, an NFC tag, or both. Customers open the same experience, and you can update it later without replacing the code or tag.",
+    action: { to: "/admin?tab=engagement", label: "Build your first Egg" }
   },
   {
     number: "3",

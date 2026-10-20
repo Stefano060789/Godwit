@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none">
+  <path d="M512 104c-151 0-298 266-298 504 0 190 118 312 298 312s298-122 298-312C810 370 663 104 512 104Z" fill="url(#egg)" stroke="#FFF8E8" stroke-width="34"/>
+  <path d="M385 636c49 46 129 72 221 55" stroke="#FFF8E8" stroke-linecap="round" stroke-width="30" opacity=".82"/>
+  <path d="M353 729c53 42 112 61 174 61" stroke="#FFF8E8" stroke-linecap="round" stroke-width="20" opacity=".56"/>
+  <defs>
+    <linearGradient id="egg" x1="300" x2="738" y1="136" y2="856" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF3C4"/>
+      <stop offset=".5" stop-color="#F2C744"/>
+      <stop offset="1" stop-color="#D99A24"/>
+    </linearGradient>
+  </defs>
+</svg>

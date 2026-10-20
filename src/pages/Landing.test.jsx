@@ -52,19 +52,19 @@ describe("public landing donation messaging", () => {
 
     expect(renderedCopy).not.toMatch(paymentPromotion);
     expect(renderedCopy).not.toContain(i18n.t("landing.steps.step1DetailWithDonations"));
-    expect(renderedCopy).not.toContain(i18n.t("landing.flock.magpieDetailWithDonations"));
+    expect(renderedCopy).not.toContain(i18n.t("landing.flock.eggDetailWithDonations"));
     expect(renderedCopy).not.toContain(i18n.t("landing.flock.waxwingDetailWithDonations"));
     expect(renderedCopy).toContain(i18n.t("landing.steps.step1Detail"));
-    expect(renderedCopy).toContain(i18n.t("landing.flock.magpieDetail"));
+    expect(renderedCopy).toContain(i18n.t("landing.flock.eggDetail"));
     expect(renderedCopy).toContain(i18n.t("landing.flock.waxwingDetail"));
   });
 
-  it("keeps the Magpie flock description free of payment promotion while disabled", () => {
-    const magpie = FLOCK.find((bird) => bird.key === "magpie");
+  it("keeps the Egg flock description free of payment promotion while disabled", () => {
+    const egg = FLOCK.find((bird) => bird.key === "egg");
 
-    expect(magpie.detail).not.toMatch(paymentPromotion);
-    expect(magpie.detail).toContain("polls");
-    expect(magpie.detail).toContain("prize draws");
+    expect(egg.detail).not.toMatch(paymentPromotion);
+    expect(egg.detail).toContain("polls");
+    expect(egg.image).toMatch(/^data:image\/svg\+xml/);
   });
 
   it("explains Eggs, QR and NFC access, and the guided AI assistant on the public landing page", async () => {

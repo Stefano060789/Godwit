@@ -16,28 +16,31 @@
     "getStarted": "Začni"
   },
   "landing": {
-    "eyebrow": "Povratne informacije prek kode QR za resnične prostore",
-    "title": "Vsak fizični prostor spremenite v merljiv kanal za povratne informacije.",
-    "lede": "Godwit pomaga prizoriščem preprost optični bralnik QR spremeniti v povratne informacije, vpogled v kampanje in nadaljnjo komunikacijo na podlagi dovoljenja.",
+    "eyebrow": "Eggs za povezovanje s strankami v resničnih prostorih",
+    "title": "En Egg. Več načinov za povezovanje.",
+    "lede": "Godwit podjetjem pomaga ponuditi povratne informacije, koristne informacije in izbirno pomoč umetne inteligence prek ponovno uporabnih Eggs, dostopnih prek kode QR ali NFC.",
     "workspaceDashboard": "Nadzorna plošča",
     "createWorkspace": "Začnite z Godwit",
     "workspaceLogin": "Prijavite se v Godwit",
     "note": "Narejeno za lokale, dogodke, gostinstvo, trgovine, umetnike, ustvarjalce in ekipe na terenu.",
     "howItWorksEyebrow": "Preprost krog",
-    "howItWorksTitle": "Od kode QR do boljše odločitve.",
+    "howItWorksTitle": "Od Egg do boljše izkušnje za stranke.",
     "steps": {
-      "step1Detail": "Uporabite označen plakat QR na mizi, pultu, v sobi ali pri vhodu na dogodek – za anketo ali informativno kartico.",
-      "step1DetailWithDonations": "Uporabite označen plakat QR na mizi, pultu, v sobi ali pri vhodu na dogodek – za anketo, informativno kartico ali prošnjo za prispevek."
+      "step1Title": "Ustvarite in namestite Egg",
+      "step1Detail": "V Egg dodajte anketo ali informacije ter ga delite prek kode QR, oznake NFC ali obojega.",
+      "step1DetailWithDonations": "V Egg dodajte anketo, informacije ali podporo lokalu ter ga delite prek kode QR, oznake NFC ali obojega."
     },
     "flock": {
-      "magpieDetail": "Vsako kodo QR spremeni v meni z več anketami in informativno kartico ter izmenjavo vsebin in nagradnimi žrebanji.",
-      "magpieDetailWithDonations": "Vsako kodo QR spremeni v meni z več anketami, informativno kartico in možnostjo plačila za podporo lokalu ter izmenjavo vsebin in nagradnimi žrebanji.",
+      "eggName": "Egg",
+      "eggRole": "Ena stična točka, veliko načinov povezovanja",
+      "eggDetail": "Združi ankete, informacije in opravila na enem mestu za večkratno uporabo, dostopnem prek QR ali NFC.",
+      "eggDetailWithDonations": "Združi ankete, informacije, opravila in podporo lokalu na enem mestu za večkratno uporabo, dostopnem prek QR ali NFC.",
       "waxwingDetail": "Ponuja nagradna žrebanja, sledenje unovčenim nagradam in samodejna e-poštna sporočila za delovne prostore, pripravljene na hitrejšo rast.",
       "waxwingDetailWithDonations": "Ponuja nagradna žrebanja, sledenje unovčenim nagradam, donacije in samodejna e-poštna sporočila za delovne prostore, pripravljene na hitrejšo rast."
     },
     "finalEyebrow": "Ste pripravljeni izmeriti odziv?",
-    "finalTitle": "Zaženite svojo prvo kampanjo povratnih informacij prek kode QR.",
-    "finalCopy": "Nastavite delovni prostor, ustvarite kampanjo in spremenite odzive strank v naslednjo odločitev.",
+    "finalTitle": "Ustvarite svoj prvi Egg.",
+    "finalCopy": "Nastavite delovni prostor, ustvarite Egg in odzive strank spremenite v naslednji korak.",
     "openDashboard": "Odpri nadzorno ploščo"
   },
   "vote": {

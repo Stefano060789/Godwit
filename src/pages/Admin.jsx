@@ -810,7 +810,7 @@ export default function Admin() {
   }
 
   async function handleRemoveItem(itemId) {
-    if (!confirm("Remove this item from the QR code?")) return;
+    if (!confirm("Remove this item from the Egg?")) return;
     try {
       await removeQrCampaignItem(itemId);
       setQrCampaignItems((current) => current.filter((item) => item.id !== itemId));
@@ -895,7 +895,7 @@ export default function Admin() {
     const managed = await resolveManagedQrToken(token);
     if (!managed) {
       setScanResult(null);
-      setScanMessage("This QR code isn't linked to a poll in your workspace.");
+      setScanMessage("This Egg isn't linked to a poll in your workspace.");
       return;
     }
 
@@ -1357,7 +1357,7 @@ export default function Admin() {
     };
   }
 
-  // QR campaigns (the multi-item menu QR codes) previously only offered a "copy link" text
+  // Eggs (the multi-item customer destinations) previously only offered a "copy link" text
   // URL, with no actual QR image, download, or print option - unlike the older single-poll
   // QR cards above, which have all three. These two functions bring campaigns up to the same
   // level, reusing the same api.qrserver.com image source and branded print-poster layout,
@@ -1603,7 +1603,7 @@ export default function Admin() {
   const quickActions = [
     { key: "polls", icon: "\ud83d\udcca", bird: flockMemberForTab("polls"), label: t("admin.quickActions.polls.label"), description: t("admin.quickActions.polls.description"), onSelect: () => setActiveTab("polls") },
     { key: "woodpecker", icon: "\u2705", bird: flockMemberForTab("woodpecker"), label: t("admin.quickActions.woodpecker.label"), description: t("admin.quickActions.woodpecker.description"), onSelect: () => setActiveTab("woodpecker") },
-    { key: "engagement", icon: "\u2728", bird: flockMemberForTab("engagement"), label: t("admin.quickActions.engagement.label"), description: t("admin.quickActions.engagement.description"), onSelect: () => setActiveTab("engagement") },
+    { key: "engagement", icon: "🥚", bird: flockMemberForTab("engagement"), label: t("admin.quickActions.engagement.label"), description: t("admin.quickActions.engagement.description"), onSelect: () => setActiveTab("engagement") },
     { key: "connection", icon: "\ud83e\udd1d", bird: flockMemberForTab("connection"), label: t("admin.quickActions.connection.label"), description: t("admin.quickActions.connection.description"), onSelect: () => setActiveTab("connection") },
     { key: "analytics", icon: "\ud83d\udcca", bird: FLOCK.find((member) => member.key === "waxwing"), label: t("admin.quickActions.analytics.label"), description: t("admin.quickActions.analytics.description"), onSelect: () => navigate("/admin/analytics") },
     { key: "feedback", icon: "\ud83d\udcac", bird: flockMemberForTab("feedback"), label: t("admin.quickActions.feedback.label"), description: t("admin.quickActions.feedback.description"), onSelect: () => setActiveTab("feedback") },

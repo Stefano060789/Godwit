@@ -166,7 +166,7 @@ export default function QrRedirect() {
 
       if (error || !data) {
         console.error(error);
-        setErrorMessage("This QR code does not have an active poll.");
+        setErrorMessage("This Egg does not have an active poll.");
         return;
       }
 
@@ -190,7 +190,7 @@ export default function QrRedirect() {
   if (manage) {
     return (
       <main className="mx-auto max-w-md p-6 text-white">
-        <p className="text-xs font-semibold uppercase tracking-wide text-teal-300">You are managing this QR code</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-teal-300">You are managing this Egg</p>
         <h1 className="mt-1 text-2xl font-bold">{manage.campaign.name}</h1>
         <p className="mt-1 text-sm text-slate-400">
           {manage.campaign.placement_label || "Unlabeled placement"}{manage.campaign.variant_label ? ` · ${manage.campaign.variant_label}` : ""}
@@ -201,7 +201,7 @@ export default function QrRedirect() {
           <p className="mt-1 font-semibold">{manage.currentPoll?.question || "No poll assigned yet"}</p>
         </div>
 
-        <label className="mt-6 block text-sm font-semibold">Change the poll for this QR code</label>
+        <label className="mt-6 block text-sm font-semibold">Change the poll for this Egg</label>
         <select
           value={manage.campaign.poll_id ? String(manage.campaign.poll_id) : ""}
           onChange={(event) => changeAssignedPoll(event.target.value)}
@@ -217,7 +217,7 @@ export default function QrRedirect() {
           to={`/create?campaign=${manage.campaign.id}`}
           className="mt-4 block rounded bg-teal-400 px-4 py-3 text-center font-semibold text-slate-950"
         >
-          Create a new poll for this QR code
+          Create a new poll for this Egg
         </Link>
 
         <Link to="/admin" className="mt-6 block text-center text-sm text-slate-300 underline">Back to dashboard</Link>

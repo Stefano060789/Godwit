@@ -15,19 +15,19 @@
     "getStarted": "Empezar"
   },
   "landing": {
-    "eyebrow": "Feedback por QR para espacios reales",
-    "title": "Convierte cada local físico en un canal de feedback medible.",
-    "lede": "Godwit ayuda a los locales a convertir un simple escaneo QR en feedback, información de campañas y seguimiento basado en el consentimiento.",
+    "eyebrow": "Eggs para conectar con clientes en espacios reales",
+    "title": "Un Egg. Más formas de conectar.",
+    "lede": "Godwit ayuda a los negocios a ofrecer feedback, información útil y guía de IA opcional mediante Eggs reutilizables, accesibles por QR o NFC.",
     "workspaceDashboard": "Panel",
     "createWorkspace": "Empieza con Godwit",
     "workspaceLogin": "Iniciar sesión en Godwit",
     "note": "Diseñado para locales, eventos, hostelería, retail y equipos presenciales.",
     "howItWorksEyebrow": "Un ciclo simple",
-    "howItWorksTitle": "De un código QR a una mejor decisión.",
+    "howItWorksTitle": "De un Egg a una mejor experiencia para tus clientes.",
     "steps": {
-      "step1Title": "Coloca un código QR",
-      "step1Detail": "Usa un cartel QR personalizado en una mesa, mostrador, sala o entrada de un evento - para una encuesta o una tarjeta informativa.",
-      "step1DetailWithDonations": "Usa un cartel QR personalizado en una mesa, mostrador, sala o entrada de un evento - para una encuesta, una tarjeta informativa o una solicitud de donación.",
+      "step1Title": "Crea y coloca un Egg",
+      "step1Detail": "Configura un Egg con una encuesta o información y compártelo mediante QR, etiqueta NFC o ambos.",
+      "step1DetailWithDonations": "Configura un Egg con una encuesta, información o apoyo al negocio y compártelo mediante QR, etiqueta NFC o ambos.",
       "step2Title": "Recoge feedback en segundos",
       "step2Detail": "Los visitantes escanean, eligen una respuesta y la envían. No se necesita descarga ni cuenta.",
       "step3Title": "Convierte las respuestas en crecimiento",
@@ -47,7 +47,7 @@
     },
     "flockEyebrow": "Un producto, una bandada entera",
     "flockTitle": "Cada parte de Godwit tiene su propio carácter.",
-    "flockLede": "Siete especialistas que trabajan juntos, cada uno con el nombre de un ave, cada uno con una tarea que hace bien.",
+    "flockLede": "Conoce a los guías de Godwit: cada uno tiene una función clara para ayudar a tu negocio.",
     "flock": {
       "robinName": "Robin",
       "robinRole": "Tu primer guía amigable",
@@ -55,10 +55,10 @@
       "redshankName": "Redshank",
       "redshankRole": "Detecta los problemas a tiempo",
       "redshankDetail": "Redirige el feedback negativo a un mensaje privado antes de que llegue a Google, Booking o Tripadvisor.",
-      "magpieName": "Magpie",
-      "magpieRole": "Reúne el nido disperso",
-      "magpieDetail": "Convierte cada código QR en un menú con varias encuestas y una tarjeta informativa, además de rotaciones y sorteos.",
-      "magpieDetailWithDonations": "Convierte cada código QR en un menú con varias encuestas, una tarjeta informativa y una opción de pago de apoyo al local, además de rotaciones y sorteos.",
+      "eggName": "Egg",
+      "eggRole": "Un punto de contacto, muchas formas de conectar",
+      "eggDetail": "Reúne encuestas, información y tareas en un destino reutilizable, accesible mediante QR o NFC.",
+      "eggDetailWithDonations": "Reúne encuestas, información, tareas y apoyo al negocio en un destino reutilizable, accesible mediante QR o NFC.",
       "flamingoName": "Flamingo",
       "flamingoRole": "Muestra tu mejor cara",
       "flamingoDetail": "Presenta tu mejor feedback en una vitrina pública elegante que los visitantes disfrutan leer.",
@@ -74,8 +74,8 @@
       "owlDetail": "Vigila tu marca, el acceso de tu equipo y tu plan, en silencio, hasta que algo necesite tu atención."
     },
     "finalEyebrow": "¿Listo para medir el ambiente?",
-    "finalTitle": "Lanza tu primera campaña de feedback por QR.",
-    "finalCopy": "Configura tu espacio de trabajo, crea una campaña de feedback por QR y convierte las respuestas de los clientes en tu próxima decisión.",
+    "finalTitle": "Crea tu primer Egg.",
+    "finalCopy": "Configura tu espacio de trabajo, crea un Egg y convierte las respuestas de tus clientes en tu próximo paso.",
     "openDashboard": "Abrir el panel"
   },
   "vote": {
@@ -186,7 +186,7 @@
     },
     "rows": {
       "pollLimit": "Límite de encuestas activas",
-      "campaignLimit": "Campañas QR activas",
+      "campaignLimit": "Eggs activos",
       "seatLimit": "Puestos del equipo",
       "donations": "Donaciones",
       "csvExport": "Exportación CSV",
@@ -209,7 +209,7 @@
     "nav": {
       "overview": "Primera guía",
       "polls": "Encuestas",
-      "engagement": "Códigos QR",
+      "engagement": "Eggs",
       "connection": "Conexión con clientes",
       "feedback": "Comentarios",
       "settings": "Configuración"
@@ -217,7 +217,7 @@
     "tabDescriptions": {
       "overview": "Un resumen de tu espacio de trabajo: acciones rápidas, actividad de esta semana y cifras clave.",
       "polls": "Busca, comparte y gestiona cada pregunta que has creado.",
-      "engagement": "Un código QR es más que una encuesta: combina encuestas, tarjetas informativas y una petición de donación bajo un mismo código.",
+      "engagement": "Crea Eggs reutilizables con encuestas, información, tareas y guía de IA opcional, accesibles por QR o NFC.",
       "connection": "Convierte un escaneo QR en una relación continua con el cliente.",
       "feedback": "Mensajes de votantes, solicitudes de reseñas, sentimiento y tareas de recuperación.",
       "settings": "Marca, acceso del equipo, API de desarrollador y actividad reciente."
@@ -232,7 +232,7 @@
         "description": "Busca, filtra y consulta el rendimiento de cada encuesta."
       },
       "engagement": {
-        "label": "Crea un código QR",
+        "label": "Crea un Egg",
         "description": "Combina encuestas, tarjetas informativas y donaciones bajo un solo código impreso."
       },
       "connection": {
@@ -328,9 +328,9 @@
         "starts": "Empieza: {{date}}",
         "ends": "Termina: {{date}}",
         "created": "Creada: {{date}}",
-        "linkedQrCodes": "Códigos QR vinculados",
+        "linkedQrCodes": "Eggs vinculados",
         "notLinked": "Aún no está vinculada a ningún código QR.",
-        "setOneUp": "Configúralo en la pestaña de códigos QR",
+        "setOneUp": "Crea uno en la pestaña Eggs",
         "tokenTitle": "Token: {{token}}",
         "viewResults": "Ver resultados",
         "hideQr": "Ocultar QR",
@@ -431,9 +431,9 @@
     },
     "engagement": {
       "intro": {
-        "eyebrow": "Lo que puede contener un código QR",
-        "title": "Un código impreso, tres tipos de contenido.",
-        "body": "Un código QR no es solo un acceso directo a una encuesta. Al escanearlo, un votante puede ver una o más encuestas, una tarjeta informativa (menú, horario, biografía, notas de la exposición...) y una solicitud de donación, todo en el mismo código. Configura primero las donaciones abajo y luego crea el propio código en \"Campañas QR\"."
+        "eyebrow": "Cómo se combinan las encuestas y los Eggs",
+        "title": "Un Egg, muchas formas de conectar.",
+        "body": "Un Egg es una experiencia reutilizable para clientes, accesible por QR o NFC. Añade encuestas, tarjetas informativas, recompensas y tareas. Configura abajo el apoyo al negocio y después añádelo a un Egg."
       },
       "scanner": {
         "title": "Escanea un código QR",
@@ -481,13 +481,13 @@
         "delete": "Eliminar"
       },
       "campaigns": {
-        "title": "Campañas QR",
-        "description": "Crea un código QR duradero para cada ubicación y mide escaneos, respuestas y leads que aceptaron seguimiento. Cada uno empieza con una encuesta predeterminada abajo, pero abre \"Elementos de este código QR\" en cualquier campaña para añadir más encuestas, una tarjeta informativa o una solicitud de donación.",
+        "title": "Eggs",
+        "description": "Crea un destino reutilizable para tus clientes. Añade encuestas, información, recompensas o tareas y abre el mismo Egg mediante QR o NFC.",
         "tip": "Consejo: abre un código QR impreso mientras hayas iniciado sesión para ver su nombre y su encuesta, y cambiarlos directamente.",
         "namePlaceholder": "Póster del vestíbulo, recibo, expositor de mesa",
-        "createButton": "Crear QR de campaña",
+        "createButton": "Crear Egg",
         "placementPlaceholder": "Etiqueta de ubicación: vestíbulo, recibo, mesa",
-        "customizeWelcome": "Personalizar la pantalla de bienvenida del QR",
+        "customizeWelcome": "Personalizar la bienvenida para clientes",
         "welcomeHeadlinePlaceholder": "Titular de bienvenida (opcional)",
         "welcomeMessagePlaceholder": "Mensaje corto de bienvenida (opcional)",
         "bulkGenerate": "Generar varios códigos QR a la vez",
@@ -496,7 +496,7 @@
         "assignLater": "Asignar más tarde",
         "bulkGenerateButton": "Generar códigos QR",
         "bulkGenerateNote": "Crea \"Mesa 1\", \"Mesa 2\"... Luego puedes escanear o abrir cada uno para asignar o cambiar su encuesta.",
-        "noCampaigns": "Todavía no hay campañas QR monitorizadas.",
+        "noCampaigns": "Aún no hay Eggs. Crea el primero arriba.",
         "noDefaultPoll": "Sin encuesta predeterminada",
         "active": "Activa",
         "paused": "Pausada",
@@ -507,8 +507,8 @@
         "changePoll": "Cambiar encuesta:",
         "orRotate": "O rotar:",
         "noRotation": "Sin rotación",
-        "itemsOnQr": "Elementos de este código QR ({{count}})",
-        "itemsHint": "Añade aquí una o varias encuestas, tarjetas informativas y una solicitud de donación para convertir este código QR en un menú: al escanearlo, se mostrará todo lo que aparece abajo a la vez, en lugar de ir directamente a una sola encuesta."
+        "itemsOnQr": "Gestionar la experiencia de este Egg ({{count}})",
+        "itemsHint": "Añade encuestas, tarjetas informativas, recompensas y tareas a este Egg. Los clientes pueden abrir la misma experiencia por QR o NFC."
       },
       "wizard": {
         "stepOf": "Paso {{step}} de {{total}}",

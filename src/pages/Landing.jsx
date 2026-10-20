@@ -47,11 +47,11 @@ const flockKeys = [
   { key: "redshank", nameKey: "flock.redshankName", roleKey: "flock.redshankRole", detailKey: "flock.redshankDetail" },
   { key: "owl", nameKey: "flock.owlName", roleKey: "flock.owlRole", detailKey: "flock.owlDetail" },
   {
-    key: "magpie",
-    nameKey: "flock.magpieName",
-    roleKey: "flock.magpieRole",
-    detailKey: "flock.magpieDetail",
-    donationsDetailKey: "flock.magpieDetailWithDonations"
+    key: "egg",
+    nameKey: "flock.eggName",
+    roleKey: "flock.eggRole",
+    detailKey: "flock.eggDetail",
+    donationsDetailKey: "flock.eggDetailWithDonations"
   }
 ];
 

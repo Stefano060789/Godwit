@@ -1,7 +1,7 @@
 // The "flock": a set of bird mascots, each associated with one area of the Godwit workspace.
 // Used to give admins a friendly, memorable way to discover and learn features, both here
 // (the in-app guide) and on the public marketing site (see src/pages/Landing.jsx, which keeps
-// its own translated copy for the five customer-facing birds: Redshank, Magpie, Flamingo, Tern,
+// its own translated copy for the customer-facing flock: Redshank, Egg, Flamingo, Tern,
 // and Waxwing). Robin and Owl below are admin-only guide characters, not part of the sales pitch.
 //
 // `icon` is an emoji fallback (used only if `image` fails to load or isn't needed at a given
@@ -16,7 +16,7 @@
 import robinImage from "../assets/birds/robin.svg";
 import ternImage from "../assets/birds/tern.svg";
 import flamingoImage from "../assets/birds/flamingo.svg";
-import magpieImage from "../assets/birds/magpie.svg";
+import eggImage from "../assets/birds/egg.svg";
 import redshankImage from "../assets/birds/redshank.svg";
 import owlImage from "../assets/birds/owl.svg";
 import waxwingImage from "../assets/birds/waxwing.svg";
@@ -58,14 +58,14 @@ export const FLOCK = [
     tab: "connection"
   },
   {
-    key: "magpie",
-    name: "Magpie",
-    role: "Gathers everything into one nest",
+    key: "egg",
+    name: "Egg",
+    role: "One touchpoint, many ways to connect",
     detail: DONATION_FEATURE_ENABLED
-      ? "Builds each QR code as a menu: one or more polls, an info card, and a donation ask, plus rotations and prize draws."
-      : "Builds each QR code as a menu: one or more polls, an info card, plus rotations and prize draws.",
-    icon: "\u2728",
-    image: magpieImage,
+      ? "Brings polls, information, tasks, and venue support together in one reusable destination opened by QR or NFC."
+      : "Brings polls, information, and tasks together in one reusable destination opened by QR or NFC.",
+    icon: "🥚",
+    image: eggImage,
     color: "#8b78d6",
     colorDeep: "#5c4ca4",
     tab: "engagement"
