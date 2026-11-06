@@ -9,6 +9,7 @@
 //   - "translate": official Google Cloud Translation Basic API proxy. This stays here to respect
 //     Vercel's 12-function Hobby limit instead of adding another serverless function.
 import { captureError } from "../lib/errorReporting.js";
+import { isAllowedResendPurpose, sendResendEmail as sendResendRequest } from "../lib/resendEmail.js";
 
 async function supabaseGet(path) {
   const url = process.env.SUPABASE_URL;
@@ -20,10 +21,14 @@ async function supabaseGet(path) {
 }
 
 async function sendResendEmail({ to, subject, text }) {
+  if (!isAllowedResendPurpose("transactional_notification")) {
+    return { sent: false, reason: "purpose_not_allowed" };
+  }
   if (!process.env.RESEND_API_KEY || !process.env.REPORT_FROM_EMAIL) {
     return { sent: false, reason: "email_not_configured" };
   }
-  const delivery = await fetch("https://api.resend.com/emails", {
+  const delivery = await sendResendRequest("https://api.resend.com/emails", {
+    purpose: "transactional_notification",
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ from: process.env.REPORT_FROM_EMAIL, to: [to], subject, text })

@@ -53,6 +53,7 @@ describe("cron system-status route", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.core).toEqual({ supabase: true, appUrl: true });
+    expect(response.body.reputation).toEqual({ googlePlacesEnabled: false });
     expect(JSON.stringify(response.body)).not.toContain("must-not-be-returned");
   });
 });

@@ -66,12 +66,19 @@ export default async function handler(request, response) {
       ) {
         return response.status(400).json({ error: "Select supported countries, business types, and a total from 1 to 100 businesses." });
       }
-      return response.status(200).json(await runResearchGodwitProspects({
+      const result = await runResearchGodwitProspects({
         countries,
         businessTypes,
         targetTotal,
         language
-      }));
+      });
+      if (result.disabled) {
+        return response.status(503).json({
+          error: result.message,
+          code: result.code
+        });
+      }
+      return response.status(200).json(result);
     }
     if (action === "regenerate") {
       const contactId = String(request.body?.contactId || "");

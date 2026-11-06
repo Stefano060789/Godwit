@@ -1,145 +1,208 @@
 import { createHmac } from "node:crypto";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import handler from "../../api/stripe-webhook.js";
+import { STRIPE_SANDBOX_ACCOUNT } from "../../lib/stripeSandbox.js";
+import { jsonResponse, sandboxEnvironment, sandboxSubscription } from "../stripeSandboxFixtures.js";
 
 const originalEnv = { ...process.env };
-
-function jsonResponse(body, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
-}
+const secret = "whsec_fixture";
 
 function makeResponse() {
   return {
     statusCode: 200,
-    body: undefined,
-    status(code) {
-      this.statusCode = code;
-      return this;
-    },
-    json(payload) {
-      this.body = payload;
-      return this;
-    },
+    status(code) { this.statusCode = code; return this; },
+    json(payload) { this.body = payload; return this; },
     setHeader() {}
   };
 }
 
-function makeRequest(event, secret) {
+function makeRequest(event, signingSecret = secret, timestamp = Math.floor(Date.now() / 1000)) {
   const rawBody = JSON.stringify(event);
-  const timestamp = "1791734400";
-  const signature = createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
+  const signature = createHmac("sha256", signingSecret).update(`${timestamp}.${rawBody}`).digest("hex");
   return {
     method: "POST",
     headers: { "stripe-signature": `t=${timestamp},v1=${signature}` },
-    async *[Symbol.asyncIterator]() {
-      yield Buffer.from(rawBody);
-    }
+    async *[Symbol.asyncIterator]() { yield Buffer.from(rawBody); }
   };
 }
 
-function setWebhookEnvironment(secret) {
-  process.env.STRIPE_WEBHOOK_SECRET = secret;
-  process.env.SUPABASE_URL = "https://supabase.test";
-  process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role";
+function subscriptionEvent() {
+  return { id: "evt_godwit", type: "customer.subscription.updated", livemode: false, data: { object: sandboxSubscription() } };
 }
 
-describe("Stripe webhook history processing", () => {
+function webhookFetch({ remote = sandboxSubscription(), duplicate = false, processed = false, failWrite = false } = {}) {
+  return vi.fn(async (url, options = {}) => {
+    const href = String(url);
+    if (href.endsWith("/v1/account")) return jsonResponse({ id: STRIPE_SANDBOX_ACCOUNT });
+    if (href.includes("/v1/subscriptions/")) return jsonResponse(remote);
+    if (href.includes("/stripe_webhook_events?") && options.method === "POST") {
+      return jsonResponse(duplicate ? [] : [{ id: "evt_godwit" }]);
+    }
+    if (href.includes("/stripe_webhook_events?") && !options.method) {
+      return jsonResponse([{ processed_at: processed ? "2026-11-06T00:00:00Z" : null, error: null }]);
+    }
+    if (href.includes("/workspace_subscriptions?") && options.method === "POST") {
+      return new Response(null, { status: failWrite ? 500 : 204 });
+    }
+    if (href.includes("/stripe_webhook_events?") && options.method === "PATCH") return new Response(null, { status: 204 });
+    throw new Error(`Unexpected request: ${options.method} ${href}`);
+  });
+}
+
+describe("shared-account Stripe sandbox webhook", () => {
+  beforeEach(sandboxEnvironment);
   afterEach(() => {
     vi.unstubAllGlobals();
     process.env = { ...originalEnv };
   });
 
-  it("records completed donation events while new donation checkout is disabled", async () => {
-    const secret = "test-signing-secret";
-    setWebhookEnvironment(secret);
-    const donationWrites = [];
-    const fetchMock = vi.fn(async (url, options = {}) => {
-      const href = String(url);
-      const method = options.method || "GET";
-      if (href.includes("/stripe_webhook_events?") && method === "POST") {
-        return jsonResponse([{ id: "evt_donation" }]);
-      }
-      if (href.includes("/donations?") && method === "POST") {
-        donationWrites.push(JSON.parse(options.body));
-        return new Response(null, { status: 204 });
-      }
-      if (href.includes("/stripe_webhook_events?id=") && method === "PATCH") {
-        return new Response(null, { status: 204 });
-      }
-      throw new Error(`Unexpected request: ${method} ${href}`);
-    });
+  it.each(["disabled", "live-key"])("fails closed before any network calls when %s", async (mode) => {
+    if (mode === "disabled") process.env.STRIPE_SANDBOX_ENABLED = "0";
+    else process.env.STRIPE_SECRET_KEY = "sk_live_fixture";
+    const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
-
     const response = makeResponse();
-    await handler(makeRequest({
-      id: "evt_donation",
-      type: "checkout.session.completed",
-      data: {
-        object: {
-          id: "cs_donation",
-          amount_total: 2500,
-          currency: "eur",
-          payment_intent: "pi_donation",
-          metadata: {
-            kind: "donation",
-            workspace_id: "workspace-1",
-            campaign_id: "7",
-            application_fee_amount: "2250"
-          }
-        }
-      }
-    }, secret), response);
-
-    expect(response.statusCode).toBe(200);
-    expect(donationWrites).toEqual([expect.objectContaining({
-      workspace_id: "workspace-1",
-      campaign_id: 7,
-      stripe_checkout_session_id: "cs_donation",
-      amount_total: 25,
-      application_fee_amount: 22.5,
-      currency: "EUR",
-      status: "succeeded"
-    })]);
+    await handler(makeRequest(subscriptionEvent()), response);
+    expect(response.statusCode).toBe(503);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("continues to persist previously connected account status events", async () => {
-    const secret = "test-connect-signing-secret";
-    process.env.STRIPE_CONNECT_WEBHOOK_SECRET = secret;
-    process.env.SUPABASE_URL = "https://supabase.test";
-    process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role";
-    const accountUpdates = [];
-    const fetchMock = vi.fn(async (url, options = {}) => {
-      const href = String(url);
-      const method = options.method || "GET";
-      if (href.includes("/stripe_webhook_events?") && method === "POST") {
-        return jsonResponse([{ id: "evt_account" }]);
-      }
-      if (href.includes("/donation_settings?") && method === "PATCH") {
-        accountUpdates.push({ href, body: JSON.parse(options.body) });
-        return new Response(null, { status: 204 });
-      }
-      if (href.includes("/stripe_webhook_events?id=") && method === "PATCH") {
-        return new Response(null, { status: 204 });
-      }
-      throw new Error(`Unexpected request: ${method} ${href}`);
-    });
+  it("blocks before audit or entitlement writes if the configured sandbox database differs", async () => {
+    process.env.STRIPE_SANDBOX_SUPABASE_URL = "https://isolated-project.test";
+    const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
-
     const response = makeResponse();
-    await handler(makeRequest({
-      id: "evt_account",
-      type: "account.updated",
-      account: "acct_existing",
-      data: { object: { details_submitted: true, charges_enabled: true, payouts_enabled: false } }
-    }, secret), response);
+    await handler(makeRequest(subscriptionEvent()), response);
+    expect(response.statusCode).toBe(503);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 
+  it.each(["wrong-secret", "connect-secret", "expired"])("rejects %s signatures before writes", async (mode) => {
+    process.env.STRIPE_CONNECT_WEBHOOK_SECRET = "whsec_connect";
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeRequest(subscriptionEvent(), mode === "connect-secret" ? "whsec_connect"
+      : mode === "wrong-secret" ? "whsec_wrong" : secret, mode === "expired" ? 1 : undefined), response);
+    expect(response.statusCode).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each(["event-live", "object-live", "missing-mode", "missing-object-mode"])("rejects %s before audit writes", async (mode) => {
+    const event = subscriptionEvent();
+    if (mode === "event-live") event.livemode = true;
+    if (mode === "object-live") event.data.object.livemode = true;
+    if (mode === "missing-mode") delete event.livemode;
+    if (mode === "missing-object-mode") delete event.data.object.livemode;
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeRequest(event), response);
+    expect(response.statusCode).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it.each(["muse", "adventurebook", "unmarked", "wrong-environment", "donation", "connect", "unsupported"])(
+    "ignores %s events before any API calls or writes", async (mode) => {
+      const event = subscriptionEvent();
+      const object = event.data.object;
+      if (["muse", "adventurebook"].includes(mode)) object.metadata.app = mode;
+      if (mode === "unmarked") delete object.metadata.app;
+      if (mode === "wrong-environment") object.metadata.billing_environment = "live";
+      if (mode === "donation") { event.type = "checkout.session.completed"; object.metadata.kind = "donation"; }
+      if (mode === "connect") { event.type = "account.updated"; event.account = "acct_connected"; delete object.livemode; }
+      if (mode === "unsupported") event.type = "invoice.paid";
+      const fetchMock = vi.fn();
+      vi.stubGlobal("fetch", fetchMock);
+      const response = makeResponse();
+      await handler(makeRequest(event), response);
+      expect(response.statusCode).toBe(200);
+      expect(response.body.ignored).toBe(true);
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(["price", "plan", "workspace", "currency", "quantity", "multiple", "recurrence", "product"])(
+    "rejects mismatched %s before audit writes", async (mode) => {
+      const event = subscriptionEvent();
+      const object = event.data.object;
+      const item = object.items.data[0];
+      if (mode === "price") item.price.id = "price_muse";
+      if (mode === "plan") object.metadata.plan = "growth";
+      if (mode === "workspace") delete object.metadata.workspace_id;
+      if (mode === "currency") item.price.currency = "usd";
+      if (mode === "quantity") item.quantity = 2;
+      if (mode === "multiple") object.items.data.push(item);
+      if (mode === "recurrence") item.price.recurring.interval = "year";
+      if (mode === "product") item.price.product = "prod_muse";
+      const fetchMock = vi.fn();
+      vi.stubGlobal("fetch", fetchMock);
+      const response = makeResponse();
+      await handler(makeRequest(event), response);
+      expect(response.statusCode).toBe(500);
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(["customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"])(
+    "persists validated %s subscriptions", async (type) => {
+      const event = subscriptionEvent();
+      event.type = type;
+      if (type.endsWith("deleted")) event.data.object.status = "canceled";
+      const fetchMock = webhookFetch();
+      vi.stubGlobal("fetch", fetchMock);
+      const response = makeResponse();
+      await handler(makeRequest(event), response);
+      expect(response.statusCode).toBe(200);
+      const write = fetchMock.mock.calls.find(([url]) => url.includes("/workspace_subscriptions?"));
+      expect(JSON.parse(write[1].body)).toMatchObject({
+        workspace_id: "workspace-1", plan: "starter", status: event.data.object.status,
+        stripe_subscription_id: "sub_godwit", current_period_end: new Date(1800000000 * 1000).toISOString()
+      });
+    }
+  );
+
+  function checkoutEvent() {
+    const event = subscriptionEvent();
+    event.type = "checkout.session.completed";
+    event.data.object = {
+      id: "cs_test_godwit", livemode: false, mode: "subscription", subscription: "sub_godwit",
+      customer: "cus_godwit", metadata: sandboxSubscription().metadata
+    };
+    return event;
+  }
+
+  it("retrieves and validates checkout's subscription rather than marking a trial active", async () => {
+    const fetchMock = webhookFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeRequest(checkoutEvent()), response);
     expect(response.statusCode).toBe(200);
-    expect(accountUpdates).toHaveLength(1);
-    expect(accountUpdates[0].href).toBe("https://supabase.test/rest/v1/donation_settings?stripe_account_id=eq.acct_existing");
-    expect(accountUpdates[0].body).toMatchObject({
-      stripe_onboarding_complete: true,
-      stripe_charges_enabled: true,
-      stripe_payouts_enabled: false
-    });
+    const write = fetchMock.mock.calls.find(([url]) => url.includes("/workspace_subscriptions?"));
+    expect(JSON.parse(write[1].body).status).toBe("trialing");
+  });
+
+  it.each(["live", "foreign", "workspace", "customer"])("rejects %s retrieved subscriptions before audit writes", async (mode) => {
+    const remote = sandboxSubscription();
+    if (mode === "live") remote.livemode = true;
+    if (mode === "foreign") remote.metadata.app = "muse";
+    if (mode === "workspace") remote.metadata.workspace_id = "other-workspace";
+    if (mode === "customer") remote.customer = "cus_other";
+    const fetchMock = webhookFetch({ remote });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeRequest(checkoutEvent()), response);
+    expect(response.statusCode).toBeGreaterThanOrEqual(400);
+    expect(fetchMock.mock.calls.some(([url]) => url.includes("supabase"))).toBe(false);
+  });
+
+  it.each([false, true])("only skips already successfully processed deliveries (%s)", async (processed) => {
+    const fetchMock = webhookFetch({ duplicate: true, processed });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeRequest(subscriptionEvent()), response);
+    expect(response.statusCode).toBe(200);
+    expect(fetchMock.mock.calls.some(([url]) => url.includes("/workspace_subscriptions?"))).toBe(!processed);
+    expect(response.body.duplicate).toBe(processed ? true : undefined);
   });
 });

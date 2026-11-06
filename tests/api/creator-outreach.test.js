@@ -481,4 +481,33 @@ describe("creator-outreach regenerate action", () => {
     expect(res.body.error).toContain("Supabase");
     expect(res.body.error).toContain("Invalid JWT");
   });
+
+  it("returns an explicit disabled response without starting Places research", async () => {
+    process.env.SUPABASE_URL = "https://supabase.test";
+    process.env.SUPABASE_ANON_KEY = "anon-key";
+    process.env.CREATOR_EMAILS = "bonomistefano@outlook.it";
+    const fetchMock = vi.fn(async (url) => {
+      if (String(url).includes("/auth/v1/user")) {
+        return jsonResponse({ email: "bonomistefano@outlook.it" });
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubGlobal("fetch", fetchMock);
+
+    const req = makeRequest({ body: { action: "research" } });
+    const res = makeResponse();
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(503);
+    expect(res.body).toEqual({
+      error: "Google Places features are disabled.",
+      code: "google_places_disabled"
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalledWith("Google Places feature disabled.", {
+      action: "prospect_research",
+      code: "google_places_disabled"
+    });
+  });
 });

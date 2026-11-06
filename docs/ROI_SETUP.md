@@ -8,18 +8,18 @@ Campaign tracking applies only to links created under **Admin > QR campaigns**. 
 
 ## Stripe checkout
 
-Configure these Vercel server environment variables for the `api/create-checkout-session` endpoint:
+Only the explicitly opted-in **test subscription sandbox** is supported. Follow
+[STRIPE_SANDBOX.md](STRIPE_SANDBOX.md) for manual server environment and webhook
+configuration, shared-account isolation, and the pinned public catalogue.
+`BILLING_ENABLED=1` alone does not enable checkout; `STRIPE_SANDBOX_ENABLED=1`
+and a test-only API key are also required, together with the explicit isolated-storage
+URL and acknowledgment documented there. Legacy price environment overrides
+are ignored. Tax automation, guest donations, Connect flows, and live billing
+remain disabled. The pilot UI is unchanged.
 
-| Variable | Purpose |
-| --- | --- |
-| `STRIPE_SECRET_KEY` | Stripe secret API key. Never prefix it with `VITE_`. |
-| `STRIPE_PRICE_STARTER` | Recurring Stripe Price ID for the Starter plan. |
-| `STRIPE_PRICE_GROWTH` | Recurring Stripe Price ID for the Growth plan. |
-| `APP_URL` | Canonical deployed app origin, such as `https://example.com`. |
-| `SUPABASE_URL` | Server-side Supabase project URL used to verify the caller. |
-| `SUPABASE_ANON_KEY` | Server-side Supabase anon key used for verification. |
-
-The browser only sends a fixed plan key and the authenticated Supabase access token. The endpoint chooses the Price ID server-side and creates the Stripe Checkout session. `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` remain required client variables; do not create any `VITE_` Stripe variable.
+The browser only sends a fixed plan key and the authenticated Supabase access token.
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` remain required client variables;
+do not create any `VITE_` Stripe variable.
 
 ## Follow-up consent
 

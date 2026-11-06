@@ -27,7 +27,6 @@ const COMPARISON_ROWS = [
   { rowKey: "redemptionTracking" },
   { rowKey: "prizeDraws" },
   { rowKey: "automatedNurture" },
-  { rowKey: "reputationMonitoring" },
   { rowKey: "webhooks" },
   { rowKey: "apiAccess" }
 ];

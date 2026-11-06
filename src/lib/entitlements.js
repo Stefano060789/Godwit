@@ -67,7 +67,7 @@ export const PLAN_FEATURES = {
     prizeDraws: true,
     leadCapture: true,
     automatedNurture: true,
-    reputationMonitoring: true,
+    reputationMonitoring: false,
     webhooks: true,
     apiAccess: true
   }
@@ -85,7 +85,6 @@ export const FEATURE_COPY = {
   prizeDraws: { label: "Prize draws / raffles", minPlan: "growth" },
   leadCapture: { label: "Lead capture", minPlan: "starter" },
   automatedNurture: { label: "Automated follow-up emails", minPlan: "growth" },
-  reputationMonitoring: { label: "Public reputation monitoring", minPlan: "growth" },
   webhooks: { label: "Webhooks", minPlan: "growth" },
   apiAccess: { label: "Developer API access", minPlan: "growth" }
 };

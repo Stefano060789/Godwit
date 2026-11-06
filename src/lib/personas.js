@@ -72,12 +72,6 @@ export const PERSONAS = [
         tab: "engagement",
         feature: "redemptionTracking"
       },
-      {
-        title: "Watch your public reputation",
-        detail: "See your Google rating trend in one place, without checking multiple apps.",
-        tab: "settings",
-        feature: "reputationMonitoring"
-      }
     ]
   },
   {

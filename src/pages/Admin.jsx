@@ -23,7 +23,6 @@ import FlockAvatar from "../components/FlockAvatar";
 import { loadLeadNurtureSettings, saveLeadNurtureSettings } from "../lib/leadNurture";
 import { loadWinbackSettings, saveWinbackSettings } from "../lib/winbackSettings";
 import { loadDonationSettings, saveDonationSettings, startStripeConnectOnboarding, refreshStripeConnectStatus } from "../lib/donationSettings";
-import { loadLatestReputationSnapshot, refreshReputationSnapshot } from "../lib/reputation";
 import { loadApiKeys, createApiKey, deleteApiKey } from "../lib/apiKeys";
 import { getEntitlements, planLabel, minPlanLabelFor } from "../lib/entitlements";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
@@ -78,7 +77,6 @@ export default function Admin() {
     primaryColor: "#0f766e",
     accentColor: "#172b2b",
     webhookUrl: "",
-    googlePlaceId: "",
     reviewPlatforms: [],
     role: "owner",
     plan: "free"
@@ -144,9 +142,6 @@ export default function Admin() {
   const [stripeConnectBusy, setStripeConnectBusy] = useState(false);
   const [stripeConnectError, setStripeConnectError] = useState("");
   const [donationStats, setDonationStats] = useState({ totalRaised: 0, count: 0 });
-  const [reputationSnapshot, setReputationSnapshot] = useState(null);
-  const [reputationLoading, setReputationLoading] = useState(false);
-  const [reputationError, setReputationError] = useState("");
   const [sentimentSummary, setSentimentSummary] = useState({});
   const [newRulePollId, setNewRulePollId] = useState("");
   const [newRuleType, setNewRuleType] = useState("low_score");
@@ -289,11 +284,6 @@ export default function Admin() {
           totalRaised: (donationRows || []).reduce((sum, row) => sum + Number(row.amount_total || 0), 0),
           count: (donationRows || []).length
         });
-        try {
-          setReputationSnapshot(await loadLatestReputationSnapshot(profile.id));
-        } catch (reputationLoadError) {
-          console.error(reputationLoadError);
-        }
         const { data: sentimentRows } = await supabase.from("user_answers").select("poll_id, sentiment").not("sentiment", "is", null);
         const summary = {};
         (sentimentRows || []).forEach((row) => {
@@ -1033,20 +1023,6 @@ export default function Admin() {
       setStripeConnectError(error.message || "Unable to check Stripe status.");
     } finally {
       setStripeConnectBusy(false);
-    }
-  }
-
-  async function refreshPublicReputation() {
-    setReputationLoading(true);
-    setReputationError("");
-    try {
-      const snapshot = await refreshReputationSnapshot(workspaceUserId);
-      setReputationSnapshot(snapshot);
-    } catch (error) {
-      console.error(error);
-      setReputationError(error.message || "Unable to refresh public reputation.");
-    } finally {
-      setReputationLoading(false);
     }
   }
 
@@ -3250,70 +3226,6 @@ export default function Admin() {
           </button>
         </div>
 
-        <div className="mt-6 border-t border-slate-700 pt-4">
-          <p className="font-semibold">{t("admin.settings.googleBusiness.title")}</p>
-          <p className="mt-1 text-xs text-slate-400">{t("admin.settings.googleBusiness.subtitle")}</p>
-          <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-slate-300">
-            <li>{t("admin.settings.googleBusiness.step1Prefix")} <strong>{t("admin.settings.googleBusiness.step1Cta")}</strong> {t("admin.settings.googleBusiness.step1Suffix")}</li>
-            <li>{t("admin.settings.googleBusiness.step2")}</li>
-            <li>{t("admin.settings.googleBusiness.step3Prefix")} <strong>{t("admin.settings.googleBusiness.step3PlaceId")}</strong> {t("admin.settings.googleBusiness.step3Suffix")} <code>ChIJN1t_tDeuEmsRUsoyG83frY4</code>).</li>
-            <li>{t("admin.settings.googleBusiness.step4Prefix")} <strong>{t("admin.settings.googleBusiness.step4Cta")}</strong>.</li>
-          </ol>
-          <a
-            href="https://developers.google.com/maps/documentation/places/web-service/place-id"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-block rounded bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-950"
-          >
-            {t("admin.settings.googleBusiness.findLink")} ↗
-          </a>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <input
-              type="text"
-              value={workspaceProfile.googlePlaceId || ""}
-              onChange={(event) => setWorkspaceProfile((current) => ({ ...current, googlePlaceId: event.target.value }))}
-              className="flex-1 border p-2 rounded text-black"
-              placeholder={t("admin.settings.googleBusiness.placeIdPlaceholder")}
-            />
-            <button
-              onClick={saveWorkspaceSettings}
-              disabled={!permission.canManageWorkspace}
-              className={`shrink-0 rounded px-4 py-2 font-semibold ${
-                permission.canManageWorkspace ? "bg-blue-600 text-white" : "bg-gray-600 text-gray-300 cursor-not-allowed"
-              }`}
-            >
-              {t("admin.settings.googleBusiness.saveButton")}
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-6 border-t border-slate-700 pt-4">
-          <p className="font-semibold">{t("admin.settings.reputation.title")}</p>
-          {entitlements.reputationMonitoring ? (
-          <>
-          <p className="mt-1 text-xs text-slate-400">{t("admin.settings.reputation.subtitle")}</p>
-          {reputationSnapshot ? (
-            <p className="mt-3 text-sm">
-              <span className="text-2xl font-bold text-amber-300">{reputationSnapshot.rating ?? "-"}</span>
-              <span className="ml-2 text-slate-400">{t("admin.settings.reputation.ratingSummary", { count: reputationSnapshot.rating_count ?? 0 })}</span>
-              <span className="ml-2 block text-xs text-slate-500 sm:inline sm:ml-2">{t("admin.settings.reputation.asOf", { date: new Date(reputationSnapshot.captured_at).toLocaleString() })}</span>
-            </p>
-          ) : (
-            <p className="mt-3 text-sm text-slate-400">{t("admin.settings.reputation.noRating")}</p>
-          )}
-          <button onClick={refreshPublicReputation} disabled={reputationLoading || !workspaceProfile.googlePlaceId} className="mt-3 rounded bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-60">
-            {reputationLoading ? t("admin.settings.reputation.refreshing") : t("admin.settings.reputation.refreshButton")}
-          </button>
-          {reputationError && <p className="mt-2 text-sm text-red-300">{reputationError}</p>}
-          </>
-          ) : (
-            <LockedFeature
-              feature="reputationMonitoring"
-              title={t("admin.settings.reputation.lockedTitle")}
-              description={t("admin.settings.reputation.lockedDescription")}
-            />
-          )}
-        </div>
         </div>
       </details>
 

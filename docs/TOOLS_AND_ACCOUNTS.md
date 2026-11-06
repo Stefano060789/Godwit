@@ -2,6 +2,8 @@
 
 This is an operational handoff for the Godwit application. It records what each service does, which login identifiers are known from the project, and where its configuration is managed. It intentionally does not contain passwords, API keys, recovery codes, or other secrets.
 
+See [the privacy/provider inventory](./PRIVACY_PROVIDER_INVENTORY.md) for source-observed data flows and owner-only release checks, and [the license/source inventory](./LICENSE_SOURCE_INVENTORY.md) for installed direct dependency metadata and asset provenance gaps.
+
 ## Main services
 
 | Service | Why the project uses it | Login/account identifier known here | Configuration and notes |
@@ -10,15 +12,15 @@ This is an operational handoff for the Godwit application. It records what each 
 | **Cloudflare (domain/DNS, if configured)** | May manage the `hellogodwit.com` domain's DNS, proxy, or security settings in front of Vercel. The application source does not confirm that Cloudflare is currently active for this domain. | Cloudflare account login is not recorded in the repository. | Check the domain's nameservers at the registrar and the DNS records in Cloudflare. Keep Vercel as the app host unless the deployment setup is intentionally changed. |
 | **Supabase** | PostgreSQL database, authentication, Row Level Security, and application RPC functions. | Creator sign-in emails: `bonomistefano@outlook.it` and `afelix470@gmail.com`. The Supabase dashboard owner email is not recorded here. | The project URL and keys are environment variables. The service-role key must remain server-only. The migration `supabase/20261004_add_creator_access.sql` must be run in the SQL Editor to grant the additional Creator access in the database. |
 | **GitHub** | Source control and the deployment source for the app. | Owner `Stefano060789`, repository [`Stefano060789/Godwit`](https://github.com/Stefano060789/Godwit); local `origin` is `https://github.com/Stefano060789/Godwit.git`. Renamed from `iVote` on 11 October 2026. | Push changes to `main`; Vercel's Git connection was refreshed to the renamed repository and the production deployment verified. |
-| **Google / Gmail** | Google Places supplies business prospects and location details; Google Translate supports translation features; Gmail SMTP sends Creator outreach and Gmail IMAP checks for replies. | Outbound Creator mail account: `hellogodwit@gmail.com`. The Google Cloud project owner/login is not recorded here. | Places and Translate use separate API-key environment variables. SMTP uses a Google App Password in `OUTREACH_SMTP_PASSWORD`; IMAP also uses `OUTREACH_SMTP_USER`. Never use or store the normal Gmail password in the app. |
-| **SerpApi** | Searches public Google results for business contact emails when the listed business website has no email or is unavailable. | SerpApi account email is not recorded here. | `SERPAPI_API_KEY` is a server-only Vercel variable. The key was configured by the project owner; public search may incur provider usage charges. |
+| **Google / Gmail** | Google Places prospect research and rating refresh are disabled in code. Google Cloud Translation remains available; Gmail SMTP sends Creator outreach and Gmail IMAP checks for replies. | Outbound Creator mail account: `hellogodwit@gmail.com`. The Google Cloud project owner/login is not recorded here. | Translation uses `GOOGLE_TRANSLATE_API_KEY`. Gmail SMTP/IMAP use the existing server-only `OUTREACH_SMTP_PASSWORD` and `OUTREACH_SMTP_USER`. A Places key, if still configured externally, does not re-enable the feature. Never use or store the normal Gmail password in the app. |
+| **SerpApi** | Searches public Google results for business contact emails on previously stored Creator prospect records; it no longer discovers prospects through Google Places. | SerpApi account email is not recorded here. | `SERPAPI_API_KEY` is a server-only Vercel variable. The key was configured by the project owner; public search may incur provider usage charges. |
 
 ## Additional and optional integrations
 
 | Service | Why / when it is used | Login/account identifier known here | Configuration |
 | --- | --- | --- | --- |
-| **Stripe** | Subscription checkout and webhook processing, including retained donation/Connect history handling. New donations and Connect onboarding are disabled in the application. | Stripe dashboard login is not recorded here. | `STRIPE_SECRET_KEY`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_GROWTH`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_WEBHOOK_SECRET`; subscription billing is gated by `BILLING_ENABLED`, and donation/Connect entry points by `DONATION_FEATURE_ENABLED` in `lib/donationFeature.js`. |
-| **Resend** | Transactional notifications, reports, and consent-based lead follow-up email. | Resend account login is not recorded here. | `RESEND_API_KEY` and verified sender `REPORT_FROM_EMAIL`. This is separate from Gmail Creator outreach. |
+| **Stripe** | Explicitly opted-in test subscription sandbox only, on shared account `acct_1UQsxxC5ufGRzg9R`. Donation/Connect flows and their webhook history processing remain blocked in the sandbox. | Stripe dashboard login is not recorded here. | `STRIPE_SECRET_KEY` must be test-only; `STRIPE_WEBHOOK_SECRET` must be Godwit's separate test endpoint secret. Both `BILLING_ENABLED=1` and `STRIPE_SANDBOX_ENABLED=1` are required. Public catalogue IDs are pinned in `lib/stripeSandbox.js`; see [STRIPE_SANDBOX.md](STRIPE_SANDBOX.md) for manual configuration. |
+| **Resend** | Transactional notifications/reports and consent-based lead follow-up. Code accepts only transactional-notification and consented-marketing purposes; cold/prospect outreach is blocked. | Resend account login is not recorded here. | `RESEND_API_KEY` and sender `REPORT_FROM_EMAIL`. This is separate from Gmail Creator outreach; provider configuration and sender verification are not confirmed here. |
 | **Google Gemini** | Preferred provider for Creator outreach drafts, using available public business information to propose a business-specific feedback opportunity. | Google AI Studio account; the account owner is not recorded here. | Set `GEMINI_API_KEY` in Vercel. The app uses Gemini's OpenAI-compatible API; when both provider keys are configured, Gemini is preferred. Research does not create a sendable template; use Regenerate to create each draft. |
 | **OpenAI** | Optional AI-assisted sentiment classification and fallback provider for Creator outreach drafts. | OpenAI account login is not recorded here. | `OPENAI_API_KEY`. Used for outreach only when `GEMINI_API_KEY` is not configured. |
 | **Sentry** | Optional browser and server error monitoring. | Sentry organization/account login is not recorded here. | Client `VITE_SENTRY_DSN`; server `SENTRY_DSN`. |
@@ -48,14 +50,15 @@ The current Creator email allowlist includes `bonomistefano@outlook.it` and `afe
 - `OUTREACH_SMTP_PASSWORD` — Gmail App Password for `hellogodwit@gmail.com`, not its normal password.
 - `OUTREACH_SMTP_USER` — Gmail account used by the IMAP reply monitor; use `hellogodwit@gmail.com`.
 - `SERPAPI_API_KEY` — public web search fallback for business contact email discovery.
-- `GOOGLE_PLACES_API_KEY` — Places search and business/location data.
 - `OUTREACH_NOTIFICATION_EMAIL` (optional reply-monitor notification destination).
 - `SUPPORT_TO_EMAIL` (optional support/notification destination).
+
+Google Places is disabled in code; do not configure a new `GOOGLE_PLACES_API_KEY` for this product. Existing workspace Place IDs and reputation snapshots remain stored and are not displayed or refreshed.
 
 ### Other feature-specific variables
 
 - Google Translate: `GOOGLE_TRANSLATE_API_KEY`
-- Stripe: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_GROWTH`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONNECT_WEBHOOK_SECRET`, `STRIPE_TAX_ENABLED`, `BILLING_ENABLED`
+- Stripe sandbox: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BILLING_ENABLED`, `STRIPE_SANDBOX_ENABLED`, `STRIPE_SANDBOX_SUPABASE_URL`, `STRIPE_SANDBOX_ISOLATED_STORAGE_ACK`; explicit isolated storage is required, tax automation is forced off, legacy price env overrides and Connect secrets are not used.
 - Resend: `RESEND_API_KEY`, `REPORT_FROM_EMAIL`
 - Gemini outreach: `GEMINI_API_KEY`
 - OpenAI sentiment classification and optional outreach fallback: `OPENAI_API_KEY`

@@ -72,7 +72,7 @@ export async function loadWorkspaceProfile() {
 
   let { data: workspace, error } = await supabase
     .from("workspaces")
-    .select("id, name, logo_url, primary_color, accent_color, webhook_url, vote_retention_days, google_place_id, review_platforms")
+    .select("id, name, logo_url, primary_color, accent_color, webhook_url, vote_retention_days, review_platforms")
     .eq("id", workspaceId)
     .single();
 
@@ -81,7 +81,7 @@ export async function loadWorkspaceProfile() {
   if (error?.code === "42703" || error?.message?.includes("review_platforms")) {
     ({ data: workspace, error } = await supabase
       .from("workspaces")
-      .select("id, name, logo_url, primary_color, accent_color, webhook_url, vote_retention_days, google_place_id")
+      .select("id, name, logo_url, primary_color, accent_color, webhook_url, vote_retention_days")
       .eq("id", workspaceId)
       .single());
   }
@@ -101,7 +101,6 @@ export async function loadWorkspaceProfile() {
     accentColor: workspace.accent_color || "#0f172a",
     webhookUrl: workspace.webhook_url || "",
     voteRetentionDays: workspace.vote_retention_days || "",
-    googlePlaceId: workspace.google_place_id || "",
     reviewPlatforms: Array.isArray(workspace.review_platforms) ? workspace.review_platforms : [],
     role,
     plan
@@ -141,7 +140,6 @@ export async function saveWorkspaceProfile(workspaceId, patch = {}) {
     accent_color: next.accentColor,
     webhook_url: patch.webhookUrl?.trim() || null,
     vote_retention_days: patch.voteRetentionDays ? Number(patch.voteRetentionDays) : null,
-    google_place_id: patch.googlePlaceId?.trim() || null,
     reviewPlatforms: Array.isArray(patch.reviewPlatforms)
       ? patch.reviewPlatforms
         .filter((platform) => platform?.name?.trim() && platform?.url?.trim())

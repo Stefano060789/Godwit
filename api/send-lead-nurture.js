@@ -1,4 +1,5 @@
 import { captureError } from "../lib/errorReporting.js";
+import { isAllowedResendPurpose, sendResendEmail } from "../lib/resendEmail.js";
 
 async function supabaseGet(path) {
   const url = process.env.SUPABASE_URL;
@@ -33,29 +34,50 @@ export default async function handler(request, response) {
   }
 
   try {
-    const [lead] = await supabaseGet(`voter_leads?id=eq.${leadId}&workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,email,nurture_sent_at`);
+    const [lead] = await supabaseGet(`voter_leads?id=eq.${leadId}&workspace_id=eq.${encodeURIComponent(workspaceId)}&select=id,email,consented_at,nurture_sent_at`);
     if (!lead || lead.nurture_sent_at) return response.status(200).json({ sent: false });
+    if (!lead.consented_at) {
+      console.warn("Resend lead nurture blocked: consent could not be verified.", { leadId });
+      return response.status(200).json({ sent: false, reason: "consent_not_verified" });
+    }
 
     const [subscription] = await supabaseGet(`workspace_subscriptions?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=plan,status`);
     const plan = subscription?.plan === "growth" && ["active", "trialing"].includes(subscription.status) ? "growth" : "free";
     if (plan !== "growth") return response.status(200).json({ sent: false });
 
     const [settings] = await supabaseGet(`lead_nurture_settings?workspace_id=eq.${encodeURIComponent(workspaceId)}&select=is_enabled,subject,message`);
-    if (!settings?.is_enabled || !settings.subject || !settings.message) return response.status(200).json({ sent: false });
+    if (!settings?.is_enabled || !settings.subject || !settings.message) {
+      return response.status(200).json({ sent: false, reason: "not_enabled" });
+    }
 
-    if (!process.env.RESEND_API_KEY || !process.env.REPORT_FROM_EMAIL) return response.status(200).json({ sent: false });
+    if (!process.env.RESEND_API_KEY || !process.env.REPORT_FROM_EMAIL) {
+      return response.status(503).json({
+        sent: false,
+        error: "Consented email delivery is not configured.",
+        code: "resend_not_configured"
+      });
+    }
 
     const [profile] = await supabaseGet(
       `voter_profiles?workspace_id=eq.${encodeURIComponent(workspaceId)}&email=eq.${encodeURIComponent(lead.email)}&select=unsubscribed_at,unsubscribe_token`
     );
-    if (profile?.unsubscribed_at) return response.status(200).json({ sent: false, reason: "unsubscribed" });
+    if (!profile) {
+      console.warn("Resend lead nurture blocked: recipient consent status could not be verified.", { leadId });
+      return response.status(200).json({ sent: false, reason: "consent_not_verified" });
+    }
+    if (profile.unsubscribed_at) return response.status(200).json({ sent: false, reason: "unsubscribed" });
 
     const appUrl = process.env.APP_URL || "";
     const unsubscribeLine = profile?.unsubscribe_token
       ? `\n\n---\nDon't want these emails? Unsubscribe: ${appUrl}/unsubscribe?token=${profile.unsubscribe_token}`
       : "";
 
-    const delivery = await fetch("https://api.resend.com/emails", {
+    if (!isAllowedResendPurpose("consented_marketing")) {
+      return response.status(403).json({ sent: false, reason: "purpose_not_allowed" });
+    }
+
+    const delivery = await sendResendEmail("https://api.resend.com/emails", {
+      purpose: "consented_marketing",
       method: "POST",
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ from: process.env.REPORT_FROM_EMAIL, to: [lead.email], subject: settings.subject, text: `${settings.message}${unsubscribeLine}` })
@@ -67,6 +89,9 @@ export default async function handler(request, response) {
     return response.status(200).json({ sent: true });
   } catch (error) {
     captureError("Lead nurture email failed", error);
-    return response.status(200).json({ sent: false });
+    return response.status(500).json({
+      sent: false,
+      error: "Unable to send the consented follow-up email."
+    });
   }
 }

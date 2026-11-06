@@ -12,11 +12,12 @@
 
 import { captureError } from "../lib/errorReporting.js";
 import { DONATION_FEATURE_ENABLED } from "../lib/donationFeature.js";
-
-const PLANS = {
-  starter: { priceEnv: "STRIPE_PRICE_STARTER", label: "Starter" },
-  growth: { priceEnv: "STRIPE_PRICE_GROWTH", label: "Growth" }
-};
+import {
+  STRIPE_SANDBOX_PLANS as PLANS,
+  requireStripeSandbox,
+  stripeSandboxRequest,
+  validateSandboxPrice
+} from "../lib/stripeSandbox.js";
 
 const DONATION_PLATFORM_FEE_RATE = 0.09;
 const DONATION_MIN_AMOUNT = 1;
@@ -27,18 +28,8 @@ function readBearerToken(request) {
   return header.startsWith("Bearer ") ? header.slice(7) : "";
 }
 
-async function stripeRequest(path, form, secretKey, method = "POST") {
-  const response = await fetch(`https://api.stripe.com/v1${path}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${secretKey}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: method === "GET" ? undefined : form
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data?.error?.message || "Stripe request failed.");
-  return data;
+async function stripeRequest(path, form, method = "POST") {
+  return stripeSandboxRequest(path, { form, method });
 }
 
 async function supabaseServiceRequest(path, { method = "GET", body, prefer } = {}) {
@@ -95,13 +86,6 @@ async function getManagedWorkspace(token, userId) {
 // from a second free trial (otherwise: subscribe, cancel, resubscribe, repeat forever).
 const FREE_TRIAL_DAYS = 90;
 
-// Stripe Tax auto-calculates VAT/GST for subscriptions based on the customer's billing address,
-// but it errors out if the Stripe account hasn't finished the one-time "add an origin address /
-// enable Stripe Tax" setup in the Dashboard (Settings -> Tax). Gate it behind an env var so
-// checkout keeps working today, and flip it on only once that Dashboard setup is done - see
-// docs/TODO.md's "External legal review" section for the full VAT walkthrough.
-const STRIPE_TAX_ENABLED = process.env.STRIPE_TAX_ENABLED === "1";
-
 async function hasUsedTrialBefore(headers, workspaceId) {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   if (!supabaseUrl) return true; // fail closed: no trial if we can't check
@@ -124,6 +108,7 @@ export default async function handler(request, response) {
   if (mode === "connect-onboarding") return handleConnectOnboarding(request, response);
   if (mode === "connect-status") return handleConnectStatus(request, response);
   if (mode === "donation") return handleDonationCheckout(request, response);
+  if (mode !== "subscription") return response.status(400).json({ error: "Unsupported checkout mode." });
   return handleSubscriptionCheckout(request, response);
 }
 
@@ -133,9 +118,14 @@ async function handleSubscriptionCheckout(request, response) {
   if (process.env.BILLING_ENABLED !== "1") {
     return response.status(503).json({ error: "Paid subscriptions are unavailable during the free pilot." });
   }
+  try {
+    requireStripeSandbox();
+  } catch {
+    return response.status(503).json({ error: "Stripe sandbox billing is not configured." });
+  }
   const planKey = String(request.body?.plan || "");
-  const plan = PLANS[planKey];
-  const priceId = plan && process.env[plan.priceEnv];
+  const plan = Object.hasOwn(PLANS, planKey) ? PLANS[planKey] : null;
+  const priceId = plan?.priceId;
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   const appUrl = process.env.APP_URL || request.headers.origin;
   const user = await getAuthenticatedUser(readBearerToken(request));
@@ -159,11 +149,16 @@ async function handleSubscriptionCheckout(request, response) {
     cancel_url: `${appUrl}/admin/billing?checkout=cancelled`,
     "line_items[0][price]": priceId,
     "line_items[0][quantity]": "1",
+    "automatic_tax[enabled]": "false",
+    "metadata[app]": "godwit",
+    "metadata[billing_environment]": "sandbox",
     "metadata[plan]": planKey,
     "metadata[supabase_user_id]": user.id,
     "metadata[workspace_id]": workspaceId,
     "subscription_data[metadata][plan]": planKey,
     "subscription_data[metadata][workspace_id]": workspaceId,
+    "subscription_data[metadata][app]": "godwit",
+    "subscription_data[metadata][billing_environment]": "sandbox",
     client_reference_id: user.id
   });
   if (user.email) form.set("customer_email", user.email);
@@ -174,16 +169,12 @@ async function handleSubscriptionCheckout(request, response) {
     form.set("subscription_data[trial_settings][end_behavior][missing_payment_method]", "cancel");
     form.set("payment_method_collection", "always");
   }
-  if (STRIPE_TAX_ENABLED) {
-    // Requires the customer's location to pick the right jurisdiction/rate, and lets an EU
-    // business customer enter their own VAT ID for reverse charge.
-    form.set("automatic_tax[enabled]", "true");
-    form.set("billing_address_collection", "required");
-    form.set("tax_id_collection[enabled]", "true");
-  }
-
   try {
-    const checkout = await stripeRequest("/checkout/sessions", form, stripeSecretKey);
+    await stripeSandboxRequest("account");
+    const price = await stripeSandboxRequest(`prices/${encodeURIComponent(priceId)}`);
+    validateSandboxPrice(price, planKey);
+    if (price.active !== true) throw new Error("Stripe sandbox price is not active.");
+    const checkout = await stripeRequest("/checkout/sessions", form);
     if (!checkout.url) throw new Error("Stripe did not return a checkout URL.");
     return response.status(200).json({ url: checkout.url, plan: plan.label, trialDays: trialEligible ? FREE_TRIAL_DAYS : 0 });
   } catch (error) {
@@ -225,7 +216,7 @@ async function handleConnectOnboarding(request, response) {
         "capabilities[transfers][requested]": "true",
         "metadata[workspace_id]": workspaceId
       });
-      const account = await stripeRequest("/accounts", accountForm, stripeSecretKey);
+      const account = await stripeRequest("/accounts", accountForm);
       accountId = account.id;
       await supabaseServiceRequest("/rest/v1/donation_settings?on_conflict=workspace_id", {
         method: "POST",
@@ -240,7 +231,7 @@ async function handleConnectOnboarding(request, response) {
       refresh_url: `${appUrl}/admin?tab=engagement&donations=refresh`,
       return_url: `${appUrl}/admin?tab=engagement&donations=connected`
     });
-    const accountLink = await stripeRequest("/account_links", linkForm, stripeSecretKey);
+    const accountLink = await stripeRequest("/account_links", linkForm);
     return response.status(200).json({ url: accountLink.url });
   } catch (error) {
     captureError("Stripe Connect onboarding error", error);
@@ -267,7 +258,7 @@ async function handleConnectStatus(request, response) {
     const existing = existingRows?.[0];
     if (!existing?.stripe_account_id) return response.status(200).json({ connected: false });
 
-    const account = await stripeRequest(`/accounts/${existing.stripe_account_id}`, null, stripeSecretKey, "GET");
+    const account = await stripeRequest(`/accounts/${existing.stripe_account_id}`, null, "GET");
     await supabaseServiceRequest("/rest/v1/donation_settings?on_conflict=workspace_id", {
       method: "POST",
       prefer: "resolution=merge-duplicates,return=minimal",
@@ -346,7 +337,7 @@ async function handleDonationCheckout(request, response) {
       "metadata[currency]": currency
     });
 
-    const checkout = await stripeRequest("/checkout/sessions", form, stripeSecretKey);
+    const checkout = await stripeRequest("/checkout/sessions", form);
     if (!checkout.url) throw new Error("Stripe did not return a checkout URL.");
     return response.status(200).json({ url: checkout.url });
   } catch (error) {
