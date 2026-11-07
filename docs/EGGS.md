@@ -22,6 +22,19 @@ tag. Scan/tap counts are stored separately from submitted feedback.
 
 ## Creating an Egg
 
+The public **Quick start** guide offers five business groups and a choice of
+starting goals. Category selection is optional. Each goal shows setup, sharing,
+and customer-result steps, then opens the relevant dashboard tab. The selected
+category and goal stay in the URL, including through workspace sign-in. A valid
+category also becomes the workspace's saved guide choice; older saved choices
+remain supported.
+
+This is a setup guide, not an automatically configured AI goal workflow. The
+manager still creates the poll or Egg, adds information, and enables the AI
+assistant explicitly. Enquiries use a business-provided contact or booking link,
+not a Godwit enquiry inbox. Email capture requires the relevant plan and explicit
+consent. Any thank-you benefit must be independent of public reviews.
+
 Choose **Create Egg**, enter its name and optional placement, then select QR,
 NFC, or both for the setup instructions. Both is recommended so customers have
 a fallback. The selection guides the setup screen; it does not disable either

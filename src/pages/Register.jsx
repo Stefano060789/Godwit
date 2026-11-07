@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { getLoginReturnPath } from "../lib/startGuide";
 
 export default function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnPath = getLoginReturnPath(location.state?.returnTo);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,23 +28,26 @@ export default function Register() {
     }
 
     if (data.session) {
-      navigate("/admin");
+      navigate(returnPath);
       return;
     }
 
     setMessage("Registration successful. Check your email to confirm your account.");
-    navigate("/login");
+    navigate("/login", { state: { returnTo: returnPath } });
   }
 
   return (
-    <div className="app-page max-w-md mx-auto p-6">
+    <div className="app-page auth-page max-w-md mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Create your workspace</h1>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
       {message && <p className="text-green-600 mb-4">{message}</p>}
 
       <form onSubmit={handleRegister} className="space-y-4">
+        <label htmlFor="register-email">Email</label>
         <input
+          id="register-email"
+          autoComplete="email"
           type="email"
           placeholder="Email"
           value={email}
@@ -50,7 +56,10 @@ export default function Register() {
           required
         />
 
+        <label htmlFor="register-password">Password</label>
         <input
+          id="register-password"
+          autoComplete="new-password"
           type="password"
           placeholder="Password"
           value={password}
@@ -61,11 +70,12 @@ export default function Register() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded font-semibold"
+          className="auth-primary"
         >
           Create workspace
         </button>
       </form>
+      <p className="auth-footer"><Link to="/login" state={{ returnTo: returnPath }}>Sign in to your workspace</Link></p>
     </div>
   );
 }

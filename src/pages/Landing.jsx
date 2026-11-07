@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
 import godwitLockup from "../assets/godwit-logo-lockup.svg";
-import { FLOCK } from "../lib/flock";
-import FlockAvatar from "../components/FlockAvatar";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 
 const stepKeys = [
@@ -33,48 +31,23 @@ const eggFeatureKeys = [
   { key: "guidance", titleKey: "eggFeatures.guidanceTitle", detailKey: "eggFeatures.guidanceDetail" }
 ];
 
-const flockKeys = [
-  { key: "robin", nameKey: "flock.robinName", roleKey: "flock.robinRole", detailKey: "flock.robinDetail" },
-  { key: "tern", nameKey: "flock.ternName", roleKey: "flock.ternRole", detailKey: "flock.ternDetail" },
-  { key: "flamingo", nameKey: "flock.flamingoName", roleKey: "flock.flamingoRole", detailKey: "flock.flamingoDetail" },
-  {
-    key: "waxwing",
-    nameKey: "flock.waxwingName",
-    roleKey: "flock.waxwingRole",
-    detailKey: "flock.waxwingDetail",
-    donationsDetailKey: "flock.waxwingDetailWithDonations"
-  },
-  { key: "redshank", nameKey: "flock.redshankName", roleKey: "flock.redshankRole", detailKey: "flock.redshankDetail" },
-  { key: "owl", nameKey: "flock.owlName", roleKey: "flock.owlRole", detailKey: "flock.owlDetail" },
-  {
-    key: "egg",
-    nameKey: "flock.eggName",
-    roleKey: "flock.eggRole",
-    detailKey: "flock.eggDetail",
-    donationsDetailKey: "flock.eggDetailWithDonations"
-  }
+const audienceKeys = [
+  { key: "arts", titleKey: "useCases.artsTitle", detailKey: "useCases.artsDetail" },
+  { key: "hospitality", titleKey: "useCases.hospitalityTitle", detailKey: "useCases.hospitalityDetail" },
+  { key: "places", titleKey: "useCases.placesTitle", detailKey: "useCases.placesDetail" },
+  { key: "events", titleKey: "useCases.eventsTitle", detailKey: "useCases.eventsDetail" },
+  { key: "shops", titleKey: "useCases.shopsTitle", detailKey: "useCases.shopsDetail" }
 ];
 
 export default function Landing() {
   const { t } = useTranslation("translation", { keyPrefix: "landing" });
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setIsSignedIn(Boolean(data.user)));
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setIsSignedIn(Boolean(session?.user)));
     return () => listener.subscription.unsubscribe();
   }, []);
-
-  // Send a flock card to its matching Admin dashboard tab (or standalone page, for Waxwing's
-  // analytics). Works whether or not the visitor is signed in yet - /admin itself handles
-  // redirecting a signed-out visitor to login first.
-  function goToFlockItem(birdKey) {
-    const member = FLOCK.find((item) => item.key === birdKey);
-    if (!member) return;
-    if (member.tab) navigate(`/admin?tab=${member.tab}`);
-    else if (member.route) navigate(member.route);
-  }
 
   return (
     <main className="landing-page">
@@ -89,7 +62,7 @@ export default function Landing() {
             </div>
           ) : (
             <div className="landing-actions">
-              <Link to="/register" className="landing-primary-action">{t("createWorkspace")}</Link>
+              <Link to="/essentials" className="landing-primary-action">{t("createWorkspace")}</Link>
               <Link to="/login" className="landing-secondary-action">{t("workspaceLogin")}</Link>
             </div>
           )}
@@ -157,26 +130,19 @@ export default function Landing() {
         </ul>
       </section>
 
-      <section className="landing-flock" aria-labelledby="flock-title">
+      <section className="landing-audiences" aria-labelledby="use-cases-title">
         <div className="landing-section-heading">
-          <p className="landing-eyebrow">{t("flockEyebrow")}</p>
-          <h2 id="flock-title">{t("flockTitle")}</h2>
-          <p className="landing-flock-lede">{t("flockLede")}</p>
+          <p className="landing-eyebrow">{t("useCasesEyebrow")}</p>
+          <h2 id="use-cases-title">{t("useCasesTitle")}</h2>
+          <p className="landing-audience-lede">{t("useCasesLede")}</p>
         </div>
-        <div className="landing-flock-grid">
-          {flockKeys.map((bird) => (
-            <button
-              type="button"
-              key={bird.key}
-              className="landing-flock-card"
-              onClick={() => goToFlockItem(bird.key)}
-              aria-label={t("flockCardAriaLabel", { name: t(bird.nameKey) })}
-            >
-              <FlockAvatar bird={FLOCK.find((member) => member.key === bird.key)} size={44} className="landing-flock-badge" />
-              <h3>{t(bird.nameKey)}</h3>
-              <p className="landing-flock-role">{t(bird.roleKey)}</p>
-              <p>{t(DONATION_FEATURE_ENABLED && bird.donationsDetailKey ? bird.donationsDetailKey : bird.detailKey)}</p>
-            </button>
+        <div className="landing-audience-grid">
+          {audienceKeys.map((audience, index) => (
+            <article key={audience.key} className="landing-audience-card">
+              <span className="landing-audience-number">0{index + 1}</span>
+              <h3>{t(audience.titleKey)}</h3>
+              <p>{t(audience.detailKey)}</p>
+            </article>
           ))}
         </div>
       </section>

@@ -103,19 +103,41 @@ The recommended visual direction is **evening marsh**: deep blue-green space,
 quiet blue highlights, and gold used like a small point of reflected light.
 This keeps long admin sessions calm while preserving the Godwit identity.
 
-### Flock background
+### Audience background
 
-The flock section is intentionally a shared stage for the characters rather
-than another white card grid:
+The landing page's audience section uses a shared editorial stage rather
+than another white card grid. Business groups, not bird characters, label the
+product's main starting paths:
 
 | Theme | Background | Soft glow |
 | --- | --- | --- |
-| Light | `#214B46` | `#2D635D` |
+| Light | `#F3F5EE` to `#E5F0E9` | Restrained gold |
 | Dark | `#071A2D` | `#102D46` |
 
-The flock uses restrained radial glows: gold and sky blue in light mode, sky
-blue and lavender in dark mode. This gives the flock depth while keeping
-the bird marks and text readable.
+The light audience stage uses warm paper cards with sage borders and deep green
+text. Dark mode retains sky-blue and lavender glows.
+
+Quick-start and dashboard guidance use warm-paper cards, serif display headings,
+and short sans-serif labels. Selection has both a border and a check mark, not
+color alone. Scoped `--guide-*` variables keep selected cards and supporting text
+readable in both themes without relying on the workspace's Tailwind overrides.
+In light mode, use white unselected cards, `#6F8D83` borders, and `#415C55`
+supporting text. Selected cards use deep teal (`#0B5F59`) with white titles and
+pale sage (`#E7F2EC`) descriptions; hover alone uses a pale sage background.
+Small gold labels use dark ochre (`#765414`) on light surfaces, not bright gold.
+Supporting quick-start copy is at least 0.9rem. Text contrast should meet WCAG AA
+(4.5:1 for normal text); meaningful control borders should reach 3:1.
+
+### Entry-page polish
+
+Quick start, sign-in, and registration share generous panel padding, rounded
+24px desktop surfaces (18px for the mobile guide), and serif display headings.
+Dark entry panels use `#0F2028` over the navy canvas, with `#688487` control
+borders. Selected dark guide cards use `#234B47`; hover is the quieter `#193137`.
+Both themes use 0.9rem supporting copy and circular selection indicators.
+Account forms use persistent field labels, 48px controls, autofill attributes,
+and reciprocal sign-in/registration links that preserve the starting destination.
+Teal actions in light mode and gold actions in dark mode share the same sizing.
 
 ### Character color associations
 

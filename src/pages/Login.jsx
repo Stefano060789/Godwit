@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { getLoginReturnPath } from "../lib/startGuide";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnPath = getLoginReturnPath(location.state?.returnTo);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -44,7 +47,7 @@ export default function Login() {
       return;
     }
 
-    navigate("/admin");
+    navigate(returnPath, { replace: true });
   }
 
   async function handleVerifyMfa(e) {
@@ -68,7 +71,7 @@ export default function Login() {
       return;
     }
 
-    navigate("/admin");
+    navigate(returnPath, { replace: true });
   }
 
   async function resetPassword() {
@@ -79,11 +82,13 @@ export default function Login() {
 
   if (mfaFactorId) {
     return (
-      <div className="app-page max-w-md mx-auto p-6">
+      <div className="app-page auth-page max-w-md mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6 text-center">Enter your authenticator code</h1>
         {error && <p className="text-red-600 mb-4">{error}</p>}
         <form onSubmit={handleVerifyMfa} className="space-y-4">
+          <label htmlFor="login-code">Authenticator code</label>
           <input
+            id="login-code"
             type="text"
             inputMode="numeric"
             autoComplete="one-time-code"
@@ -92,7 +97,7 @@ export default function Login() {
             onChange={(e) => setMfaCode(e.target.value)}
             className="w-full border p-2 rounded text-black"
           />
-          <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded font-semibold">
+          <button type="submit" className="auth-primary">
             Verify
           </button>
         </form>
@@ -101,13 +106,16 @@ export default function Login() {
   }
 
   return (
-    <div className="app-page max-w-md mx-auto p-6">
+    <div className="app-page auth-page max-w-md mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Sign in to your workspace</h1>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
 
       <form onSubmit={handleLogin} className="space-y-4">
+        <label htmlFor="login-email">Email</label>
         <input
+          id="login-email"
+          autoComplete="email"
           type="email"
           placeholder="Email"
           value={email}
@@ -115,7 +123,10 @@ export default function Login() {
           className="w-full border p-2 rounded text-black"
         />
 
+        <label htmlFor="login-password">Password</label>
         <input
+          id="login-password"
+          autoComplete="current-password"
           type="password"
           placeholder="Password"
           value={password}
@@ -125,14 +136,13 @@ export default function Login() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded font-semibold"
+          className="auth-primary"
         >
           Sign in
         </button>
-        <button type="button" onClick={resetPassword} className="w-full text-sm text-blue-300 underline">Forgot password?</button>
+        <button type="button" onClick={resetPassword} className="auth-secondary">Forgot password?</button>
       </form>
+      <p className="auth-footer"><Link to="/register" state={{ returnTo: returnPath }}>Create your workspace</Link></p>
     </div>
   );
 }
-
-

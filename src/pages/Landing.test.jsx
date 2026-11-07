@@ -51,12 +51,9 @@ describe("public landing donation messaging", () => {
     const renderedCopy = markup.replaceAll("&#x27;", "'");
 
     expect(renderedCopy).not.toMatch(paymentPromotion);
-    expect(renderedCopy).not.toContain(i18n.t("landing.steps.step1DetailWithDonations"));
-    expect(renderedCopy).not.toContain(i18n.t("landing.flock.eggDetailWithDonations"));
-    expect(renderedCopy).not.toContain(i18n.t("landing.flock.waxwingDetailWithDonations"));
     expect(renderedCopy).toContain(i18n.t("landing.steps.step1Detail"));
-    expect(renderedCopy).toContain(i18n.t("landing.flock.eggDetail"));
-    expect(renderedCopy).toContain(i18n.t("landing.flock.waxwingDetail"));
+    expect(renderedCopy).toContain(i18n.t("landing.useCases.artsTitle"));
+    expect(renderedCopy).not.toMatch(/Robin's guide|Robin will|tripadvisor.*voucher/i);
   });
 
   it("keeps the Egg flock description free of payment promotion while disabled", () => {
@@ -67,7 +64,7 @@ describe("public landing donation messaging", () => {
     expect(egg.image).toMatch(/^data:image\/svg\+xml/);
   });
 
-  it("explains Eggs, QR and NFC access, and the guided AI assistant on the public landing page", async () => {
+  it("explains the Godwit assistant, Eggs, QR and NFC access, and target audiences", async () => {
     const i18n = createInstance();
     await i18n.use(initReactI18next).init({
       lng: "en",
@@ -81,12 +78,19 @@ describe("public landing donation messaging", () => {
         { i18n },
         createElement(MemoryRouter, null, createElement(Landing))
       )
-    );
+    ).replaceAll("&#x27;", "'");
 
     expect(markup).toContain(en.landing.eggFeatures.title);
     expect(markup).toContain(en.landing.eggFeatures.accessDetail);
     expect(markup).toContain(en.landing.eggFeatures.assistantDetail);
     expect(markup).toContain(en.landing.eggFeatures.guidanceDetail);
+    expect(markup).toContain(en.landing.useCases.artsDetail);
+    expect(markup).toContain(en.landing.useCases.hospitalityDetail);
+    expect(markup).toContain(en.landing.useCases.placesDetail);
+    expect(markup).toContain(en.landing.useCases.eventsDetail);
+    expect(markup).toContain(en.landing.useCases.shopsDetail);
+    expect(markup).toContain("Keep any benefit separate from public reviews.");
     expect(markup).toContain('href="/register"');
+    expect(markup).toContain('href="/essentials"');
   });
 });

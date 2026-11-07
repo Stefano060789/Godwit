@@ -15,20 +15,132 @@
     "dashboard": "Nadzorna plošča",
     "getStarted": "Začni"
   },
+  "quickStart": {
+    "eyebrow": "Vaš začetek z Godwitom",
+    "title": "En cilj. Koristna izkušnja.",
+    "intro": "Izberite, kaj je pomembno za vaše podjetje. Pokazali vam bomo, kje začeti.",
+    "loopLabel": "Izkušnja Godwit",
+    "loopGoal": "Vaš cilj",
+    "loopEgg": "QR / NFC Egg",
+    "loopResults": "Koristni rezultati",
+    "businessTitle": "S čim se ukvarjate?",
+    "optional": "Neobvezno",
+    "goalTitle": "Kaj želite doseči?",
+    "chooseHint": "Izberite cilj za prikaz naslednjih korakov.",
+    "planEyebrow": "Vaš začetni načrt",
+    "shareStep": "Dodajte vsebino v Egg, ga preizkusite in delite kodo QR ali povezavo NFC.",
+    "benefitNote": "Majhna zahvala lahko nagradi zasebno mnenje ali soglasje za e-pošto. Nikoli ne ponudite ugodnosti za javno oceno.",
+    "planAvailability": "Razpoložljivost te funkcije je odvisna od paketa delovnega prostora.",
+    "continue": "Nadaljuj z nastavitvijo",
+    "continueHint": "Po potrebi se prijavite. Orodja boste nastavili v delovnem prostoru.",
+    "changeGoal": "Spremeni cilj",
+    "pickGoal": "Izberi cilj",
+    "openEggSetup": "Ustvari Egg",
+    "existingEggHint": "Pri obstoječem Egg spodaj odprite pomočnika umetne inteligence ali upravljanje vsebine.",
+    "businesses": {
+      "arts": "Umetniki, galerije, muzeji",
+      "hospitality": "Hoteli, restavracije, kavarne",
+      "places": "Destinacije, mestne ekipe, znamenitosti",
+      "events": "Dogodki, društva, skupnosti",
+      "shops": "Trgovine, studii, lokalne storitve"
+    },
+    "goals": {
+      "answers": {
+        "title": "Odgovarjanje na vprašanja",
+        "example": "Pomagajte ljudem najti potrebne informacije.",
+        "setup": "Ustvarite Egg, odprite pomočnika umetne inteligence, dodajte spletno stran ali pogosta vprašanja in omogočite Godwit.",
+        "result": "Pred deljenjem preizkusite vprašanje. Godwit odgovarja iz vaših virov in predlaga ustrezno vsebino."
+      },
+      "feedback": {
+        "title": "Zbiranje koristnih mnenj",
+        "example": "Ugotovite, kaj stranke menijo o obisku.",
+        "setup": "Ustvarite kratko anketo o izkušnji, ki jo želite izboljšati.",
+        "result": "Odprite rezultate ankete, preglejte odgovore in poiščite možnosti za izboljšave."
+      },
+      "information": {
+        "title": "Deljenje informacij",
+        "example": "Povejte zgodbo, razložite izdelek ali delite praktične podrobnosti.",
+        "setup": "Ustvarite Egg in dodajte informacijsko kartico z besedilom, sliko in uporabnimi povezavami.",
+        "result": "Stranke vsebino najdejo brez računa. Posodobite jo, ko se podatki spremenijo."
+      },
+      "next-step": {
+        "title": "Prejemanje povpraševanj",
+        "example": "Olajšajte vprašanja o umetninah, izdelkih ali rezervacijah.",
+        "setup": "Informacijski kartici v Egg dodajte povezavo za stik ali rezervacijo.",
+        "result": "Povpraševanja prejmete prek povezane e-pošte ali strani za rezervacije, ne v novem nabiralniku Godwit."
+      },
+      "contacts": {
+        "title": "Ustvarjanje e-poštnega seznama",
+        "example": "Povabite ljudi k prejemanju novic ali ponudb.",
+        "setup": "Ustvarite anketo in v razdelku Po glasovanju nastavite jasno soglasje za e-pošto.",
+        "result": "Izvozite kontakte s soglasjem iz razdelka Povezava s strankami. Ljudje lahko glasujejo brez delitve e-pošte."
+      },
+      "reviews": {
+        "title": "Povabilo k iskrenim ocenam",
+        "example": "Strankam omogočite deljenje izkušenj na Googlu ali Tripadvisorju.",
+        "setup": "V nastavitvah dodajte povezave do ocen in jih vključite pri nastavitvi Egg.",
+        "result": "Vsem ponudite iste povezave. Javne ocene so neobvezne in nikoli povezane z nagrado."
+      }
+    }
+  },
   "landing": {
-    "eyebrow": "Eggs za povezovanje s strankami v resničnih prostorih",
-    "title": "En Egg. Več načinov za povezovanje.",
-    "lede": "Godwit podjetjem pomaga ponuditi povratne informacije, koristne informacije in izbirno pomoč umetne inteligence prek ponovno uporabnih Eggs, dostopnih prek kode QR ali NFC.",
+    "eyebrow": "Pomočnik z umetno inteligenco za lokalna podjetja",
+    "title": "Pomagajte vsaki stranki najti naslednji korak.",
+    "lede": "Godwitu posredujte informacije o svojem podjetju in cilj. Stranke do pomočnika dostopajo prek Egg s kodo QR ali NFC.",
     "workspaceDashboard": "Nadzorna plošča",
     "createWorkspace": "Začnite z Godwit",
     "workspaceLogin": "Prijavite se v Godwit",
-    "note": "Narejeno za lokale, dogodke, gostinstvo, trgovine, umetnike, ustvarjalce in ekipe na terenu.",
-    "howItWorksEyebrow": "Preprost krog",
-    "howItWorksTitle": "Od Egg do boljše izkušnje za stranke.",
+    "note": "Za umetnike, galerije, muzeje, hotele, turistične destinacije, dogodke, trgovine in lokalne storitve.",
+    "eggFeatures": {
+      "eyebrow": "Spoznajte Godwit Egg",
+      "title": "Do Godwita prek Egg.",
+      "lede": "Godwit je vaš pomočnik umetne inteligence. Egg je dostopna točka za stranke, ki jo lahko posodobite brez menjave kode QR ali oznake NFC.",
+      "accessibilityLabel": "Načini odpiranja Egg",
+      "sameExperience": "Ena skupna izkušnja",
+      "accessTitle": "Preprost dostop za stranke",
+      "accessDetail": "Koda QR, oznaka NFC ali oboje: vsak dostop odpre isti posodobljeni Egg.",
+      "assistantTitle": "Odgovori umetne inteligence na podlagi vašega podjetja",
+      "assistantDetail": "Dodajte spletno stran ali pogosta vprašanja, da pomočnik odgovarja in stranke usmeri k naslednjemu koraku.",
+      "guidanceTitle": "Od vprašanja do naslednjega koraka",
+      "guidanceDetail": "Stranke usmerite do ustrezne ankete, informacijske kartice ali odprtega opravila.",
+      "control": "Izberete informacije, teme in uporabo umetne inteligence. Omejitve uporabe pomagajo ohraniti nadzor.",
+      "cta": "Ustvarite prvi Egg"
+    },
+    "howItWorksEyebrow": "Trije preprosti koraki",
+    "howItWorksTitle": "Izberite cilj. Delite Godwit. Učite se iz vsake interakcije.",
     "steps": {
-      "step1Title": "Ustvarite in namestite Egg",
-      "step1Detail": "V Egg dodajte anketo ali informacije ter ga delite prek kode QR, oznake NFC ali obojega.",
-      "step1DetailWithDonations": "V Egg dodajte anketo, informacije ali podporo lokalu ter ga delite prek kode QR, oznake NFC ali obojega."
+      "step1Title": "Izberite, kaj želite doseči",
+      "step1Detail": "Zberite mnenja, odgovorite na vprašanja obiskovalcev, delite informacije ali povabite k zasebnemu povpraševanju.",
+      "step1DetailWithDonations": "Zberite mnenja, odgovorite na vprašanja obiskovalcev, delite informacije ali povabite k zasebnemu povpraševanju.",
+      "step2Title": "Godwitu posredujte svoje informacije",
+      "step2Detail": "Uporabite spletno stran ali dodajte pogosta vprašanja, da Godwit odgovarja na podlagi vaših informacij.",
+      "step3Title": "Postavite in delite Egg",
+      "step3Detail": "Stranke skenirajo ali se dotaknejo oznake, prejmejo pomoč Godwita in nadaljujejo do ankete, informacij ali dejanja."
+    },
+    "outcomesEyebrow": "Odgovori, ki prinesejo vrednost",
+    "outcomesTitle": "Koristno za stranke. Uporabno za vaše podjetje.",
+    "outcomes": {
+      "conversionTitle": "Odgovori",
+      "conversionDetail": "Strankam pomagajte najti zanesljive informacije in ustrezen naslednji korak.",
+      "growthTitle": "Mnenja",
+      "growthDetail": "S kratkimi anketami in odgovori strank ugotovite, kaj si ljudje mislijo.",
+      "publicTitle": "Zasebno nadaljnje obveščanje",
+      "publicDetail": "Stranke povabite k zasebni delitvi kontaktnih podatkov ali mnenj. Ugodnosti naj bodo ločene od javnih ocen."
+    },
+    "useCasesEyebrow": "En pomočnik za različne vrste prostorov",
+    "useCasesTitle": "Ustvarjeno za kraje, ki jih ljudje obiskujejo.",
+    "useCasesLede": "Izberite cilj, ki ustreza vašemu delu. Godwit strankam pomaga z odgovori, mnenji ali naslednjimi koraki.",
+    "useCases": {
+      "artsTitle": "Umetnost in kultura",
+      "artsDetail": "Umetniki, galerije in muzeji delijo zgodbe, odgovarjajo na vprašanja ter vabijo k mnenjem ali povpraševanjem.",
+      "hospitalityTitle": "Gostinstvo",
+      "hospitalityDetail": "Hoteli, restavracije in kavarne odgovarjajo na pogosta vprašanja ter spoznavajo izkušnje gostov.",
+      "placesTitle": "Turizem in kraji",
+      "placesDetail": "Destinacije in mestne ekipe delijo lokalne informacije ter obiskovalcem pomagajo odkriti, kaj sledi.",
+      "eventsTitle": "Dogodki in skupnosti",
+      "eventsDetail": "Organizatorji in skupine delijo novosti, zbirajo mnenja ter olajšajo sodelovanje.",
+      "shopsTitle": "Trgovine in storitve",
+      "shopsDetail": "Lokalna podjetja predstavijo ponudbo, odgovorijo na vprašanja o izdelkih in prisluhnejo strankam."
     },
     "flock": {
       "eggName": "Egg",
@@ -42,6 +154,13 @@
     "finalTitle": "Ustvarite svoj prvi Egg.",
     "finalCopy": "Nastavite delovni prostor, ustvarite Egg in odzive strank spremenite v naslednji korak.",
     "openDashboard": "Odpri nadzorno ploščo"
+  },
+  "admin": {
+    "overview": {
+      "goalGuideTitle": "Vaš vodnik Godwit",
+      "goalGuideIntro": "Izberite cilj za svoje delo. Godwit odgovarja iz vaših informacij in stranke usmeri do anket, informacij ali dejanj.",
+      "businessTypePrompt": "Katera skupina najbolje opisuje vaše delo?"
+    }
   },
   "vote": {
     "loading": "Nalaganje ankete...",

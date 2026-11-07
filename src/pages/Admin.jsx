@@ -19,15 +19,14 @@ import { extractQrToken, reassignManagedCampaignPoll, resolveManagedQrToken } fr
 import { ACCESSIBILITY_TAGS } from "../lib/accessibilityTags";
 import QrScanner from "../components/QrScanner";
 import LockedFeature from "../components/LockedFeature";
-import FlockAvatar from "../components/FlockAvatar";
 import { loadLeadNurtureSettings, saveLeadNurtureSettings } from "../lib/leadNurture";
 import { loadWinbackSettings, saveWinbackSettings } from "../lib/winbackSettings";
 import { loadDonationSettings, saveDonationSettings, startStripeConnectOnboarding, refreshStripeConnectStatus } from "../lib/donationSettings";
 import { loadApiKeys, createApiKey, deleteApiKey } from "../lib/apiKeys";
 import { getEntitlements, planLabel, minPlanLabelFor } from "../lib/entitlements";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
-import { FLOCK, flockMemberForTab } from "../lib/flock";
 import { PERSONAS, findPersona } from "../lib/personas";
+import { getAdminTab, getStartSelection } from "../lib/startGuide";
 import Woodpecker from "./Woodpecker";
 import {
   getCurrentUserRole,
@@ -47,11 +46,15 @@ export default function Admin() {
   const location = useLocation();
   const [polls, setPolls] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(() => {
-    const validTabs = ["overview", "polls", "woodpecker", "connection", "engagement", "feedback", "settings"];
-    const tabParam = new URLSearchParams(window.location.search).get("tab");
-    return validTabs.includes(tabParam) ? tabParam : "overview";
-  });
+  const activeTab = getAdminTab(location.search);
+  const startSelection = getStartSelection(location.search);
+
+  function setActiveTab(tab) {
+    const params = new URLSearchParams(location.search);
+    params.set("tab", tab);
+    params.delete("poll");
+    navigate(`/admin?${params}`);
+  }
 
   // Scroll a poll into view when arriving via a "jump to this poll" link from the QR codes
   // tab. Must run unconditionally on every render (before any early return below) - hooks
@@ -156,9 +159,6 @@ export default function Admin() {
   const [scanLookupValue, setScanLookupValue] = useState("");
   const [scanResult, setScanResult] = useState(null);
   const [scanMessage, setScanMessage] = useState("");
-  const [totalVotesCount, setTotalVotesCount] = useState(0);
-  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
-  const [qrShared, setQrShared] = useState(false);
   const [personaKey, setPersonaKey] = useState(null);
   const [weeklyInsight, setWeeklyInsight] = useState(null);
   const [voteTrend, setVoteTrend] = useState(null);
@@ -168,6 +168,13 @@ export default function Admin() {
   const [apiKeys, setApiKeys] = useState([]);
   const [newApiKeyLabel, setNewApiKeyLabel] = useState("");
   const [selectedQrReviewPlatforms, setSelectedQrReviewPlatforms] = useState([]);
+
+  useEffect(() => {
+    const { business } = getStartSelection(location.search);
+    if (!workspaceUserId || !business) return;
+    setPersonaKey(business.key);
+    localStorage.setItem(`ivote_persona_${workspaceUserId}`, business.key);
+  }, [workspaceUserId, location.search]);
 
   function getPollStatusInfo(poll) {
     const meta = readPollMeta(poll.id);
@@ -198,12 +205,12 @@ export default function Admin() {
     if (userError) {
       console.error(userError);
       setLoading(false);
-      navigate("/login");
+      navigate("/login", { replace: true, state: { returnTo: `/admin${location.search}` } });
       return;
     }
 
     if (!user) {
-      navigate("/login");
+      navigate("/login", { replace: true, state: { returnTo: `/admin${location.search}` } });
       return;
     }
 
@@ -245,6 +252,8 @@ export default function Admin() {
         setWorkspaceUserId(profile.id);
         setCurrentUserRole(profile.role);
         setWorkspaceProfile(profile);
+        const savedPersona = findPersona(localStorage.getItem(`ivote_persona_${profile.id}`));
+        setPersonaKey(savedPersona?.key || null);
         setTeamMembers(await readWorkspaceMembers(profile.id));
         setQrCampaigns(await loadQrCampaigns());
         setQrCampaignItems(await loadQrCampaignItems());
@@ -292,15 +301,8 @@ export default function Admin() {
         });
         setSentimentSummary(summary);
 
-        setOnboardingDismissed(localStorage.getItem(`ivote_onboarding_dismissed_${profile.id}`) === "true");
-        setQrShared(localStorage.getItem(`ivote_qr_shared_${profile.id}`) === "true");
-        setPersonaKey(localStorage.getItem(`ivote_persona_${profile.id}`) || null);
-
         const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
         const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString();
-        const { count: votesCount } = await supabase.from("votes").select("id", { count: "exact", head: true });
-        setTotalVotesCount(votesCount || 0);
-
         const { count: priorWeekCount } = await supabase.from("votes").select("id", { count: "exact", head: true }).gte("created_at", fourteenDaysAgo).lt("created_at", sevenDaysAgo);
 
         const { data: recentVotes } = await supabase.from("votes").select("answer, poll_id").gte("created_at", sevenDaysAgo);
@@ -1204,15 +1206,6 @@ export default function Admin() {
   function copyShareLink(poll) {
     const shareLink = poll.stable_short_url || poll.short_url || `${window.location.origin}/vote/${poll.id}`;
     navigator.clipboard.writeText(shareLink);
-    if (workspaceUserId) {
-      localStorage.setItem(`ivote_qr_shared_${workspaceUserId}`, "true");
-      setQrShared(true);
-    }
-  }
-
-  function dismissOnboarding() {
-    if (workspaceUserId) localStorage.setItem(`ivote_onboarding_dismissed_${workspaceUserId}`, "true");
-    setOnboardingDismissed(true);
   }
 
   function choosePersona(key) {
@@ -1223,6 +1216,9 @@ export default function Admin() {
   function changePersona() {
     setPersonaKey(null);
     if (workspaceUserId) localStorage.removeItem(`ivote_persona_${workspaceUserId}`);
+    const params = new URLSearchParams(location.search);
+    params.delete("business");
+    navigate(`/admin?${params}`, { replace: true });
   }
 
   function goToPersonaStep(step) {
@@ -1537,7 +1533,6 @@ export default function Admin() {
   }
 
   function goToPoll(pollId) {
-    setActiveTab("polls");
     setSearchTerm("");
     setStatusFilter("all");
     setLocationFilter("all");
@@ -1577,13 +1572,13 @@ export default function Admin() {
   };
 
   const quickActions = [
-    { key: "polls", icon: "\ud83d\udcca", bird: flockMemberForTab("polls"), label: t("admin.quickActions.polls.label"), description: t("admin.quickActions.polls.description"), onSelect: () => setActiveTab("polls") },
-    { key: "woodpecker", icon: "\u2705", bird: flockMemberForTab("woodpecker"), label: t("admin.quickActions.woodpecker.label"), description: t("admin.quickActions.woodpecker.description"), onSelect: () => setActiveTab("woodpecker") },
-    { key: "engagement", icon: "🥚", bird: flockMemberForTab("engagement"), label: t("admin.quickActions.engagement.label"), description: t("admin.quickActions.engagement.description"), onSelect: () => setActiveTab("engagement") },
-    { key: "connection", icon: "\ud83e\udd1d", bird: flockMemberForTab("connection"), label: t("admin.quickActions.connection.label"), description: t("admin.quickActions.connection.description"), onSelect: () => setActiveTab("connection") },
-    { key: "analytics", icon: "\ud83d\udcca", bird: FLOCK.find((member) => member.key === "waxwing"), label: t("admin.quickActions.analytics.label"), description: t("admin.quickActions.analytics.description"), onSelect: () => navigate("/admin/analytics") },
-    { key: "feedback", icon: "\ud83d\udcac", bird: flockMemberForTab("feedback"), label: t("admin.quickActions.feedback.label"), description: t("admin.quickActions.feedback.description"), onSelect: () => setActiveTab("feedback") },
-    { key: "settings", icon: "\u2699\ufe0f", bird: flockMemberForTab("settings"), label: t("admin.quickActions.settings.label"), description: t("admin.quickActions.settings.description"), onSelect: () => setActiveTab("settings") }
+    { key: "polls", icon: "\ud83d\udcca", label: t("admin.quickActions.polls.label"), description: t("admin.quickActions.polls.description"), onSelect: () => setActiveTab("polls") },
+    { key: "woodpecker", icon: "\u2705", label: t("admin.quickActions.woodpecker.label"), description: t("admin.quickActions.woodpecker.description"), onSelect: () => setActiveTab("woodpecker") },
+    { key: "engagement", icon: "🥚", label: t("admin.quickActions.engagement.label"), description: t("admin.quickActions.engagement.description"), onSelect: () => setActiveTab("engagement") },
+    { key: "connection", icon: "\ud83e\udd1d", label: t("admin.quickActions.connection.label"), description: t("admin.quickActions.connection.description"), onSelect: () => setActiveTab("connection") },
+    { key: "analytics", icon: "\ud83d\udcca", label: t("admin.quickActions.analytics.label"), description: t("admin.quickActions.analytics.description"), onSelect: () => navigate("/admin/analytics") },
+    { key: "feedback", icon: "\ud83d\udcac", label: t("admin.quickActions.feedback.label"), description: t("admin.quickActions.feedback.description"), onSelect: () => setActiveTab("feedback") },
+    { key: "settings", icon: "\u2699\ufe0f", label: t("admin.quickActions.settings.label"), description: t("admin.quickActions.settings.description"), onSelect: () => setActiveTab("settings") }
   ];
 
   function openConnectionSetup(tab, sectionId) {
@@ -1599,80 +1594,78 @@ export default function Admin() {
       </div>
 
       <div className="mb-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-center">
-        {adminTabs.map((tab) => {
-          const bird = flockMemberForTab(tab.key);
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center justify-center gap-1.5 rounded px-4 py-3 text-center font-semibold ${activeTab === tab.key ? "bg-teal-500 text-slate-950" : "bg-gray-800 text-slate-300"}`}
-            >
-              {bird && <FlockAvatar bird={bird} size={28} />}
-              {tab.label}
-            </button>
-          );
-        })}
+        {adminTabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex items-center justify-center gap-1.5 rounded px-4 py-3 text-center font-semibold ${activeTab === tab.key ? "bg-teal-500 text-slate-950" : "bg-gray-800 text-slate-300"}`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
       <p className="mb-1 text-center text-sm text-slate-400">{adminTabDescriptions[activeTab]}</p>
-      {activeTab !== "overview" && flockMemberForTab(activeTab) && (
-        <p className="mb-6 flex items-center justify-center gap-2 text-xs text-slate-500">
-          <FlockAvatar bird={flockMemberForTab(activeTab)} size={28} />
-          <span>
-            {t("admin.onDuty", { name: flockMemberForTab(activeTab).name, role: flockMemberForTab(activeTab).role.toLowerCase() })}
-          </span>
-        </p>
+
+      {startSelection.goal && (
+        <section className="goal-plan goal-workspace-plan" aria-labelledby="workspace-goal-title">
+          <div className="goal-plan-heading">
+            <div>
+              <p className="goal-eyebrow">{t("quickStart.planEyebrow")}</p>
+              <h2 id="workspace-goal-title">{t(`quickStart.goals.${startSelection.goal.key}.title`)}</h2>
+            </div>
+            <Link className="goal-text-link" to={`/essentials?${new URLSearchParams({
+              goal: startSelection.goal.key,
+              ...(startSelection.business ? { business: startSelection.business.audienceKey } : {})
+            })}`}>{t("quickStart.changeGoal")}</Link>
+          </div>
+          <p>{t(`quickStart.goals.${startSelection.goal.key}.setup`)}</p>
+          {startSelection.goal.feature && !entitlements[startSelection.goal.feature] ? (
+            <p className="goal-plan-note">
+              {t("admin.overview.availableOn", { plan: minPlanLabelFor(startSelection.goal.feature) })}{" "}
+              <Link to="/admin/billing" className="goal-text-link">{t("admin.overview.upgrade")}</Link>
+            </p>
+          ) : startSelection.goal.action === "egg" ? (
+            <>
+              <button className="goal-primary-action" type="button" onClick={() => {
+                setActiveTab("engagement");
+                openQrWizard();
+              }}>{t("quickStart.openEggSetup")}</button>
+              {qrCampaigns.length > 0 && <p className="goal-plan-caption">{t("quickStart.existingEggHint")}</p>}
+            </>
+          ) : startSelection.goal.action === "reviews" ? (
+            <button className="goal-primary-action" type="button" onClick={() => openConnectionSetup("settings", "review-platform-settings")}>
+              {t("admin.overview.setupLinks.reviews")}
+            </button>
+          ) : (
+            <Link className="goal-primary-action" to="/create">{t("admin.overview.firstSteps.createPollCta")}</Link>
+          )}
+        </section>
       )}
 
       {activeTab === "overview" && (
       <>
-      <div className="mb-6 rounded border border-teal-700 bg-slate-900 p-4">
-        <div className="flex items-center gap-2">
-          <FlockAvatar bird={flockMemberForTab("overview")} size={32} />
-          <span className="text-lg font-bold">{t("admin.overview.robinGuideTitle")}</span>
+      <div className="goal-guide mb-6">
+        <div className="goal-plan-heading">
+          <h2>{t("admin.overview.goalGuideTitle")}</h2>
+          <Link to={`/essentials${personaKey ? `?business=${findPersona(personaKey)?.audienceKey || ""}` : ""}`} className="goal-text-link">
+            {t("quickStart.pickGoal")}
+          </Link>
         </div>
-        <p className="mt-2 text-sm text-slate-300">{t("admin.overview.firstSteps.explanation")}</p>
+        <p className="mt-2 text-sm text-slate-300">{t("admin.overview.goalGuideIntro")}</p>
 
-        {!onboardingDismissed && (
-          <div className="mt-3 rounded border border-slate-700 bg-slate-950 p-3">
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("admin.overview.firstSteps.heading")}</p>
-              <button onClick={dismissOnboarding} className="text-xs text-slate-400 underline">{t("admin.overview.firstSteps.dismiss")}</button>
-            </div>
-            <p className="mt-1 text-xs text-slate-400">
-              {t("admin.overview.firstSteps.newHerePrefix")} <Link to="/essentials" className="underline">{t("admin.overview.firstSteps.readGuide")}</Link> - {t("admin.overview.firstSteps.newHereSuffix")}
-            </p>
-            <div className="mt-3 space-y-2 text-sm">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className={polls.length > 0 ? "text-emerald-300" : "text-slate-300"}>{polls.length > 0 ? "\u2713" : "\u25cb"} {t("admin.overview.firstSteps.createFirstPoll")}</p>
-                {polls.length === 0 && <Link to="/create" className="shrink-0 rounded bg-teal-500 px-3 py-1.5 text-xs font-semibold text-slate-950">{t("admin.overview.firstSteps.createPollCta")}</Link>}
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className={actionTasks.length > 0 ? "text-emerald-300" : "text-slate-300"}>{actionTasks.length > 0 ? "\u2713" : "\u25cb"} {t("admin.overview.firstSteps.createFirstAction")}</p>
-                {actionTasks.length === 0 && <button onClick={() => setActiveTab("woodpecker")} className="shrink-0 rounded bg-teal-500 px-3 py-1.5 text-xs font-semibold text-slate-950">{t("admin.overview.firstSteps.createActionCta")}</button>}
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className={qrShared ? "text-emerald-300" : "text-slate-300"}>{qrShared ? "\u2713" : "\u25cb"} {t("admin.overview.firstSteps.shareQr")}</p>
-                {!qrShared && polls.length > 0 && <button onClick={() => setActiveTab("polls")} className="shrink-0 rounded bg-teal-500 px-3 py-1.5 text-xs font-semibold text-slate-950">{t("admin.overview.firstSteps.goToPolls")}</button>}
-              </div>
-              <p className={totalVotesCount > 0 ? "text-emerald-300" : "text-slate-300"}>{totalVotesCount > 0 ? "\u2713" : "\u25cb"} {t("admin.overview.firstSteps.getFirstVote")}</p>
-            </div>
-          </div>
-        )}
-
-        {!personaKey ? (
+        {!findPersona(personaKey) ? (
           <>
-            <p className="mt-3 text-sm text-slate-400">{t("admin.overview.personaPrompt")}</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <p className="mt-3 text-sm text-slate-400">{t("admin.overview.businessTypePrompt")}</p>
+            <div className="goal-business-grid">
               {PERSONAS.map((persona) => (
                 <button
                   key={persona.key}
                   type="button"
                   onClick={() => choosePersona(persona.key)}
-                  className="rounded border border-slate-700 bg-gray-900 p-3 text-left transition hover:border-teal-500"
+                  className="goal-choice"
                 >
-                  <span className="text-xl" aria-hidden="true">{persona.icon}</span>
-                  <p className="mt-1 font-bold">{persona.label}</p>
-                  <p className="mt-1 text-xs text-slate-400">{persona.pitch}</p>
+                  <span className="goal-choice-title">{t(`landing.useCases.${persona.audienceKey}Title`)}</span>
+                  <span className="goal-choice-detail">{t(`quickStart.businesses.${persona.audienceKey}`)}</span>
                 </button>
               ))}
             </div>
@@ -1685,7 +1678,7 @@ export default function Admin() {
               <>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm text-slate-400">
-                    <span aria-hidden="true">{persona.icon}</span> {t("admin.overview.guideFor")} <strong className="text-slate-200">{persona.label.toLowerCase()}</strong>
+                    {t("admin.overview.guideFor")} <strong className="text-slate-200">{t(`landing.useCases.${persona.audienceKey}Title`)}</strong>
                   </p>
                   <button onClick={changePersona} className="text-xs text-slate-400 underline">{t("admin.overview.chooseDifferentPath")}</button>
                 </div>
@@ -1741,11 +1734,7 @@ export default function Admin() {
             onClick={action.onSelect}
             className="rounded border border-slate-700 bg-gray-900 p-4 text-left transition hover:border-teal-500"
           >
-            {action.bird ? (
-              <FlockAvatar bird={action.bird} size={44} />
-            ) : (
-              <span className="text-2xl" aria-hidden="true">{action.icon}</span>
-            )}
+            <span className="text-2xl" aria-hidden="true">{action.icon}</span>
             <p className="mt-2 font-bold">{action.label}</p>
             <p className="mt-1 text-sm text-slate-400">{action.description}</p>
           </button>

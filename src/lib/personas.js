@@ -1,115 +1,133 @@
-// Robin's persona guide: three common ways people use Godwit, each with a short, ordered set
-// of recommended next steps built entirely from features that already exist in the product.
-// Shown on the Admin Overview tab once a workspace picks "what are you using Godwit for?".
-//
-// Each step points at either an Admin tab (`tab`) or a direct route (`route`) to jump to. A
-// step can optionally declare a `feature` key (matching entitlements.js/FEATURE_COPY) if it
-// needs a paid plan - Robin's guide then shows an inline "Available on X · Upgrade" note
-// before the admin clicks through, instead of only relying on the destination tab's own
-// LockedFeature prompt to break the news.
-
 export const PERSONAS = [
   {
-    key: "artist",
+    key: "arts-culture",
+    audienceKey: "arts",
     icon: "\ud83c\udfa8",
-    label: "Artist or creator",
-    pitch: "Turn a show, exhibition, or busking spot into a way to meet the people who came to see you.",
+    label: "Arts and culture",
+    pitch: "Share stories, answer visitor questions, and invite feedback or enquiries.",
     steps: [
       {
-        title: "Create a reaction poll",
-        detail: "One quick question after a set or show - what should I play/show next time?",
-        route: "/create"
-      },
-      {
-        title: "Add an info card with your links and a photo",
-        detail: "Show your bio, socials, and streaming links - and now a photo - right in the QR menu.",
+        title: "Add your story and links",
+        detail: "Use an information card for your bio, exhibition, artwork, or visitor details.",
         tab: "engagement"
       },
       {
-        title: "Turn on tips from fans",
-        detail: "Let people support you directly with a card or wallet payment. Godwit keeps a 9% platform fee, you keep the rest.",
-        tab: "engagement",
-        featureFlag: "donations"
+        title: "Let Godwit answer questions",
+        detail: "Add your website or FAQs as the assistant's information source.",
+        tab: "engagement"
       },
       {
-        title: "Build your fan list",
-        detail: "Invite fans to share an email for new show announcements, with clear consent - never bundled with voting.",
-        tab: "connection",
-        feature: "leadCapture"
-      },
-      {
-        title: "Give something away",
-        detail: "Run a free-to-enter prize draw for a signed print, a free ticket, or a shoutout.",
-        tab: "engagement",
-        feature: "prizeDraws"
+        title: "Invite an enquiry",
+        detail: "Add your contact or booking link to an information card on the Egg.",
+        tab: "engagement"
       }
     ]
   },
   {
-    key: "small-business",
+    key: "hospitality",
+    audienceKey: "hospitality",
     icon: "\u2615",
-    label: "Cafe, restaurant, or small shop",
-    pitch: "Turn one table QR code into better reviews, repeat visits, and honest feedback.",
+    label: "Hospitality",
+    pitch: "Help guests find useful information and share feedback about their visit.",
     steps: [
       {
-        title: "Create your first feedback poll",
-        detail: "One simple question: how was their visit today?",
+        title: "Answer common guest questions",
+        detail: "Add your website or FAQs, such as opening hours, amenities, or services.",
+        tab: "engagement"
+      },
+      {
+        title: "Ask one feedback question",
+        detail: "Create a short poll about the guest experience.",
         route: "/create"
       },
       {
-        title: "Print your QR code",
-        detail: "Put it on a table tent, receipt, or counter card - reusable, so you can swap the question later.",
-        tab: "polls"
-      },
-      {
-        title: "Set up honest review requests",
-        detail: "Every voter gets the same Google/Tripadvisor link, regardless of their answer - never gated by sentiment.",
-        tab: "connection"
-      },
-      {
-        title: "Reward returning customers",
-        detail: "Recognize regulars automatically and offer a small thank-you after a few visits.",
-        tab: "engagement",
-        feature: "redemptionTracking"
-      },
+        title: "Place an Egg where guests need help",
+        detail: "Share the same experience with a QR code, an NFC tag, or both.",
+        tab: "engagement"
+      }
     ]
   },
   {
-    key: "large-org",
-    icon: "\ud83c\udfdb\ufe0f",
-    label: "Hotel, museum, city, or large venue",
-    pitch: "Coordinate feedback across many rooms, departments, or locations from one dashboard.",
+    key: "tourism-places",
+    audienceKey: "places",
+    icon: "\ud83d\uddfa\ufe0f",
+    label: "Tourism and places",
+    pitch: "Share local knowledge and help visitors discover what to do next.",
     steps: [
       {
-        title: "Create reusable QR locations",
-        detail: "One durable code per hotel room, museum floor, or landmark - swap the active poll anytime without reprinting.",
+        title: "Share local information",
+        detail: "Add practical details, directions, or links to an information card.",
         tab: "engagement"
       },
       {
-        title: "Invite your team",
-        detail: "Give each department or staff member - front desk, housekeeping, a museum wing - their own login and role.",
-        tab: "settings"
-      },
-      {
-        title: "Track analytics across every location",
-        detail: "Compare engagement location by location, not just poll by poll.",
-        route: "/admin/analytics"
-      },
-      {
-        title: "Add wayfinding, exhibit, or amenity info cards",
-        detail: "Show opening hours, spa or restaurant hours, accessibility info, or an exhibit photo right in the QR menu.",
+        title: "Answer visitor questions",
+        detail: "Give Godwit your website or FAQs so it can answer using your information.",
         tab: "engagement"
       },
       {
-        title: "Connect the developer API or webhooks",
-        detail: "Feed results into your own dashboards or public data systems.",
-        tab: "settings",
-        feature: "apiAccess"
+        title: "Place an Egg at the point of interest",
+        detail: "Use a QR code or NFC tag where visitors are deciding what to do.",
+        tab: "engagement"
+      }
+    ]
+  },
+  {
+    key: "events-communities",
+    audienceKey: "events",
+    icon: "\ud83c\udf89",
+    label: "Events and communities",
+    pitch: "Share updates, gather feedback, and make it easy to get involved.",
+    steps: [
+      {
+        title: "Share event or community details",
+        detail: "Add the schedule, venue information, or useful links to an information card.",
+        tab: "engagement"
+      },
+      {
+        title: "Ask attendees what matters",
+        detail: "Create a short poll to gather feedback during or after the event.",
+        route: "/create"
+      },
+      {
+        title: "Put an Egg where people gather",
+        detail: "Place a QR code or NFC tag at the entrance, activity, or information point.",
+        tab: "engagement"
+      }
+    ]
+  },
+  {
+    key: "shops-services",
+    audienceKey: "shops",
+    icon: "\ud83d\uded2",
+    label: "Shops and services",
+    pitch: "Explain what you offer, answer questions, and hear from your customers.",
+    steps: [
+      {
+        title: "Show what you offer",
+        detail: "Add product or service details, a photo, and useful links to an information card.",
+        tab: "engagement"
+      },
+      {
+        title: "Answer common questions",
+        detail: "Add your website or FAQs so Godwit can answer from your business information.",
+        tab: "engagement"
+      },
+      {
+        title: "Ask for customer feedback",
+        detail: "Create a short poll and add it to an Egg customers can scan or tap.",
+        route: "/create"
       }
     ]
   }
 ];
 
+const LEGACY_PERSONA_KEYS = {
+  artist: "arts-culture",
+  "small-business": "shops-services",
+  "large-org": "tourism-places"
+};
+
 export function findPersona(key) {
-  return PERSONAS.find((persona) => persona.key === key) || null;
+  const personaKey = LEGACY_PERSONA_KEYS[key] ?? key;
+  return PERSONAS.find((persona) => persona.key === personaKey) || null;
 }

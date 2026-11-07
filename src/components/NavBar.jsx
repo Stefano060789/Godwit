@@ -99,7 +99,7 @@ export default function NavBar() {
               {t("nav.dashboard")}
             </Link>
           )}
-          {!displayUser && <Link to="/register" onClick={closeMenu} className="site-nav-primary">{t("nav.getStarted")}</Link>}
+          {!displayUser && <Link to="/essentials" onClick={closeMenu} className="site-nav-primary site-nav-start">{t("nav.getStarted")}</Link>}
           <LanguageSwitcher className="site-nav-lang" />
           <button
             type="button"
@@ -129,6 +129,7 @@ export default function NavBar() {
 
       <div id="site-navigation" className={`site-nav-links ${menuOpen ? "is-open" : ""}`}>
         {!displayUser && <>
+          <Link to="/essentials" onClick={closeMenu} className="site-nav-links-start">{t("nav.getStarted")}</Link>
           <Link to="/login" onClick={closeMenu}>{t("nav.signIn")}</Link>
         </>}
         {displayUser && <>
