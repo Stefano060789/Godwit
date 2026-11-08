@@ -2154,9 +2154,9 @@ export default function Admin() {
           </div>
 
           {qrWizardOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+            <div className="godwit-dialog-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
               <div
-                className="qr-wizard-modal max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg border border-[#24345c] bg-[#0b1a33] p-5 text-[#e7ecf5]"
+                className="godwit-dialog-panel qr-wizard-modal max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg border p-5"
                 role="dialog"
                 aria-modal="true"
                 aria-label={t(`admin.engagement.wizard.step${qrWizardStep}Title`)}
@@ -2925,8 +2925,8 @@ export default function Admin() {
       {qrModifier && (() => {
         const generatedStyle = generateQrStyle(qrModifier.seed, qrModifier.preset);
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4" role="dialog" aria-modal="true" aria-labelledby="modify-qr-title">
-            <div className="max-h-[calc(100vh-2rem)] w-full max-w-3xl overflow-y-auto rounded-xl border border-slate-700 bg-[#0b1a33] p-5 text-white shadow-2xl">
+          <div className="godwit-dialog-overlay fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modify-qr-title">
+            <div className="godwit-dialog-panel qr-modifier-modal max-h-[calc(100vh-2rem)] w-full max-w-3xl overflow-y-auto rounded-xl border p-5 shadow-2xl">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h2 id="modify-qr-title" className="text-xl font-bold">{t("admin.polls.card.modifyQr")}</h2>
@@ -2997,7 +2997,7 @@ export default function Admin() {
                   </label>
                   <p className="text-xs text-slate-300">{t("admin.polls.card.backgroundTemplateHint")}</p>
                 </div>
-                <div className="rounded-xl bg-cover bg-center p-4 text-center shadow-lg" style={{ backgroundImage: generatedStyle.background }}>
+                <div className="qr-modifier-preview rounded-xl bg-cover bg-center p-4 text-center shadow-lg" style={{ backgroundImage: generatedStyle.background }}>
                   {qrModifier.logoUrl && <img src={qrModifier.logoUrl} alt={t("admin.polls.card.logoAlt")} className="mx-auto mb-3 max-h-14 max-w-40 object-contain" />}
                   <p className="mb-3 text-sm font-bold text-slate-900">{qrModifier.text || qrModifier.campaign.name}</p>
                   <div className="mx-auto w-fit rounded-xl border-8 border-[#0b1a33] bg-white p-3 shadow-lg">

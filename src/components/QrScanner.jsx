@@ -63,16 +63,16 @@ export default function QrScanner({ onDecode, onClose }) {
   }, [onDecode]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 p-4">
-      <div className="w-full max-w-sm rounded-lg bg-slate-900 p-4 text-center text-white">
+    <div className="godwit-dialog-overlay fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Scan a QR code">
+      <div className="godwit-dialog-panel qr-scanner-modal w-full max-w-sm rounded-lg p-4 text-center">
         <p className="mb-3 font-semibold">Point your camera at a QR code</p>
         {error ? (
-          <p className="mb-3 text-sm text-red-300">{error}</p>
+          <p className="qr-scanner-error mb-3 text-sm">{error}</p>
         ) : (
           <video ref={videoRef} className="mx-auto mb-3 w-full rounded" muted playsInline />
         )}
         <canvas ref={canvasRef} className="hidden" />
-        <button type="button" onClick={onClose} className="mt-2 w-full rounded border border-slate-500 px-4 py-2 font-semibold">
+        <button type="button" onClick={onClose} className="qr-scanner-cancel mt-2 w-full rounded border px-4 py-2 font-semibold">
           Cancel
         </button>
       </div>

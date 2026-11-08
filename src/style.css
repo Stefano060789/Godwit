@@ -848,24 +848,90 @@ textarea {
   color: var(--link) !important;
 }
 
+.godwit-dialog-overlay {
+  background: rgba(15, 23, 42, .62);
+  backdrop-filter: blur(4px);
+}
+
+.godwit-dialog-panel {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 64px rgba(22, 35, 36, .2);
+}
+
+.godwit-dialog-panel :is(input:not([type="checkbox"]), textarea, select) {
+  border-color: var(--control-line);
+  background: var(--input-surface);
+  color: var(--ink);
+}
+
+.godwit-dialog-panel :is(input, textarea)::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.godwit-dialog-panel :is(input, textarea, select):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+:root[data-theme="dark"] .godwit-dialog-overlay {
+  background: rgba(4, 12, 16, .76);
+}
+
+:root:not([data-theme="dark"]) .godwit-dialog-panel {
+  box-shadow: 0 24px 64px rgba(47, 52, 43, .22);
+}
+
 :root:not([data-theme="dark"]) .qr-wizard-modal {
   border-color: var(--control-line) !important;
-  background: var(--surface) !important;
-  color: var(--ink) !important;
-  box-shadow: 0 18px 48px rgba(66, 71, 53, 0.2);
 }
 
-:root:not([data-theme="dark"]) .qr-wizard-modal [class*="text-[#f4f7fb]"],
-:root:not([data-theme="dark"]) .qr-wizard-modal [class*="text-[#dbe3f0]"] {
+.qr-wizard-modal [class*="text-[#f4f7fb]"],
+.qr-wizard-modal [class*="text-[#dbe3f0]"] {
   color: var(--ink) !important;
 }
 
-:root:not([data-theme="dark"]) .qr-wizard-modal [class*="text-[#93a3c2]"] {
+.qr-wizard-modal [class*="text-[#93a3c2]"],
+.qr-wizard-modal [class*="text-[#8fa0c2]"],
+.qr-wizard-modal [class*="text-[#c3cede]"],
+.qr-wizard-modal [class*="text-[#e7ecf5]"] {
   color: var(--muted) !important;
 }
 
-:root:not([data-theme="dark"]) .qr-wizard-modal [class*="text-[#8fa0c2]"] {
-  color: var(--muted) !important;
+:root:not([data-theme="dark"]) .qr-wizard-modal [class*="border-[#"] {
+  border-color: var(--line) !important;
+}
+
+.qr-wizard-modal [class*="bg-slate-950"],
+.qr-wizard-modal [class*="bg-slate-800"],
+.qr-wizard-modal [class*="bg-violet-950"],
+.qr-wizard-modal [class*="bg-teal-950"],
+.qr-wizard-modal [class*="bg-[#182742]"],
+.qr-wizard-modal [class*="bg-[#10203a]"],
+.qr-wizard-modal [class*="bg-[#101f39]"],
+.qr-wizard-modal [class*="bg-[#385277]"] {
+  background: var(--surface-soft) !important;
+}
+
+.qr-wizard-modal [class*="hover:bg-[#1f3252]"]:hover {
+  background: var(--teal-soft) !important;
+}
+
+.qr-wizard-modal button[class*="bg-[#f2c744]"] {
+  background: var(--gold-deep) !important;
+  color: var(--action-on-accent) !important;
+}
+
+.qr-wizard-modal button[class*="bg-[#0f766e]"] {
+  background: var(--action-primary) !important;
+  color: var(--action-on-dark) !important;
+}
+
+.qr-wizard-modal button[class*="hover:bg-[#e3b93c]"]:hover,
+.qr-wizard-modal button[class*="hover:bg-[#0d6259]"]:hover {
+  background: var(--action-primary-hover) !important;
 }
 
 .qr-wizard-input {
@@ -952,22 +1018,113 @@ textarea {
 }
 
 :root:not([data-theme="dark"]) .qr-wizard-modal .qr-wizard-back-button {
-  color: #f4f7fb !important;
+  border-color: var(--control-line) !important;
+  background: var(--surface-soft) !important;
+  color: var(--ink) !important;
 }
 
 :root:not([data-theme="dark"]) .qr-wizard-modal .qr-wizard-benefits {
-  color: #f4f7fb !important;
+  border-color: var(--line) !important;
+  background: var(--surface-soft) !important;
+  color: var(--ink) !important;
 }
 
-:root:not([data-theme="dark"]) .qr-wizard-modal .qr-wizard-benefits [class*="text-teal-"],
-:root:not([data-theme="dark"]) .qr-wizard-modal .qr-wizard-benefits [class*="text-sky-"],
-:root:not([data-theme="dark"]) .qr-wizard-modal .qr-wizard-benefits [class*="text-slate-"] {
-  color: #dbe3f0 !important;
+.qr-wizard-modal .qr-wizard-benefits [class*="text-sky-"],
+.qr-wizard-modal .qr-wizard-benefits [class*="text-slate-"] {
+  color: var(--muted) !important;
 }
 
-:root:not([data-theme="dark"]) .qr-wizard-modal .qr-wizard-benefits [class*="text-teal-"],
-:root:not([data-theme="dark"]) .qr-wizard-modal .qr-wizard-benefits h3 {
-  color: #f2c744 !important;
+.qr-wizard-modal .qr-wizard-benefits [class*="text-teal-"],
+.qr-wizard-modal .qr-wizard-benefits h3 {
+  color: var(--gold-deep) !important;
+}
+
+.godwit-dialog-panel [class*="text-slate-"] {
+  color: var(--muted) !important;
+}
+
+.godwit-dialog-panel :is(h1, h2, h3, h4, legend) {
+  color: var(--ink);
+}
+
+.godwit-dialog-panel [class*="border-slate-"],
+.godwit-dialog-panel [class*="border-[#"] {
+  border-color: var(--line) !important;
+}
+
+.godwit-dialog-panel [class*="bg-slate-950"],
+.godwit-dialog-panel [class*="bg-slate-900"],
+.godwit-dialog-panel [class*="bg-slate-800"],
+.godwit-dialog-panel [class*="bg-violet-950"],
+.godwit-dialog-panel [class*="bg-teal-950"] {
+  background: var(--surface-soft) !important;
+}
+
+.godwit-dialog-panel :is(input[type="text"], input[type="url"], input[type="file"], textarea, select) {
+  border-color: var(--control-line) !important;
+  background: var(--input-surface) !important;
+  color: var(--ink) !important;
+}
+
+.godwit-dialog-panel input[type="file"]::file-selector-button {
+  border: 0;
+  border-radius: .35rem;
+  background: var(--action-primary);
+  color: var(--action-on-dark);
+}
+
+.qr-modifier-modal button[class*="bg-[#f2c744]"] {
+  background: var(--gold-deep) !important;
+  color: var(--action-on-accent) !important;
+}
+
+.qr-modifier-modal button[class*="bg-[#0f766e]"] {
+  background: var(--action-primary) !important;
+  color: var(--action-on-dark) !important;
+}
+
+.qr-modifier-modal > div:last-child {
+  border-color: var(--line);
+}
+
+.qr-modifier-modal > div:first-child button {
+  border-color: var(--control-line);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.qr-modifier-modal > div:first-child button:hover {
+  background: var(--teal-soft);
+}
+
+.qr-modifier-modal .qr-modifier-preview {
+  color: #0f172a;
+}
+
+.qr-scanner-modal {
+  text-align: center;
+}
+
+.qr-scanner-modal video {
+  background: #0b1a33;
+}
+
+.qr-scanner-error {
+  color: #a32e24;
+}
+
+:root[data-theme="dark"] .qr-scanner-error {
+  color: #ffb2a5;
+}
+
+.qr-scanner-cancel {
+  border-color: var(--control-line);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.qr-scanner-cancel:hover {
+  background: var(--teal-soft);
 }
 
 /* Secondary/utility actions (create-a-thing buttons that aren't the single primary CTA of
