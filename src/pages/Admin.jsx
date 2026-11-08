@@ -3152,14 +3152,6 @@ export default function Admin() {
         <h2>{t("admin.hub.settings", { defaultValue: "Settings" })}</h2>
         <p>{t("admin.settingsIntro", { defaultValue: "Brand, team and account preferences." })}</p>
       </header>
-      <details className="egg-dashboard-tools">
-        <summary>{t("admin.dashboardNav.moreTools", { defaultValue: "More tools" })}</summary>
-        <div>
-          <button type="button" onClick={() => setActiveTab("polls")}>{t("admin.nav.polls")}</button>
-          <button type="button" onClick={() => setActiveTab("woodpecker")}>{t("admin.nav.woodpecker")}</button>
-          <button type="button" onClick={() => setActiveTab("connection")}>{t("admin.nav.connection")}</button>
-        </div>
-      </details>
       {DONATION_FEATURE_ENABLED && <details id="donation-settings" className="mb-6 border rounded bg-gray-900">
         <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.engagement.donations.title")}</summary>
         <div className="px-4 pb-4 space-y-3">
