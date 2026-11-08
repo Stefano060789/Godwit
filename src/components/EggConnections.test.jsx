@@ -71,4 +71,13 @@ describe("Egg connections", () => {
     expect(markup).toContain('href="/create"');
     expect(markup).not.toContain("/create?campaign=");
   });
+  it("keeps poll management out of AI-managed Eggs", () => {
+    const markup = render({ isAiManaged: true });
+    expect(markup).toContain("AI-managed feedback");
+    expect(markup).not.toContain("Default question");
+    expect(markup).not.toContain("Item question");
+    expect(markup).not.toContain("Choose a poll");
+    expect(markup).not.toContain('href="/create"');
+    expect(markup).not.toContain(">Remove</button>");
+  });
 });

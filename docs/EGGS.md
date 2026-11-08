@@ -39,11 +39,15 @@ creation reports the error and removes any partial setup.
 Enquiries use a business-provided contact or booking link,
 not a Godwit enquiry inbox. Email capture requires the relevant plan and explicit
 consent. Any thank-you benefit must be independent of public reviews.
-The **Customer benefits** area links to the existing poll-level email benefit
-settings. A voucher or discount is offered only after a customer chooses to
+The **Customer benefits** area lets the business choose an optional voucher,
+discount code, or HTTPS redemption link directly in Goal (Starter and above).
+Godwit attaches it to the generated poll; no Create/Edit Poll setup is needed.
+The business supplies the actual offer; AI must never invent a benefit.
+A voucher or discount is offered only after a customer chooses to
 share an email and consents to follow-up. Review links for Google, Tripadvisor,
 or other platforms are configured in **Settings**; public reviews are optional
-and cannot be exchanged for a reward.
+and cannot be exchanged for a reward. Creating an Egg with the reviews goal
+automatically attaches the configured review links as neutral information cards.
 
 The existing multi-step wizard remains under **Advanced setup**. Both QR and
 NFC remain available for every Egg. **Configure NFC** provides a copyable URL
@@ -66,11 +70,17 @@ eight shared sources. Data is stored in Supabase, not just browser storage.
 
 **Results** summarizes private organizer messages by Egg, including the total
 message count and the three most recent messages. Messages may include a
-reply email only when the customer chose to provide one. Use the customer
-messages view for the full inbox. Poll counts, visit counts, and shared action
+reply email only when the customer chose to provide one. Older messages load
+directly inside each Egg's result card in pages of 20, using a manager-only
+workspace-scoped cursor RPC. There is no link to a separate message inbox.
+Poll counts, visit counts, and shared action
 status are left to their detailed tools because they do not summarize what
 customers are telling the business. AI conversation transcripts and
 public-review conversion are not recorded in these results.
+
+Apply `supabase/20261112_egg_message_history.sql` after the message-results
+migration to enable inline older-message loading. Initial previews still work
+without it; loading older messages reports an error rather than hiding a failure.
 
 Each Egg prominently shows its name, location, target, and access tools.
 Its expandable content settings list the default poll and poll items, plus the Actions linked through

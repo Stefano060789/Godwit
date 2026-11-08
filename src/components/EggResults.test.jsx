@@ -15,7 +15,7 @@ describe("Egg-specific results", () => {
     const t = (key, options = {}) => labels[key] || options.defaultValue || key;
     const markup = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(EggResults, {
       campaigns,
-      onOpenEgg: vi.fn(), onOpenFeedback: vi.fn(), t
+      onOpenEgg: vi.fn(), t
     })));
     expect(markup).toContain("Gallery");
     expect(markup).toContain("Entrance");
@@ -26,5 +26,6 @@ describe("Egg-specific results", () => {
     expect(markup).not.toContain("View poll answers");
     expect(markup).not.toContain("Connected actions");
     expect(markup).not.toContain("Detailed analytics");
+    expect(markup).not.toContain("Open message inbox");
   });
 });

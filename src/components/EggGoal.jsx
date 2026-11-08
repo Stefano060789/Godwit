@@ -3,14 +3,18 @@ import { Link } from "react-router-dom";
 import { PERSONAS } from "../lib/personas";
 import { START_GOALS } from "../lib/startGuide";
 import { minPlanLabelFor } from "../lib/entitlements";
+import { normalizeEggEmailBenefit } from "../lib/eggBenefits";
 
-export default function EggGoal({ initialSelection, canManage, entitlements, onCreate, onOpenPolls, onOpenReviewSettings, t }) {
+export default function EggGoal({ initialSelection, canManage, entitlements, onCreate, onOpenReviewSettings, t }) {
   const [business, setBusiness] = useState(initialSelection.business?.audienceKey || "");
   const [goalKeys, setGoalKeys] = useState(() => initialSelection.goal ? [initialSelection.goal.key] : []);
   const [name, setName] = useState("");
   const [placement, setPlacement] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [benefitType, setBenefitType] = useState("none");
+  const [benefitValue, setBenefitValue] = useState("");
+  const [benefitUrl, setBenefitUrl] = useState("");
   const selectedGoals = START_GOALS.filter((entry) => goalKeys.includes(entry.key));
   const lockedGoals = selectedGoals.filter((entry) => entry.feature && !entitlements[entry.feature]);
 
@@ -26,7 +30,13 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
     setBusy(true);
     setError("");
     try {
-      await onCreate({ name: name.trim(), placementLabel: placement.trim(), businessType: business, goalKeys });
+      const emailBenefit = { type: benefitType, value: benefitValue, url: benefitUrl };
+      try {
+        normalizeEggEmailBenefit(emailBenefit);
+      } catch {
+        throw new Error(t("admin.goal.benefitInvalid", { defaultValue: "Enter a voucher or discount code, or a valid HTTPS redemption link." }));
+      }
+      await onCreate({ name: name.trim(), placementLabel: placement.trim(), businessType: business, goalKeys, emailBenefit });
     } catch (failure) {
       console.error("Unable to create goal-led Egg", failure);
       setError(failure.message);
@@ -39,7 +49,7 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
     <header className="hub-page-heading"><p className="goal-eyebrow">{t("admin.hub.goal", { defaultValue: "Goal" })}</p>
       <h2 id="egg-goal-title">{t("admin.goal.title", { defaultValue: "Give your Egg a purpose" })}</h2>
       <p>{t("admin.goal.intro", { defaultValue: "Choose a target and where people will find it." })}</p>
-      <p className="goal-multi-hint">{t("admin.goal.creationDetails", { defaultValue: "Godwit will create one poll and one text-response action for this Egg, based on your goals." })}</p>
+      <p className="goal-multi-hint">{t("admin.goal.creationDetails", { defaultValue: "Godwit creates and connects the polls for your goals. You do not need to set them up." })}</p>
     </header>
     <form onSubmit={submit} className="egg-goal-form">
       <fieldset disabled={!canManage || busy}>
@@ -76,15 +86,29 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
         </div>
         <div className="goal-benefits-grid">
           <article>
-            <h4>{t("admin.goal.emailBenefitTitle", { defaultValue: "Reward an email opt-in" })}</h4>
-            <p>{t("admin.goal.emailBenefitBody", { defaultValue: "Offer a voucher or discount after a customer chooses to share their email and consent to follow-up. Configure it in a poll’s After voting settings, then add that poll to this Egg." })}</p>
-            <button type="button" className="goal-text-link" onClick={onOpenPolls}>
-              {t("admin.goal.emailBenefitAction", { defaultValue: "Open polls" })} &rarr;
-            </button>
+            <h4>{t("admin.goal.emailBenefitTitle", { defaultValue: "Optional email thank-you" })}</h4>
+            <p>{t("admin.goal.emailBenefitBody", { defaultValue: "Choose a benefit here. Godwit adds it to the customer journey, shown only after email sharing and follow-up consent." })}</p>
+            {entitlements.emailBenefits ? <fieldset disabled={!canManage || busy} className="goal-benefit-fields">
+              <label>{t("admin.goal.benefitType", { defaultValue: "Customer benefit" })}
+                <select value={benefitType} onChange={(event) => setBenefitType(event.target.value)}>
+                  <option value="none">{t("admin.goal.benefitNone", { defaultValue: "No benefit" })}</option>
+                  <option value="voucher">{t("thankYou.voucher")}</option>
+                  <option value="discount_code">{t("thankYou.discountCode")}</option>
+                </select>
+              </label>
+              {benefitType !== "none" && <>
+                <label>{t("admin.pollForm.voucherOrCode")}
+                  <input maxLength={200} value={benefitValue} onChange={(event) => setBenefitValue(event.target.value)} />
+                </label>
+                <label>{t("admin.pollForm.redemptionLink")}
+                  <input type="url" maxLength={500} placeholder="https://" value={benefitUrl} onChange={(event) => setBenefitUrl(event.target.value)} />
+                </label>
+              </>}
+            </fieldset> : <p className="hub-caption">{t("admin.overview.availableOn", { plan: minPlanLabelFor("emailBenefits") })} <Link to="/admin/billing">{t("admin.overview.upgrade")}</Link></p>}
           </article>
           <article>
             <h4>{t("admin.goal.reviewLinksTitle", { defaultValue: "Public review links" })}</h4>
-            <p>{t("admin.goal.reviewLinksBody", { defaultValue: "Set up Google, Tripadvisor, or other review links in Settings, then add them to an Egg in Advanced setup. Public reviews must stay optional and cannot be rewarded." })}</p>
+            <p>{t("admin.goal.reviewLinksBody", { defaultValue: "Set up your review links once in Settings. Godwit includes them when you create an Egg with a review goal. Public reviews must stay optional and cannot be rewarded." })}</p>
             <button type="button" className="goal-text-link" onClick={onOpenReviewSettings}>
               {t("admin.goal.reviewLinksAction", { defaultValue: "Set up review links" })} &rarr;
             </button>

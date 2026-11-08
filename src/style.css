@@ -3,28 +3,38 @@
 @tailwind utilities;
 
 :root {
-  --ink: #172b2b;
-  --muted: #607170;
-  --canvas: #f4f7f5;
-  --surface: #ffffff;
-  --line: #d6e2de;
-  --teal: #0f766e;
-  --teal-soft: #d9f3ed;
-  --blue-soft: #e3f0f4;
-  --navy: #0b1a33;
-  --navy-deep: #071021;
-  --navy-soft: #12274a;
-  --gold: #f2c744;
-  --gold-soft: #fbe9ae;
-  --gold-deep: #c9971e;
-  --action-primary: #0f766e;
-  --action-primary-hover: #0b5f59;
-  --action-accent: #c9971e;
-  --action-accent-hover: #b58416;
-  --action-on-dark: #ffffff;
+  --ink: #34312c;
+  --muted: #5b534c;
+  --canvas: #e6eeee;
+  --surface: #fff8e9;
+  --surface-soft: #f3dfcc;
+  --line: #c7c6b8;
+  --control-line: #7d7d70;
+  --input-surface: #fffaf0;
+  --teal: #31565d;
+  --teal-soft: #d6e5e5;
+  --blue-soft: #c8dde2;
+  --sky: #bad2db;
+  --rose-soft: #efc3b7;
+  --rose: #84463e;
+  --navy: #213d43;
+  --navy-deep: #192e34;
+  --navy-soft: #2c4b51;
+  --gold: #dfba73;
+  --gold-soft: #f1dfb6;
+  --gold-deep: #6d4d21;
+  --action-primary: #84463e;
+  --action-primary-hover: #6e3832;
+  --action-accent: #dfba73;
+  --action-accent-hover: #cfaa62;
+  --action-on-dark: #fff8e9;
+  --action-on-accent: #34312c;
+  --focus-ring: #31565d;
+  --link: #31565d;
+  --flock-bg: #213d43;
+  --flock-bg-soft: #2c4b51;
+  color-scheme: light;
   --action-danger: #b91c1c;
-  --flock-bg: #214b46;
-  --flock-bg-soft: #2d635d;
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -530,19 +540,32 @@ textarea {
 /* The light theme is the default. Dark mode is intentionally layered below the
    existing component styles so brand colors and semantic status colors remain intact. */
 [data-theme="dark"] {
-  --ink: #e7ecf5;
-  --muted: #a9b6cb;
-  --canvas: #081326;
-  --surface: #101f38;
-  --line: #2c4165;
-  --flock-bg: #071a2d;
-  --flock-bg-soft: #102d46;
+  --ink: #fff1dc;
+  --muted: #d3c9ba;
+  --canvas: #192e34;
+  --surface: #213d43;
+  --surface-soft: #2c4b51;
+  --line: #536c70;
+  --control-line: #9cb2ae;
+  --input-surface: #1d353b;
+  --teal: #bdd8dd;
+  --teal-soft: #304e54;
+  --blue-soft: #32555d;
+  --sky: #3c626e;
+  --rose-soft: #67453f;
+  --rose: #f2c1ad;
+  --gold-deep: #dfba73;
+  --action-primary: #895046;
+  --action-primary-hover: #744139;
+  --focus-ring: #dfba73;
+  --link: #bdd8dd;
   color-scheme: dark;
 }
 
 [data-theme="dark"] body {
   background:
-    radial-gradient(circle at 15% 0%, rgba(15, 118, 110, 0.18), transparent 34rem),
+    radial-gradient(circle at 15% 0%, var(--blue-soft), transparent 34rem),
+    radial-gradient(circle at 95% 10%, var(--rose-soft), transparent 30rem),
     var(--canvas);
   color: var(--ink);
 }
@@ -563,15 +586,15 @@ textarea {
 [data-theme="dark"] input,
 [data-theme="dark"] textarea,
 [data-theme="dark"] select {
-  background: #10223e !important;
-  border-color: #385277 !important;
-  color: #edf3fb !important;
+  background: var(--input-surface) !important;
+  border-color: var(--control-line) !important;
+  color: var(--ink) !important;
   box-shadow: 0 2px 8px rgba(2, 8, 23, 0.2);
 }
 
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
-  color: #8fa0bb;
+  color: var(--muted);
 }
 
 [data-theme="dark"] .workspace-page .bg-slate-900,
@@ -582,14 +605,14 @@ textarea {
 [data-theme="dark"] .app-page .bg-slate-900,
 [data-theme="dark"] [class*="bg-white"],
 [data-theme="dark"] [class*="bg-gray-50"] {
-  background: #10203a !important;
-  color: #e7ecf5 !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
 }
 
 [data-theme="dark"] [class*="border-slate-"],
 [data-theme="dark"] [class*="border-gray-"],
 [data-theme="dark"] [class*="border-white"] {
-  border-color: #2c4165 !important;
+  border-color: var(--line) !important;
 }
 
 [data-theme="dark"] .workspace-page .text-slate-400,
@@ -600,12 +623,12 @@ textarea {
 [data-theme="dark"] .app-page .text-slate-400,
 [data-theme="dark"] .app-page .text-slate-300,
 [data-theme="dark"] .app-page .text-slate-200 {
-  color: #a9b6cb !important;
+  color: var(--muted) !important;
 }
 
 [data-theme="dark"] .workspace-page .text-white,
 [data-theme="dark"] .app-page .text-white {
-  color: #f8fafc !important;
+  color: var(--ink) !important;
 }
 
 [data-theme="dark"] .workspace-page .bg-amber-950\/40,
@@ -615,7 +638,7 @@ textarea {
 }
 
 [data-theme="dark"] .site-nav {
-  background: rgba(7, 16, 33, 0.92);
+  background: var(--navy-deep);
   backdrop-filter: blur(14px);
 }
 
@@ -625,47 +648,46 @@ textarea {
 
 [data-theme="dark"] .qr-portal-card,
 [data-theme="dark"] .qr-portal-menu-item {
-  background: #10203a;
-  border-color: #2c4165;
-  color: #e7ecf5;
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
   box-shadow: 0 18px 48px rgba(2, 6, 23, 0.38);
 }
 
 [data-theme="dark"] .qr-portal-card p,
 [data-theme="dark"] .qr-portal-menu-item-body,
 [data-theme="dark"] .qr-portal-menu-item-tag {
-  color: #a9b6cb;
+  color: var(--muted);
 }
 
 [data-theme="dark"] .qr-portal-menu-item-title {
-  color: #f8fafc;
+  color: var(--ink);
 }
 
-/* Light theme: warm paper, sage accents, and subtle depth instead of a flat blue
-   canvas. The palette keeps the gold/teal brand accents crisp and editorial. */
+/* Shell ivory, sea greens, and restrained rose washes echo Botticelli's Venus. */
 :root:not([data-theme="dark"]) body {
   background:
-    radial-gradient(circle at 8% -8%, rgba(242, 199, 68, 0.2), transparent 28rem),
-    radial-gradient(circle at 92% 8%, rgba(15, 118, 110, 0.11), transparent 32rem),
-    #f7f5ef;
+    radial-gradient(circle at 8% -8%, var(--sky), transparent 28rem),
+    radial-gradient(circle at 92% 8%, var(--rose-soft), transparent 32rem),
+    var(--canvas);
 }
 
 :root:not([data-theme="dark"]) .app-page,
 :root:not([data-theme="dark"]) .workspace-page {
-  background: rgba(255, 253, 248, 0.86);
-  border: 1px solid rgba(138, 151, 133, 0.18);
+  background: var(--surface);
+  border: 1px solid var(--line);
   box-shadow: 0 14px 40px rgba(66, 71, 53, 0.08);
 }
 
 :root:not([data-theme="dark"]) .workspace-page .bg-gray-900,
 :root:not([data-theme="dark"]) .workspace-page .bg-slate-900 {
-  background: #fffdf8 !important;
-  border-color: rgba(138, 151, 133, 0.28) !important;
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
   box-shadow: 0 8px 24px rgba(66, 71, 53, 0.06);
 }
 
 :root:not([data-theme="dark"]) .workspace-page .bg-gray-800 {
-  background: #f0f1e9 !important;
+  background: var(--surface-soft) !important;
 }
 
 :root:not([data-theme="dark"]) .workspace-page input,
@@ -674,22 +696,19 @@ textarea {
 :root:not([data-theme="dark"]) .app-page input,
 :root:not([data-theme="dark"]) .app-page textarea,
 :root:not([data-theme="dark"]) .app-page select {
-  background: #fffefb !important;
-  border-color: #cbd5c4 !important;
+  background: var(--input-surface) !important;
+  border-color: var(--control-line) !important;
 }
 
 :root:not([data-theme="dark"]) .workspace-page .text-slate-400,
 :root:not([data-theme="dark"]) .workspace-page .text-slate-300,
 :root:not([data-theme="dark"]) .workspace-page .text-slate-200 {
-  color: #5f6c65 !important;
+  color: var(--muted) !important;
 }
 
-/* Dashboard: recolored to the Godwit navy/gold brand palette (rather than the
-   generic teal/cream theme .app-page keeps for voter-facing pages). Structure and contrast
-   pairs are unchanged from the original light-theme overrides below - only the hues shift. */
 .workspace-page {
-  color: #16233f;
-  background: #f7f8fb;
+  color: var(--ink);
+  background: var(--surface);
   border-radius: 20px;
   box-shadow: 0 1px 2px rgba(11, 26, 51, 0.05);
 }
@@ -716,25 +735,25 @@ textarea {
 .workspace-page input,
 .workspace-page textarea,
 .workspace-page select {
-  border-color: rgba(11, 26, 51, 0.18) !important;
+  border-color: var(--control-line) !important;
   border-radius: 8px !important;
-  background: #ffffff !important;
-  color: #16233f !important;
+  background: var(--input-surface) !important;
+  color: var(--ink) !important;
   box-shadow: 0 1px 2px rgba(11, 26, 51, 0.05);
 }
 
 .app-page input:focus,
 .app-page textarea:focus,
 .app-page select:focus {
-  outline: 3px solid rgba(15, 118, 110, 0.18);
-  border-color: var(--teal) !important;
+  outline: 3px solid var(--focus-ring);
+  border-color: var(--focus-ring) !important;
 }
 
 .workspace-page input:focus,
 .workspace-page textarea:focus,
 .workspace-page select:focus {
-  outline: 3px solid rgba(242, 199, 68, 0.35);
-  border-color: var(--gold-deep) !important;
+  outline: 3px solid var(--focus-ring);
+  border-color: var(--focus-ring) !important;
 }
 
 /* Keep keyboard focus visible on links, buttons, and custom controls without changing
@@ -777,13 +796,13 @@ textarea {
 .workspace-page .bg-gray-900,
 .workspace-page [class*="bg-slate-950"],
 .workspace-page [class*="bg-gray-900"] {
-  background: #fdf6e3 !important;
-  color: #16233f !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
 }
 
 .workspace-page .bg-gray-800 {
-  background: #e9edf5 !important;
-  color: #16233f !important;
+  background: var(--surface-soft) !important;
+  color: var(--ink) !important;
 }
 
 /* Amber/warning callout boxes use Tailwind's opacity-suffixed utilities (bg-amber-950/40, /60,
@@ -800,23 +819,23 @@ textarea {
 .workspace-page .bg-amber-400,
 .workspace-page .bg-amber-500 {
   background: var(--action-accent) !important;
-  color: #f4f7fb !important;
+  color: var(--action-on-accent) !important;
 }
 
 .app-page .bg-amber-400,
 .app-page .bg-amber-500,
 .workspace-page .bg-amber-400,
 .workspace-page .bg-amber-500 {
-  color: #173b3a !important;
+  color: var(--action-on-accent) !important;
 }
 
 .workspace-page .bg-blue-600 {
   background: var(--action-accent) !important;
-  color: #173b3a !important;
+  color: var(--action-on-accent) !important;
 }
 
 .workspace-page .linked-qr-code-button {
-  color: #173b3a !important;
+  color: var(--link) !important;
 }
 
 .workspace-create-poll-button {
@@ -826,27 +845,27 @@ textarea {
 
 .workspace-page .linked-qr-code-button,
 .workspace-page .linked-qr-code-button.text-teal-300 {
-  color: #173b3a !important;
+  color: var(--link) !important;
 }
 
 :root:not([data-theme="dark"]) .qr-wizard-modal {
-  border-color: #cbd5c4 !important;
-  background: #fffdf8 !important;
-  color: #173b3a !important;
+  border-color: var(--control-line) !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
   box-shadow: 0 18px 48px rgba(66, 71, 53, 0.2);
 }
 
 :root:not([data-theme="dark"]) .qr-wizard-modal [class*="text-[#f4f7fb]"],
 :root:not([data-theme="dark"]) .qr-wizard-modal [class*="text-[#dbe3f0]"] {
-  color: #173b3a !important;
+  color: var(--ink) !important;
 }
 
 :root:not([data-theme="dark"]) .qr-wizard-modal [class*="text-[#93a3c2]"] {
-  color: #5f6c65 !important;
+  color: var(--muted) !important;
 }
 
 :root:not([data-theme="dark"]) .qr-wizard-modal [class*="text-[#8fa0c2]"] {
-  color: #5f6c65 !important;
+  color: var(--muted) !important;
 }
 
 .qr-wizard-input {
@@ -856,19 +875,19 @@ textarea {
 }
 
 :root:not([data-theme="dark"]) .qr-wizard-input {
-  border-color: #cbd5c4 !important;
-  background: #ffffff !important;
-  color: #173b3a !important;
-  caret-color: #173b3a;
+  border-color: var(--control-line) !important;
+  background: var(--input-surface) !important;
+  color: var(--ink) !important;
+  caret-color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .qr-wizard-input::placeholder {
-  color: #7b8780 !important;
+  color: var(--muted) !important;
   opacity: 1;
 }
 
 .qr-wizard-customer-content {
-  color: #607170;
+  color: var(--muted);
 }
 
 .customer-connection-journey {
@@ -885,7 +904,7 @@ textarea {
   padding: 13px;
   border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 12px;
-  background: rgba(15, 118, 110, 0.08);
+  background: var(--teal-soft);
 }
 
 .customer-connection-step-number {
@@ -981,7 +1000,7 @@ textarea {
 }
 
 .app-page .bg-blue-600 {
-  background: var(--teal) !important;
+  background: var(--action-primary) !important;
   color: #ffffff !important;
 }
 
@@ -996,13 +1015,13 @@ textarea {
 .workspace-page .text-slate-200,
 .workspace-page .text-slate-100,
 .workspace-page [class*="text-gray-"] {
-  color: #5b6577 !important;
+  color: var(--muted) !important;
 }
 
 /* Plain white/near-white emphasis text (e.g. <strong className="text-white">) was meant for
    the old dark card background and is otherwise invisible against the light workspace canvas. */
 .workspace-page .text-white {
-  color: var(--navy-deep) !important;
+  color: var(--ink) !important;
 }
 
 .app-page .text-emerald-400 {
@@ -1015,7 +1034,7 @@ textarea {
    step now reads as the same consistent gold instead of three unrelated hues. */
 .workspace-page [class*="text-teal-"],
 .workspace-page [class*="text-sky-"] {
-  color: var(--gold-deep) !important;
+  color: var(--link) !important;
 }
 
 /* Semantic status colors (error/warning/info/success/link) were originally light Tailwind
@@ -1066,7 +1085,40 @@ textarea {
 .workspace-page [class*="border-indigo-"],
 .workspace-page [class*="border-slate-"],
 .workspace-page [class*="border-gray-"] {
-  border-color: rgba(11, 26, 51, 0.14) !important;
+  border-color: var(--line) !important;
+}
+
+[data-theme="dark"] .workspace-page [class*="text-red-"] {
+  color: #ffb2a5 !important;
+}
+
+[data-theme="dark"] .workspace-page [class*="text-green-"],
+[data-theme="dark"] .workspace-page [class*="text-emerald-"] {
+  color: var(--link) !important;
+}
+
+[data-theme="dark"] .workspace-page [class*="text-yellow-"],
+[data-theme="dark"] .workspace-page [class*="text-amber-"] {
+  color: var(--gold) !important;
+}
+
+[data-theme="dark"] .workspace-page [class*="text-blue-"],
+[data-theme="dark"] .workspace-page [class*="text-indigo-"] {
+  color: #bdd5d2 !important;
+}
+
+[data-theme="dark"] .workspace-page [class*="text-violet-"],
+[data-theme="dark"] .workspace-page [class*="text-fuchsia-"] {
+  color: var(--rose) !important;
+}
+
+/* Action labels must win over the legacy text-white theme overrides. */
+:root .workspace-page :is(.bg-blue-600, .bg-teal-400, .bg-teal-500, .bg-amber-400, .bg-amber-500) {
+  color: var(--action-on-accent) !important;
+}
+
+:root .workspace-page :is(.bg-violet-600, .bg-indigo-600, .bg-fuchsia-600, .bg-purple-600, .bg-sky-500, .bg-red-600) {
+  color: var(--action-on-dark) !important;
 }
 
 .site-nav-links {
@@ -1113,7 +1165,7 @@ textarea {
 }
 
 .landing-page {
-  color: #e2e8f0;
+  color: #f4ebda;
 }
 
 .landing-hero {
@@ -1124,8 +1176,8 @@ textarea {
   gap: 48px;
   padding: 96px max(24px, calc((100vw - 1120px) / 2)) 88px;
   background:
-    radial-gradient(720px 520px at 88% 12%, rgba(242, 199, 68, 0.16), transparent 62%),
-    linear-gradient(160deg, var(--navy-deep) 0%, var(--navy) 62%, var(--navy-soft) 100%);
+    radial-gradient(ellipse at 95% 60%, var(--rose-soft), transparent 65%),
+    linear-gradient(160deg, var(--navy-deep) 0%, var(--navy) 62%, var(--sky) 100%);
   overflow: hidden;
 }
 
@@ -1161,12 +1213,40 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
+  isolation: isolate;
+  padding: 38px 24px;
+}
+
+.landing-hero-visual::before,
+.landing-hero-visual::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.landing-hero-visual::before {
+  inset: 0 5%;
+  border: 1px solid var(--gold);
+  border-radius: 48% 48% 44% 44% / 60% 60% 35% 35%;
+  background:
+    radial-gradient(ellipse at 40% 25%, var(--surface), transparent 85%),
+    var(--surface-soft);
+  box-shadow: 0 18px 60px rgba(54, 39, 32, 0.12);
+  transform: rotate(-6deg);
+}
+
+.landing-hero-visual::after {
+  inset: 14px 2% -14px 10%;
+  border: 1px solid var(--rose);
+  border-radius: 48% 48% 44% 44% / 60% 60% 35% 35%;
+  transform: rotate(5deg);
 }
 
 .landing-hero-visual img {
   width: min(100%, 420px);
   height: auto;
-  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 12px 20px rgba(87, 61, 30, 0.16));
 }
 
 .landing-eyebrow {
@@ -1212,7 +1292,7 @@ textarea {
 .landing-lede {
   max-width: 600px;
   margin: 24px 0;
-  color: #e5e7eb;
+  color: #f4ebda;
   font-size: 1.15rem;
   line-height: 1.65;
 }
@@ -1246,15 +1326,16 @@ textarea {
 
 .landing-primary-action {
   position: relative;
-  color: var(--navy-deep);
-  background: var(--gold);
-  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+  color: var(--action-on-dark);
+  background: var(--action-primary);
+  border-radius: 999px;
 }
 
 .landing-secondary-action {
-  color: var(--navy-deep);
-  border: 1px solid #fff8e8;
-  background: #fff8e8;
+  color: var(--ink);
+  border: 1px solid var(--control-line);
+  background: var(--surface);
+  border-radius: 999px;
 }
 
 .landing-primary-action::after {
@@ -1278,7 +1359,7 @@ textarea {
 }
 
 .landing-actions .landing-admin-action:hover {
-  background: var(--gold-deep);
+  background: var(--action-accent-hover);
   color: var(--navy-deep);
 }
 
@@ -1289,6 +1370,10 @@ textarea {
   box-shadow: 0 14px 28px rgba(7, 16, 33, 0.28);
 }
 
+.landing-primary-action:hover {
+  background: var(--action-primary-hover);
+}
+
 .landing-secondary-action:hover {
   background: #f4e8c8;
   color: var(--navy-deep);
@@ -1296,13 +1381,13 @@ textarea {
 
 .landing-primary-action:focus-visible,
 .landing-secondary-action:focus-visible {
-  outline-color: #fff8e8;
+  outline-color: var(--focus-ring);
   outline-offset: 5px;
 }
 
 .landing-note {
   margin: 18px 0 0;
-  color: #cbd5e1;
+  color: #c4bda9;
   font-size: 0.9rem;
 }
 
@@ -1312,16 +1397,16 @@ textarea {
   gap: clamp(36px, 7vw, 96px);
   align-items: center;
   padding: 84px max(24px, calc((100vw - 1120px) / 2));
-  color: #173b3a;
+  color: var(--ink);
   background:
-    radial-gradient(620px 420px at 8% 0%, rgba(242, 199, 68, 0.22), transparent 68%),
-    linear-gradient(145deg, #fffdf8, #e5f0e9);
+    radial-gradient(620px 420px at 8% 0%, var(--surface), transparent 68%),
+    linear-gradient(145deg, var(--surface-soft), var(--rose-soft));
 }
 
 .landing-egg h2 {
   max-width: 18ch;
   margin: 0;
-  color: #173b3a;
+  color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(2rem, 3.4vw, 3.4rem);
   line-height: 1.05;
@@ -1331,7 +1416,7 @@ textarea {
 .landing-egg-lede {
   max-width: 510px;
   margin: 20px 0;
-  color: #46625e;
+  color: var(--muted);
   font-size: 1.05rem;
   line-height: 1.65;
 }
@@ -1348,23 +1433,23 @@ textarea {
   width: 44px;
   height: 44px;
   place-items: center;
-  border: 1px solid rgba(15, 118, 110, 0.28);
+  border: 1px solid var(--control-line);
   border-radius: 50%;
-  color: #0f766e;
-  background: rgba(255, 255, 255, 0.75);
+  color: var(--link);
+  background: var(--surface);
   font-size: 0.8rem;
   font-weight: 800;
 }
 
 .landing-egg-access > span:nth-child(2) {
   border: 0;
-  color: #78918b;
+  color: var(--muted);
   background: transparent;
 }
 
 .landing-egg-access-caption {
   margin-left: 4px;
-  color: #46625e;
+  color: var(--muted);
   font-size: 0.88rem;
 }
 
@@ -1376,7 +1461,7 @@ textarea {
   padding: 0 20px;
   border-radius: 3px;
   color: #fff;
-  background: #0f766e;
+  background: var(--action-primary);
   font-weight: 700;
   text-decoration: none;
   transition: background-color 0.18s ease, transform 0.18s ease;
@@ -1385,19 +1470,19 @@ textarea {
 .landing-egg-action:hover {
   transform: translateY(-2px);
   color: #fff;
-  background: #0b5f59;
+  background: var(--action-primary-hover);
 }
 
 .landing-egg-action:focus-visible {
-  outline: 3px solid #cb971e;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 4px;
 }
 
 .landing-egg-features {
   overflow: hidden;
-  border: 1px solid rgba(23, 59, 58, 0.12);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface);
   box-shadow: 0 24px 64px rgba(23, 59, 58, 0.12);
 }
 
@@ -1410,7 +1495,7 @@ textarea {
 }
 
 .landing-egg-feature-number {
-  color: #0f766e;
+  color: var(--link);
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -1418,21 +1503,21 @@ textarea {
 
 .landing-egg-feature h3 {
   margin: 0 0 6px;
-  color: #173b3a;
+  color: var(--ink);
   font-size: 1.08rem;
 }
 
 .landing-egg-feature p {
   margin: 0;
-  color: #46625e;
+  color: var(--muted);
   line-height: 1.55;
 }
 
 .landing-egg-control {
   margin: 0;
   padding: 18px 24px;
-  color: #46625e;
-  background: rgba(229, 240, 233, 0.75);
+  color: var(--muted);
+  background: var(--teal-soft);
   font-size: 0.85rem;
   line-height: 1.5;
 }
@@ -1484,7 +1569,7 @@ textarea {
 .landing-step p,
 .landing-outcomes li span {
   margin: 0;
-  color: #94a3b8;
+  color: #c4bda9;
 }
 
 .landing-outcomes {
@@ -1510,8 +1595,8 @@ textarea {
 }
 
 .landing-final {
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--surface);
+  color: var(--ink);
   text-align: center;
 }
 
@@ -1527,7 +1612,7 @@ textarea {
 .landing-final-copy {
   max-width: 560px;
   margin: 0 auto 24px;
-  color: #475569;
+  color: var(--muted);
 }
 
 .landing-admin-actions {
@@ -1565,15 +1650,15 @@ textarea {
 .landing-audiences {
   padding: 84px max(24px, calc((100vw - 1120px) / 2));
   background:
-    radial-gradient(780px 360px at 12% 0%, rgba(78, 165, 217, 0.16), transparent 68%),
-    radial-gradient(640px 420px at 92% 100%, rgba(139, 120, 214, 0.14), transparent 68%),
+    radial-gradient(780px 360px at 12% 0%, rgba(191, 210, 181, 0.1), transparent 68%),
+    radial-gradient(640px 420px at 92% 100%, rgba(223, 179, 163, 0.1), transparent 68%),
     var(--flock-bg);
 }
 
 .landing-audience-lede {
   margin: 14px 0 0;
   max-width: 560px;
-  color: #94a3b8;
+  color: #c4bda9;
 }
 
 .landing-audience-grid {
@@ -1606,7 +1691,7 @@ textarea {
 
 .landing-audience-card p {
   margin: 0;
-  color: #94a3b8;
+  color: #c4bda9;
   font-size: 0.92rem;
   line-height: 1.55;
 }
@@ -1615,25 +1700,13 @@ textarea {
 .goal-guide,
 .goal-plan,
 .auth-page {
-  --guide-ink: #1b2c3b;
-  --guide-muted: #526676;
-  --guide-surface: #ffffff;
-  --guide-line: #a9bac6;
-  --guide-selection: #dceeea;
-  --guide-accent: #176b63;
+  --guide-ink: var(--ink);
+  --guide-muted: var(--muted);
+  --guide-surface: var(--surface);
+  --guide-line: var(--control-line);
+  --guide-selection: var(--teal-soft);
+  --guide-accent: var(--link);
   color: var(--guide-ink);
-}
-
-:root[data-theme="dark"] .goal-start,
-:root[data-theme="dark"] .goal-guide,
-:root[data-theme="dark"] .goal-plan,
-:root[data-theme="dark"] .auth-page {
-  --guide-ink: #fff8e8;
-  --guide-muted: #c1d2cf;
-  --guide-surface: #13282e;
-  --guide-line: #688487;
-  --guide-selection: #203c3a;
-  --guide-accent: #f2c744;
 }
 
 .goal-start {
@@ -1782,11 +1855,11 @@ textarea {
 }
 
 :root[data-theme="dark"] .workspace-page .goal-choice:hover:not([aria-pressed="true"]) {
-  background: #193137;
+  background: var(--surface-soft);
 }
 
 :root[data-theme="dark"] .workspace-page .goal-choice[aria-pressed="true"] {
-  background: #234b47;
+  background: var(--guide-selection);
 }
 
 .workspace-page .goal-choice[aria-pressed="true"] {
@@ -1861,23 +1934,23 @@ textarea {
   padding: 12px 20px;
   border: 1px solid transparent;
   border-radius: 8px;
-  background: #0b5f59;
-  color: #fffdf8;
+  background: var(--action-primary);
+  color: var(--action-on-dark);
   font-weight: 700;
   text-decoration: none;
 }
 
 .workspace-page .goal-primary-action:hover {
-  background: #084d48;
+  background: var(--action-primary-hover);
 }
 
 :root[data-theme="dark"] .workspace-page .goal-primary-action {
-  background: #f2c744;
-  color: #173b3a;
+  background: var(--action-accent);
+  color: var(--action-on-accent);
 }
 
 :root[data-theme="dark"] .workspace-page .goal-primary-action:hover {
-  background: #fbe9ae;
+  background: var(--action-accent-hover);
 }
 
 .goal-text-link {
@@ -1938,8 +2011,8 @@ textarea {
 }
 
 :root[data-theme="dark"] .workspace-page.goal-shell {
-  background: #0f2028;
-  border: 1px solid #30484d;
+  background: var(--surface);
+  border: 1px solid var(--line);
   box-shadow: 0 20px 64px rgba(2, 8, 16, 0.18);
 }
 
@@ -1953,8 +2026,8 @@ textarea {
 }
 
 :root[data-theme="dark"] .app-page.auth-page {
-  background: #0f2028;
-  border: 1px solid #30484d;
+  background: var(--surface);
+  border: 1px solid var(--line);
   box-shadow: 0 20px 64px rgba(2, 8, 16, 0.24);
 }
 
@@ -2084,19 +2157,18 @@ textarea {
   display: none;
 }
 
-/* The light landing page uses a warmer editorial palette instead of the
-   product's dark navy brand surfaces. Dark mode keeps the original contrast. */
+/* Daylight uses the painting's paper and sea tones; night keeps its forest shadows. */
 :root:not([data-theme="dark"]) .site-nav {
-  background: #f3efe5;
-  color: #173b3a;
-  box-shadow: inset 0 -1px 0 rgba(15, 118, 110, 0.18);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: inset 0 -1px 0 var(--line);
 }
 
 :root:not([data-theme="dark"]) .site-nav-brand,
 :root:not([data-theme="dark"]) .site-nav-actions a,
 :root:not([data-theme="dark"]) .site-nav-actions button,
 :root:not([data-theme="dark"]) .site-nav-toggle {
-  color: #173b3a;
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .site-nav-actions .site-nav-primary {
@@ -2111,58 +2183,62 @@ textarea {
 }
 
 :root:not([data-theme="dark"]) .site-nav-dashboard {
-  border-color: rgba(15, 118, 110, 0.28);
-  color: #0f5f5a;
+  border-color: var(--control-line);
+  background: var(--teal-soft);
+  color: var(--link);
 }
 
 :root:not([data-theme="dark"]) .site-nav-lang,
+:root:not([data-theme="dark"]) .language-switcher,
+:root:not([data-theme="dark"]) .site-nav-toggle,
 :root:not([data-theme="dark"]) .site-nav-theme {
-  border-color: rgba(23, 59, 58, 0.22);
-  background: rgba(255, 255, 255, 0.5);
+  border-color: var(--control-line);
+  background: var(--surface);
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .site-nav-lang {
-  color: #173b3a;
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .site-nav-links {
-  border-color: rgba(23, 59, 58, 0.16);
-  background: #fffdf8;
+  border-color: var(--line);
+  background: var(--surface);
   box-shadow: 0 14px 28px rgba(23, 59, 58, 0.16);
 }
 
 :root:not([data-theme="dark"]) .site-nav-links a,
 :root:not([data-theme="dark"]) .site-nav-links button {
-  color: #173b3a;
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .site-nav-links a:hover,
 :root:not([data-theme="dark"]) .site-nav-links button:hover {
-  background: #e5f0e9;
+  background: var(--teal-soft);
 }
 
 :root:not([data-theme="dark"]) .landing-page {
-  color: #173b3a;
-  background: #f8f5ed;
+  color: var(--ink);
+  background: var(--canvas);
 }
 
 :root:not([data-theme="dark"]) .landing-hero {
   background:
-    radial-gradient(720px 520px at 88% 12%, rgba(203, 151, 30, 0.18), transparent 62%),
-    linear-gradient(145deg, #f8f5ed 0%, #e5f0e9 58%, #d9ebe5 100%);
+    radial-gradient(ellipse at 95% 85%, var(--rose-soft), transparent 62%),
+    linear-gradient(150deg, var(--sky) 0%, var(--blue-soft) 48%, var(--canvas) 100%);
 }
 
 :root:not([data-theme="dark"]) .landing-hero h1,
 :root:not([data-theme="dark"]) .landing-outcomes h2,
 :root:not([data-theme="dark"]) .landing-final h2 {
-  color: #173b3a;
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .landing-section h2,
 :root:not([data-theme="dark"]) .landing-section h3,
 :root:not([data-theme="dark"]) .landing-outcomes h2,
 :root:not([data-theme="dark"]) .landing-outcomes li strong {
-  color: #173b3a;
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .landing-eyebrow,
@@ -2170,29 +2246,29 @@ textarea {
 :root:not([data-theme="dark"]) .landing-register-link,
 :root:not([data-theme="dark"]) .landing-step span,
 :root:not([data-theme="dark"]) .landing-audience-number {
-  color: #765414;
+  color: var(--gold-deep);
 }
 
 :root:not([data-theme="dark"]) .landing-lede,
 :root:not([data-theme="dark"]) .landing-note {
-  color: #46625e;
+  color: var(--muted);
 }
 
 :root:not([data-theme="dark"]) .landing-secondary-action {
-  border-color: #0f766e;
-  background: #0f766e;
-  color: #fffdf8;
+  border-color: var(--control-line);
+  background: var(--surface);
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .landing-secondary-action:hover {
-  background: #0b5f59;
-  color: #fffdf8;
+  background: var(--surface-soft);
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .landing-primary-action,
 :root:not([data-theme="dark"]) .landing-actions .landing-admin-action {
-  background: var(--action-accent);
-  color: #173b3a;
+  background: var(--action-primary);
+  color: var(--action-on-dark);
 }
 
 :root:not([data-theme="dark"]) .landing-admin-actions .landing-primary-action {
@@ -2202,8 +2278,8 @@ textarea {
 
 :root:not([data-theme="dark"]) .landing-primary-action:hover,
 :root:not([data-theme="dark"]) .landing-actions .landing-admin-action:hover {
-  background: var(--action-accent-hover);
-  color: #173b3a;
+  background: var(--action-primary-hover);
+  color: var(--action-on-dark);
 }
 
 :root:not([data-theme="dark"]) .landing-admin-actions .landing-primary-action:hover {
@@ -2214,80 +2290,80 @@ textarea {
 :root:not([data-theme="dark"]) .landing-section,
 :root:not([data-theme="dark"]) .landing-audiences {
   background:
-    radial-gradient(720px 380px at 8% 0%, rgba(242, 199, 68, 0.08), transparent 68%),
-    linear-gradient(145deg, #f3f5ee, #e5f0e9);
-  color: #173b3a;
+    radial-gradient(720px 380px at 8% 0%, var(--surface), transparent 68%),
+    linear-gradient(145deg, var(--blue-soft), var(--canvas));
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .landing-step p,
 :root:not([data-theme="dark"]) .landing-outcomes li span,
 :root:not([data-theme="dark"]) .landing-audience-lede,
 :root:not([data-theme="dark"]) .landing-audience-card p {
-  color: #415c55;
+  color: var(--muted);
 }
 
 :root:not([data-theme="dark"]) .landing-outcomes {
-  background: #f8f5ed;
+  background: var(--surface-soft);
 }
 
 :root:not([data-theme="dark"]) .landing-outcomes li {
-  border-bottom-color: #6f8d83;
+  border-bottom-color: var(--control-line);
 }
 
 :root:not([data-theme="dark"]) .landing-final {
-  background: #fffdf8;
-  color: #173b3a;
+  background: var(--surface);
+  color: var(--ink);
 }
 
 :root:not([data-theme="dark"]) .landing-final-copy {
-  color: #46625e;
+  color: var(--muted);
 }
 
 :root[data-theme="dark"] .landing-egg {
-  color: #e2e8f0;
+  color: var(--ink);
   background:
-    radial-gradient(620px 420px at 8% 0%, rgba(242, 199, 68, 0.12), transparent 68%),
-    linear-gradient(145deg, #10252d, #173b3a);
+    radial-gradient(620px 420px at 8% 0%, var(--rose-soft), transparent 68%),
+    linear-gradient(145deg, var(--surface), var(--surface-soft));
 }
 
 :root[data-theme="dark"] .landing-egg h2,
 :root[data-theme="dark"] .landing-egg-feature h3 {
-  color: #fff8e8;
+  color: var(--ink);
 }
 
 :root[data-theme="dark"] .landing-egg-lede,
 :root[data-theme="dark"] .landing-egg-access-caption,
 :root[data-theme="dark"] .landing-egg-feature p,
 :root[data-theme="dark"] .landing-egg-control {
-  color: #cbd5e1;
+  color: var(--muted);
 }
 
 :root[data-theme="dark"] .landing-egg-access > span:not(.landing-egg-access-caption) {
-  border-color: rgba(94, 234, 212, 0.25);
-  color: #99f6e4;
-  background: rgba(15, 23, 42, 0.55);
+  border-color: var(--control-line);
+  color: var(--link);
+  background: var(--surface);
 }
 
 :root[data-theme="dark"] .landing-egg-access > span:nth-child(2) {
-  color: #94a3b8;
+  color: var(--muted);
   background: transparent;
 }
 
 :root[data-theme="dark"] .landing-egg-features {
-  border-color: rgba(226, 232, 240, 0.14);
-  background: rgba(15, 23, 42, 0.5);
+  border-color: var(--line);
+  background: var(--surface);
 }
 
 :root[data-theme="dark"] .landing-egg-feature {
-  border-bottom-color: rgba(226, 232, 240, 0.12);
+  border-bottom-color: var(--line);
 }
 
 :root[data-theme="dark"] .landing-egg-feature-number {
-  color: #5eead4;
+  color: var(--link);
 }
 
 :root[data-theme="dark"] .landing-egg-control {
-  background: rgba(15, 23, 42, 0.48);
+  background: var(--surface-soft);
 }
 
 :root:not([data-theme="dark"]) .landing-admin-action {
@@ -2301,13 +2377,13 @@ textarea {
 }
 
 :root:not([data-theme="dark"]) .landing-audience-card {
-  border-color: #6f8d83;
-  background: #fffdf8;
+  border-color: var(--control-line);
+  background: var(--surface);
   box-shadow: 0 3px 12px rgba(23, 59, 58, 0.04);
 }
 
 :root:not([data-theme="dark"]) .landing-audience-card h3 {
-  color: #173b3a;
+  color: var(--ink);
 }
 
 @media (max-width: 720px) {

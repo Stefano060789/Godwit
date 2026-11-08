@@ -15,6 +15,7 @@ import EggNfcSetup from "../components/EggNfcSetup";
 import { listBusinessSources } from "../lib/businessData";
 import { createGoalEggSetup } from "../lib/goalEggSetup";
 import { isRestrictedTopic } from "../lib/restrictedContent";
+import { normalizeEggEmailBenefit } from "../lib/eggBenefits";
 import "../components/EggDashboard.css";
 import {
   loadQrCampaignItems,
@@ -1637,6 +1638,10 @@ export default function Admin() {
       .map((key) => START_GOALS.find((entry) => entry.key === key))
       .find((goal) => goal?.feature && !entitlements[goal.feature]);
     if (lockedGoal) throw new Error(t("admin.overview.availableOn", { plan: minPlanLabelFor(lockedGoal.feature) }));
+    const benefitFields = normalizeEggEmailBenefit(fields.emailBenefit);
+    if (benefitFields.email_benefit_type !== "none" && !entitlements.emailBenefits) {
+      throw new Error(t("admin.overview.availableOn", { plan: minPlanLabelFor("emailBenefits") }));
+    }
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user?.id) throw new Error(userError?.message || t("admin.goal.managerRequired", { defaultValue: "An owner or editor can create Eggs." }));
@@ -1685,7 +1690,16 @@ export default function Admin() {
         workspaceId: workspaceUserId,
         userId: user.id,
         pollDraft: generated.poll,
-        actionDraft: generated.action
+        actionDraft: generated.action,
+        emailBenefit: fields.emailBenefit,
+        reviewCards: fields.goalKeys.includes("reviews")
+          ? (workspaceProfile.reviewPlatforms || []).map((platform) => ({
+            title: platform.name,
+            body: t("admin.goal.reviewInvitation", { defaultValue: "Share an honest review of your experience. It is optional and independent of any customer benefit." }),
+            linkUrl: platform.url,
+            linkLabel: platform.name
+          }))
+          : []
       });
     } catch (error) {
       const { error: campaignCleanupError } = await supabase.from("qr_campaigns").delete().eq("id", campaign.id);
@@ -1695,7 +1709,7 @@ export default function Admin() {
 
     setQrCampaigns((current) => [campaign, ...current]);
     setPolls((current) => [setup.poll, ...current]);
-    setQrCampaignItems((current) => [setup.pollItem, ...current]);
+    setQrCampaignItems((current) => [setup.pollItem, ...setup.reviewItems, ...current]);
     setActionTasks((current) => [setup.task, ...current]);
     setAnalytics((current) => ({ ...current, total: current.total + 1, active: current.active + 1 }));
     goToEgg(campaign.id);
@@ -1740,11 +1754,10 @@ export default function Admin() {
         canManage={canReuseQr && Boolean(workspaceUserId)}
         entitlements={entitlements}
         onCreate={createGoalEgg}
-        onOpenPolls={() => setActiveTab("polls")}
         onOpenReviewSettings={() => openConnectionSetup("settings", "review-platform-settings")}
         t={t}
       />}
-      {activeTab === "results" && <EggResults campaigns={qrCampaigns} canViewMessages={permission.canManageWorkspace} onOpenEgg={goToEgg} onOpenFeedback={() => setActiveTab("feedback")} t={t} />}
+      {activeTab === "results" && <EggResults campaigns={qrCampaigns} canViewMessages={permission.canManageWorkspace} onOpenEgg={goToEgg} t={t} />}
 
       {activeTab === "overview" && (
       <>

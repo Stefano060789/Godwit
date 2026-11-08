@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { addQrCampaignPollItem, from, query } = vi.hoisted(() => ({
+const { addQrCampaignInfoItem, addQrCampaignPollItem, from, query } = vi.hoisted(() => ({
+  addQrCampaignInfoItem: vi.fn(),
   addQrCampaignPollItem: vi.fn(),
   from: vi.fn(),
   query: {
@@ -13,12 +14,12 @@ const { addQrCampaignPollItem, from, query } = vi.hoisted(() => ({
 }));
 
 vi.mock("./supabase", () => ({ supabase: { from } }));
-vi.mock("./qrCampaignItems", () => ({ addQrCampaignPollItem }));
+vi.mock("./qrCampaignItems", () => ({ addQrCampaignInfoItem, addQrCampaignPollItem }));
 
 import { createGoalEggSetup } from "./goalEggSetup";
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.resetAllMocks();
   from.mockReturnValue(query);
   query.delete.mockReturnThis();
   query.eq.mockResolvedValue({ error: null });
@@ -27,6 +28,7 @@ beforeEach(() => {
   query.single.mockResolvedValueOnce({ data: { id: 8, question: "How was your visit?" }, error: null })
     .mockResolvedValueOnce({ data: { id: 12, title: "Share an idea" }, error: null });
   addQrCampaignPollItem.mockResolvedValue({ id: 9, campaign_id: 4, item_type: "poll", poll_id: 8 });
+  addQrCampaignInfoItem.mockResolvedValue({ id: 10, campaign_id: 4, item_type: "info" });
 });
 
 describe("goal-led Egg content creation", () => {
@@ -73,5 +75,37 @@ describe("goal-led Egg content creation", () => {
 
     expect(from).toHaveBeenCalledWith("polls");
     expect(query.delete).toHaveBeenCalledTimes(1);
+  });
+  it("attaches the business benefit to the AI poll without manual poll setup", async () => {
+    await createGoalEggSetup({
+      campaign: { id: 4 }, workspaceId: "workspace-1", userId: "user-1",
+      pollDraft: { question: "How was your visit?", answers: ["Great", "Could improve"] },
+      actionDraft: { title: "Share an idea", description: "Tell us what would help." },
+      emailBenefit: { type: "voucher", value: "Free coffee", url: "https://example.com/redeem" }
+    });
+    expect(query.insert).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      email_benefit_type: "voucher", email_benefit_value: "Free coffee", email_benefit_url: "https://example.com/redeem",
+      workspace_id: "workspace-1"
+    }));
+  });
+  it("validates the benefit before any write", async () => {
+    await expect(createGoalEggSetup({ emailBenefit: { type: "voucher" } })).rejects.toThrow();
+    expect(from).not.toHaveBeenCalled();
+  });
+  it("rejects unsafe review links before writing content", async () => {
+    await expect(createGoalEggSetup({ reviewCards: [{ title: "Google", linkUrl: "javascript:alert(1)" }] }))
+      .rejects.toThrow("Fix the review links");
+    expect(from).not.toHaveBeenCalled();
+  });
+  it("automatically attaches configured review links separately from benefits", async () => {
+    const card = { title: "Google", linkUrl: "https://example.com/review", body: "Optional honest review" };
+    const result = await createGoalEggSetup({
+      campaign: { id: 4 }, workspaceId: "workspace-1", userId: "user-1",
+      pollDraft: { question: "How was your visit?", answers: ["Great", "Could improve"] },
+      actionDraft: { title: "Share an idea", description: "Tell us what would help." },
+      reviewCards: [card]
+    });
+    expect(addQrCampaignInfoItem).toHaveBeenCalledWith(4, card);
+    expect(result.reviewItems).toHaveLength(1);
   });
 });

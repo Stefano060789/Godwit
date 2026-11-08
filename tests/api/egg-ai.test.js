@@ -364,6 +364,11 @@ describe("Egg AI API", () => {
         expect(requestBody.system).toContain("one short customer-facing poll");
         expect(requestBody.system).toContain("arts, artists, galleries, and cultural venues");
         expect(requestBody.system).toContain("Public reviews must be optional");
+        expect(requestBody.messages).toHaveLength(1);
+        expect(requestBody.messages[0].role).toBe("user");
+        expect(requestBody.messages[0].content).toContain('"name":"Gallery welcome"');
+        expect(requestBody.messages[0].content).toContain("Invite honest feedback");
+        expect(requestBody.messages[0].content).toContain("Help the customer find relevant business information");
         return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
           poll: { question: "What would improve your visit?", answers: ["More events", "More information"] },
           action: { title: "Share an idea", description: "Tell us what would make your next visit better." }

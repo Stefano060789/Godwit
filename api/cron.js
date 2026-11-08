@@ -19,6 +19,7 @@ import { runStripeReconciliation } from "../lib/cron/stripeReconciliationJob.js"
 import { runDsarProcessing } from "../lib/cron/dsarJob.js";
 import { runCheckGmailReplies } from "../lib/cron/gmailReplyMonitorJob.js";
 import { runResearchGodwitProspects } from "../lib/cron/researchGodwitProspectsJob.js";
+import { runAdaptiveEggPolls } from "../lib/cron/adaptiveEggPollJob.js";
 import { getSystemStatus } from "../lib/cron/systemStatus.js";
 import { captureError } from "../lib/errorReporting.js";
 
@@ -32,6 +33,7 @@ const JOBS = {
   "process-dsar": { run: runDsarProcessing, methods: ["GET"] },
   "check-gmail-replies": { run: runCheckGmailReplies, methods: ["GET"] },
   "research-godwit-prospects": { run: runResearchGodwitProspects, methods: ["GET"] },
+  "adaptive-egg-polls": { run: runAdaptiveEggPolls, methods: ["GET"] },
   "system-status": { run: getSystemStatus, methods: ["GET"] }
 };
 

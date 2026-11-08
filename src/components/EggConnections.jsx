@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function EggConnections({
-  campaign, polls, items, tasks, tasksError, canManage, t,
+  campaign, polls, items, tasks, tasksError, canManage, isAiManaged = false, t,
   onOpenPoll, onAddPoll, onRemoveItem, onAttachAction, onCreateAction, onOpenActions
 }) {
   const [pollId, setPollId] = useState("");
@@ -46,6 +46,10 @@ export default function EggConnections({
       </div>
       <div className="egg-connections-grid">
         <div className="egg-connections-panel">
+          {isAiManaged ? <>
+            <h4>{t("admin.goal.aiManagedTitle", { defaultValue: "AI-managed feedback" })}</h4>
+            <p>{t("admin.goal.aiManagedBody", { defaultValue: "Godwit handles the poll questions for this Egg. See what customers tell you in Results." })}</p>
+          </> : <>
           <h4>{t("admin.engagement.items.sectionPolls")}</h4>
           {linkedPollIds.size === 0 && <p>{t("admin.eggConnections.noPolls", { defaultValue: "No polls connected yet." })}</p>}
           {campaign.poll_id && !defaultIsItem && (
@@ -81,6 +85,7 @@ export default function EggConnections({
               <Link className="egg-connection-link" to="/create">{t("admin.engagement.scanner.createNewPoll")}</Link>
             </>
           )}
+          </>}
         </div>
         <div className="egg-connections-panel">
           <h4>{t("admin.eggConnections.actions", { defaultValue: "Actions" })}</h4>

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import egg from "../assets/birds/egg.svg";
 import { getCampaignGoalKeys } from "../lib/startGuide";
+import EggMessageHistory from "./EggMessageHistory";
 
-export default function EggResults({ campaigns, canViewMessages, onOpenEgg, onOpenFeedback, t }) {
+export default function EggResults({ campaigns, canViewMessages, onOpenEgg, t }) {
   const [summaries, setSummaries] = useState(null);
   const [errors, setErrors] = useState([]);
   const [selected, setSelected] = useState("all");
@@ -69,18 +70,11 @@ export default function EggResults({ campaigns, canViewMessages, onOpenEgg, onOp
               ? <p className="hub-caption">{t("admin.eggResults.loading", { defaultValue: "Loading messages…" })}</p>
               : messages.length === 0
                 ? <p className="hub-caption">{t("admin.eggResults.noMessages", { defaultValue: "No customer messages yet." })}</p>
-                : <ul>{messages.map((message) => <li key={message.id}>
-                  <p>{message.message}</p>
-                  <time dateTime={message.created_at}>{new Date(message.created_at).toLocaleDateString()}</time>
-                  {message.reply_email && <a href={`mailto:${encodeURIComponent(message.reply_email)}`}>{message.reply_email}</a>}
-                </li>)}</ul>}
+                : <EggMessageHistory key={`${campaign.id}-${refresh}`} campaignId={campaign.id} preview={messages} total={Number(summary.message_count)} t={t} />}
           </div>
           <button type="button" className="goal-text-link" onClick={() => onOpenEgg(campaign.id)}>{t("admin.eggResults.openEgg", { defaultValue: "Open Egg" })} &rarr;</button>
         </article>;
       })}
-    </div>
-    <div className="egg-results-links">
-      <button type="button" className="goal-text-link" onClick={onOpenFeedback}>{t("admin.eggResults.allMessages", { defaultValue: "Open message inbox" })} &rarr;</button>
     </div>
   </section>;
 }

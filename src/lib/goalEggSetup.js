@@ -1,12 +1,27 @@
 import { supabase } from "./supabase";
-import { addQrCampaignPollItem } from "./qrCampaignItems";
+import { addQrCampaignInfoItem, addQrCampaignPollItem } from "./qrCampaignItems";
+import { normalizeEggEmailBenefit } from "./eggBenefits";
 
-export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDraft, actionDraft }) {
+export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDraft, actionDraft, emailBenefit, reviewCards = [] }) {
+  const benefitFields = normalizeEggEmailBenefit(emailBenefit);
+  for (const card of reviewCards) {
+    let url;
+    try {
+      url = new URL(card.linkUrl);
+    } catch {
+      throw new Error("Fix the review links in Settings before creating this Egg.");
+    }
+    if (url.protocol !== "https:" || url.username || url.password || !card.title?.trim()) {
+      throw new Error("Fix the review links in Settings before creating this Egg.");
+    }
+  }
   let poll = null;
   try {
     const { data: createdPoll, error: pollError } = await supabase
       .from("polls")
       .insert({
+        ...benefitFields,
+        workspace_id: workspaceId,
         question: pollDraft.question,
         answers: pollDraft.answers,
         multiple_choice: false,
@@ -33,10 +48,15 @@ export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDr
       .select()
       .single();
     if (taskError) throw new Error(`Unable to create the generated action: ${taskError.message}`);
+    const reviewItems = [];
+    for (const card of reviewCards) {
+      reviewItems.push(await addQrCampaignInfoItem(campaign.id, card));
+    }
 
     return {
       poll,
       pollItem,
+      reviewItems,
       task: { ...task, woodpecker_task_campaigns: [{ campaign_id: campaign.id }] }
     };
   } catch (error) {

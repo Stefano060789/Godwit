@@ -19,13 +19,15 @@ describe("Egg goal setup", () => {
     expect(markup.match(/aria-pressed="true"/g)).toHaveLength(2);
     expect(markup).toContain("Give your Egg a purpose");
     expect(markup).toContain("Select every goal you want this Egg to support.");
-    expect(markup).toContain("Godwit will create one poll and one text-response action for this Egg, based on your goals.");
+    expect(markup).toContain("Godwit creates and connects the polls for your goals. You do not need to set them up.");
     expect(markup).toContain('aria-pressed="true"');
     expect(markup).toContain('maxLength="120"');
     expect(markup).toContain('maxLength="80"');
     expect(markup).toContain("Create Egg");
     expect(markup).toContain("Customer benefits");
-    expect(markup).toContain("Reward an email opt-in");
+    expect(markup).toContain("Optional email thank-you");
+    expect(markup).not.toContain("Open polls");
+    expect(markup).not.toContain("After voting");
     expect(markup).toContain("Public reviews must stay optional and cannot be rewarded.");
     expect(markup).not.toContain("admin.goal.");
   });
@@ -34,5 +36,12 @@ describe("Egg goal setup", () => {
   });
   it("retains the upgrade route for gated goals", () => {
     expect(render({ initialSelection: getStartSelection("?business=arts&goal=contacts") })).toContain('href="/admin/billing"');
+  });
+  it("offers benefit selection in Goal without directing the business to polls", () => {
+    const markup = render({ entitlements: { emailBenefits: true } });
+    expect(markup).toContain("Customer benefit");
+    expect(markup).toContain('value="voucher"');
+    expect(markup).toContain('value="discount_code"');
+    expect(markup).not.toContain("Open polls");
   });
 });
