@@ -1127,6 +1127,26 @@ textarea {
   background: var(--teal-soft);
 }
 
+.qr-scanner-photo {
+  border: 1px solid var(--control-line);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.qr-scanner-photo:hover {
+  background: var(--teal-soft);
+}
+
+.workspace-page .egg-scanner-lookup {
+  border: 1px solid var(--control-line);
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.workspace-page .egg-scanner-lookup:hover {
+  background: var(--teal-soft);
+}
+
 /* Secondary/utility actions (create-a-thing buttons that aren't the single primary CTA of
    their section) were each using a different, unrelated Tailwind hue left over from the
    original dark theme (violet, indigo, fuchsia, purple, sky) - consolidated into one
