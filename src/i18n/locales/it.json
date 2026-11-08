@@ -53,7 +53,7 @@
       "feedback": {
         "title": "Raccogliere feedback utile",
         "example": "Scopri cosa pensano i clienti della loro visita.",
-        "setup": "Crea un breve sondaggio sull'esperienza che vuoi migliorare.",
+        "setup": "Apri o crea un Egg, poi aggiungi un breve sondaggio alla sua esperienza.",
         "result": "Apri i risultati del sondaggio per vedere le risposte e individuare cosa migliorare."
       },
       "information": {
@@ -71,7 +71,7 @@
       "contacts": {
         "title": "Creare una lista email",
         "example": "Invita le persone a ricevere novità e offerte.",
-        "setup": "Crea un sondaggio e configura un consenso email chiaro in Dopo il voto.",
+        "setup": "Apri o crea un Egg, aggiungi un sondaggio e configura un consenso email chiaro in Dopo il voto.",
         "result": "Esporta i contatti con consenso da Connessione clienti. Le persone possono votare senza condividere l'email."
       },
       "reviews": {

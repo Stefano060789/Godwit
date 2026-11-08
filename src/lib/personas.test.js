@@ -38,4 +38,13 @@ describe("business guidance paths", () => {
       });
     });
   });
+
+  it("keeps business recommendations inside the Egg workspace", () => {
+    for (const persona of PERSONAS) {
+      for (const step of persona.steps) {
+        expect(step.tab).toBe("engagement");
+        expect(step.route).toBeUndefined();
+      }
+    }
+  });
 });

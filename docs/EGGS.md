@@ -41,6 +41,29 @@ a fallback. The selection guides the setup screen; it does not disable either
 method. The dashboard keeps both links available so the business can add or
 switch access methods later.
 
+## Dashboard and connections
+
+The main dashboard navigation is **Overview**, **Eggs**, **Results**, and
+**Workspace**. Existing `tab=engagement`, `tab=feedback`, and `tab=settings`
+links still open those sections. **More tools** retains the legacy polls,
+actions, and connection screens, including polls not attached to any Egg.
+
+Each Egg lists its default poll and poll items, plus the Actions linked through
+the task-to-Egg relationship. Managers can add existing polls and Actions,
+create a simple scan Action, or remove a poll item from that Egg. Removing an
+item does not delete the poll or change an Egg's legacy default poll. To create
+a poll without replacing that default, create it first and then add it to the
+Egg. Open a poll for its existing edit and results controls; Action results,
+response requirements and notification settings remain in the Action tool.
+Information and reward counts reflect existing Egg items. The Egg setup wizard
+continues to provide the existing information, review and reward setup.
+
+The legacy default poll is a fallback: an Egg with item entries shows those
+items instead, and an Egg with only Actions opens the Action portal first.
+Add the default poll as an item if it should appear with other Egg items.
+An Egg with one poll item can open the poll directly, so its Actions may not
+be visible from that screen; the Action portal link is available separately.
+
 ## AI business assistant
 
 Workspace managers can open an Egg's **AI business assistant** setup, import a

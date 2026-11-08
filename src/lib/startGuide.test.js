@@ -17,7 +17,7 @@ describe("starting guide navigation", () => {
 
   it("keeps category optional and ignores invalid URL inputs", () => {
     expect(getStartSelection("?goal=unknown&business=unknown")).toEqual({ business: null, goal: null });
-    expect(buildStartLink("feedback", "unknown")).toBe("/admin?tab=polls&goal=feedback");
+    expect(buildStartLink("feedback", "unknown")).toBe("/admin?tab=engagement&goal=feedback");
     expect(() => buildStartLink("unknown", "arts")).toThrow("Unknown starting goal");
   });
 
@@ -31,6 +31,12 @@ describe("starting guide navigation", () => {
   it("respects existing plan requirements for contact and review goals", () => {
     expect(START_GOALS.find((goal) => goal.key === "contacts").feature).toBe("leadCapture");
     expect(START_GOALS.find((goal) => goal.key === "reviews").feature).toBe("publicReviewLinks");
+  });
+
+  it("starts every customer interaction goal from an Egg", () => {
+    for (const key of ["answers", "feedback", "information", "next-step", "contacts"]) {
+      expect(START_GOALS.find((goal) => goal.key === key)).toMatchObject({ tab: "engagement", action: "egg" });
+    }
   });
 
   it.each([undefined, "", "https://example.com", "//example.com", "/admin/../login", "/administrator", "/\\example.com"])(

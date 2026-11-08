@@ -38,7 +38,7 @@ export const PERSONAS = [
       {
         title: "Ask one feedback question",
         detail: "Create a short poll about the guest experience.",
-        route: "/create"
+        tab: "engagement"
       },
       {
         title: "Place an Egg where guests need help",
@@ -86,7 +86,7 @@ export const PERSONAS = [
       {
         title: "Ask attendees what matters",
         detail: "Create a short poll to gather feedback during or after the event.",
-        route: "/create"
+        tab: "engagement"
       },
       {
         title: "Put an Egg where people gather",
@@ -115,7 +115,7 @@ export const PERSONAS = [
       {
         title: "Ask for customer feedback",
         detail: "Create a short poll and add it to an Egg customers can scan or tap.",
-        route: "/create"
+        tab: "engagement"
       }
     ]
   }

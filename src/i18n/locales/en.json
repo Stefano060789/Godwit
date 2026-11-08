@@ -116,7 +116,7 @@
       "feedback": {
         "title": "Get useful feedback",
         "example": "Learn what customers think about their visit.",
-        "setup": "Create one short poll about the experience you want to improve.",
+        "setup": "Open or create an Egg, then add a short feedback poll to its experience.",
         "result": "Open your poll's results to see answers and spot what could improve."
       },
       "information": {
@@ -134,7 +134,7 @@
       "contacts": {
         "title": "Build an email list",
         "example": "Invite people to receive your news or offers.",
-        "setup": "Create a poll and configure a clear email opt-in under After voting.",
+        "setup": "Open or create an Egg, add a poll, and configure a clear email opt-in under After voting.",
         "result": "Export consented contacts from Customer connection. People can vote without sharing their email."
       },
       "reviews": {

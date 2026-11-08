@@ -53,7 +53,7 @@
       "feedback": {
         "title": "Nützliches Feedback erhalten",
         "example": "Erfahren Sie, was Kunden über ihren Besuch denken.",
-        "setup": "Erstellen Sie eine kurze Umfrage zu dem Erlebnis, das Sie verbessern möchten.",
+        "setup": "Öffnen oder erstellen Sie ein Egg und ergänzen Sie eine kurze Feedback-Umfrage.",
         "result": "Öffnen Sie die Umfrageergebnisse, um Antworten und Verbesserungsmöglichkeiten zu sehen."
       },
       "information": {
@@ -71,7 +71,7 @@
       "contacts": {
         "title": "E-Mail-Liste aufbauen",
         "example": "Laden Sie Menschen zu Neuigkeiten und Angeboten ein.",
-        "setup": "Erstellen Sie eine Umfrage und richten Sie unter Nach der Abstimmung eine klare E-Mail-Einwilligung ein.",
+        "setup": "Öffnen oder erstellen Sie ein Egg, ergänzen Sie eine Umfrage und richten Sie unter Nach der Abstimmung eine klare E-Mail-Einwilligung ein.",
         "result": "Exportieren Sie Kontakte mit Einwilligung unter Kundenbindung. Menschen können auch ohne E-Mail-Adresse abstimmen."
       },
       "reviews": {

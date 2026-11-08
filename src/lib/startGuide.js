@@ -2,10 +2,10 @@ import { PERSONAS } from "./personas";
 
 export const START_GOALS = [
   { key: "answers", tab: "engagement", action: "egg" },
-  { key: "feedback", tab: "polls", action: "poll" },
+  { key: "feedback", tab: "engagement", action: "egg" },
   { key: "information", tab: "engagement", action: "egg" },
   { key: "next-step", tab: "engagement", action: "egg" },
-  { key: "contacts", tab: "connection", action: "contacts", feature: "leadCapture" },
+  { key: "contacts", tab: "engagement", action: "egg", feature: "leadCapture" },
   { key: "reviews", tab: "settings", action: "reviews", feature: "publicReviewLinks" }
 ];
 

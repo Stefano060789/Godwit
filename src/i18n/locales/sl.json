@@ -54,7 +54,7 @@
       "feedback": {
         "title": "Zbiranje koristnih mnenj",
         "example": "Ugotovite, kaj stranke menijo o obisku.",
-        "setup": "Ustvarite kratko anketo o izkušnji, ki jo želite izboljšati.",
+        "setup": "Odprite ali ustvarite Egg in njegovi vsebini dodajte kratko anketo.",
         "result": "Odprite rezultate ankete, preglejte odgovore in poiščite možnosti za izboljšave."
       },
       "information": {
@@ -72,7 +72,7 @@
       "contacts": {
         "title": "Ustvarjanje e-poštnega seznama",
         "example": "Povabite ljudi k prejemanju novic ali ponudb.",
-        "setup": "Ustvarite anketo in v razdelku Po glasovanju nastavite jasno soglasje za e-pošto.",
+        "setup": "Odprite ali ustvarite Egg, dodajte anketo in v razdelku Po glasovanju nastavite jasno soglasje za e-pošto.",
         "result": "Izvozite kontakte s soglasjem iz razdelka Povezava s strankami. Ljudje lahko glasujejo brez delitve e-pošte."
       },
       "reviews": {

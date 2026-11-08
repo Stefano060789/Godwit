@@ -6,6 +6,8 @@ import { appendAuditLog, readAuditLog, readPollMeta, savePollMeta, isPollClosed 
 import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
 import { buildEggUrl } from "../lib/eggs";
 import EggAiSetup from "../components/EggAiSetup";
+import EggConnections from "../components/EggConnections";
+import "../components/EggDashboard.css";
 import {
   loadQrCampaignItems,
   addQrCampaignPollItem,
@@ -64,7 +66,7 @@ export default function Admin() {
     if (activeTab !== "polls" || !selectedId) return;
     const card = document.getElementById(`poll-card-${selectedId}`);
     card?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [activeTab, location.search]);
+  }, [activeTab, location.search, loading]);
 
   const [auditLog, setAuditLog] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -98,6 +100,7 @@ export default function Admin() {
   const [eggEditPlacement, setEggEditPlacement] = useState("");
   const [qrCampaignItems, setQrCampaignItems] = useState([]);
   const [actionTasks, setActionTasks] = useState([]);
+  const [actionTasksError, setActionTasksError] = useState("");
   const [itemFormCampaignId, setItemFormCampaignId] = useState(null);
   const [itemPollId, setItemPollId] = useState("");
   const [itemTitle, setItemTitle] = useState("");
@@ -264,7 +267,7 @@ export default function Admin() {
           supabase.from("weekly_report_settings").select("recipient_email, is_enabled").eq("workspace_id", profile.id).maybeSingle(),
           supabase.from("organizer_messages").select("*").order("created_at", { ascending: false }).limit(30),
           supabase.from("content_reports").select("*").order("created_at", { ascending: false }),
-          supabase.from("woodpecker_tasks").select("*, qr_campaigns!woodpecker_tasks_campaign_id_fkey(name)").eq("workspace_id", profile.id).order("created_at", { ascending: false }),
+          supabase.from("woodpecker_tasks").select("*, qr_campaigns!woodpecker_tasks_campaign_id_fkey(name), woodpecker_task_campaigns(campaign_id)").eq("workspace_id", profile.id).order("created_at", { ascending: false }),
           supabase.rpc("get_workspace_egg_access_metrics")
         ]);
         if (!rulesResult.error) setAlertRules(rulesResult.data || []);
@@ -273,7 +276,13 @@ export default function Admin() {
         if (!reportsResult.error && reportsResult.data) setReportSettings(reportsResult.data);
         if (!messagesResult.error) setOrganizerMessages(messagesResult.data || []);
         if (!contentReportsResult.error) setContentReports(contentReportsResult.data || []);
-        if (!actionTasksResult.error) setActionTasks(actionTasksResult.data || []);
+        if (actionTasksResult.error) {
+          console.error("Unable to load Egg actions", actionTasksResult.error);
+          setActionTasksError(actionTasksResult.error.message);
+        } else {
+          setActionTasks(actionTasksResult.data || []);
+          setActionTasksError("");
+        }
         if (eggAccessResult.error) {
           console.error("Egg access analytics are unavailable. Apply the Eggs NFC attribution migration.", eggAccessResult.error);
           setEggAccessTrackingError(t("admin.engagement.campaigns.migrationRequired"));
@@ -346,6 +355,32 @@ export default function Admin() {
 
     return () => clearInterval(interval);
   }, [navigate]);
+
+  useEffect(() => {
+    if (!workspaceUserId || activeTab !== "engagement") return;
+    let cancelled = false;
+    supabase.from("woodpecker_tasks")
+      .select("*, qr_campaigns!woodpecker_tasks_campaign_id_fkey(name), woodpecker_task_campaigns(campaign_id)")
+      .eq("workspace_id", workspaceUserId)
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          console.error("Unable to load Egg actions", error);
+          setActionTasksError(error.message);
+        } else {
+          setActionTasks(data || []);
+          setActionTasksError("");
+        }
+      });
+    return () => { cancelled = true; };
+  }, [workspaceUserId, activeTab]);
+
+  useEffect(() => {
+    const eggId = new URLSearchParams(location.search).get("egg");
+    if (activeTab !== "engagement" || !eggId || !qrCampaigns.length) return;
+    document.getElementById(`egg-card-${eggId}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [activeTab, location.search, qrCampaigns, loading]);
 
   // Returning from Stripe's hosted Connect onboarding lands back here with ?donations=
   // connected|refresh (see the return_url/refresh_url built in api/create-checkout-session.js).
@@ -739,6 +774,30 @@ export default function Admin() {
     } catch (error) {
       alert(error.message);
     }
+
+  }
+
+  async function addEggPoll(campaignId, pollId) {
+    const item = await addQrCampaignPollItem(campaignId, pollId);
+    setQrCampaignItems((current) => [...current, item]);
+  }
+
+  async function attachEggAction(campaign, taskId) {
+    const { error } = await supabase.from("woodpecker_task_campaigns")
+      .upsert({ task_id: Number(taskId), campaign_id: campaign.id }, { onConflict: "task_id,campaign_id" });
+    if (error) throw error;
+    setActionTasks((current) => current.map((task) => Number(task.id) === Number(taskId)
+      ? { ...task, woodpecker_task_campaigns: [...(task.woodpecker_task_campaigns || []).filter((link) => Number(link.campaign_id) !== Number(campaign.id)), { campaign_id: campaign.id }] }
+      : task));
+  }
+
+  async function createEggAction(campaign, title) {
+    const { data, error } = await supabase.from("woodpecker_tasks")
+      .insert({ workspace_id: workspaceUserId, campaign_id: campaign.id, title: title.trim() })
+      .select("*, woodpecker_task_campaigns(campaign_id)").single();
+    if (error) throw error;
+    if (!data) throw new Error("The action was not created.");
+    setActionTasks((current) => [data, ...current]);
   }
 
   async function handleAddInfoItem(campaignId) {
@@ -1536,7 +1595,18 @@ export default function Admin() {
     setSearchTerm("");
     setStatusFilter("all");
     setLocationFilter("all");
-    navigate(`/admin?tab=polls&poll=${pollId}`);
+    const params = new URLSearchParams(location.search);
+    params.set("tab", "polls");
+    params.set("poll", pollId);
+    navigate(`/admin?${params}`);
+  }
+
+  function goToEgg(campaignId) {
+    const params = new URLSearchParams(location.search);
+    params.set("tab", "engagement");
+    params.set("egg", campaignId);
+    params.delete("poll");
+    navigate(`/admin?${params}`);
   }
 
   const filteredPolls = polls.filter((poll) => {
@@ -1553,12 +1623,9 @@ export default function Admin() {
 
   const adminTabs = [
     { key: "overview", label: t("admin.nav.overview") },
-    { key: "polls", label: t("admin.nav.polls") },
-    { key: "woodpecker", label: t("admin.nav.woodpecker") },
-    { key: "engagement", label: t("admin.nav.engagement") },
-    { key: "connection", label: t("admin.nav.connection") },
-    { key: "feedback", label: t("admin.nav.feedback") },
-    { key: "settings", label: t("admin.nav.settings") }
+    { key: "engagement", label: t("admin.dashboardNav.eggs", { defaultValue: "Eggs" }) },
+    { key: "feedback", label: t("admin.dashboardNav.results", { defaultValue: "Results" }) },
+    { key: "settings", label: t("admin.dashboardNav.workspace", { defaultValue: "Workspace" }) }
   ];
 
   const adminTabDescriptions = {
@@ -1572,10 +1639,7 @@ export default function Admin() {
   };
 
   const quickActions = [
-    { key: "polls", icon: "\ud83d\udcca", label: t("admin.quickActions.polls.label"), description: t("admin.quickActions.polls.description"), onSelect: () => setActiveTab("polls") },
-    { key: "woodpecker", icon: "\u2705", label: t("admin.quickActions.woodpecker.label"), description: t("admin.quickActions.woodpecker.description"), onSelect: () => setActiveTab("woodpecker") },
     { key: "engagement", icon: "🥚", label: t("admin.quickActions.engagement.label"), description: t("admin.quickActions.engagement.description"), onSelect: () => setActiveTab("engagement") },
-    { key: "connection", icon: "\ud83e\udd1d", label: t("admin.quickActions.connection.label"), description: t("admin.quickActions.connection.description"), onSelect: () => setActiveTab("connection") },
     { key: "analytics", icon: "\ud83d\udcca", label: t("admin.quickActions.analytics.label"), description: t("admin.quickActions.analytics.description"), onSelect: () => navigate("/admin/analytics") },
     { key: "feedback", icon: "\ud83d\udcac", label: t("admin.quickActions.feedback.label"), description: t("admin.quickActions.feedback.description"), onSelect: () => setActiveTab("feedback") },
     { key: "settings", icon: "\u2699\ufe0f", label: t("admin.quickActions.settings.label"), description: t("admin.quickActions.settings.description"), onSelect: () => setActiveTab("settings") }
@@ -1593,18 +1657,28 @@ export default function Admin() {
         <p className="mt-2 text-sm text-slate-400">{t("admin.dashboardSubtitle")}</p>
       </div>
 
-      <div className="mb-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-center">
+      <nav className="egg-dashboard-nav" aria-label={t("admin.dashboardNav.label", { defaultValue: "Dashboard" })}>
         {adminTabs.map((tab) => (
           <button
             key={tab.key}
+            type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center justify-center gap-1.5 rounded px-4 py-3 text-center font-semibold ${activeTab === tab.key ? "bg-teal-500 text-slate-950" : "bg-gray-800 text-slate-300"}`}
+            aria-current={activeTab === tab.key ? "page" : undefined}
+            className="egg-dashboard-nav-item"
           >
             {tab.label}
           </button>
         ))}
-      </div>
+      </nav>
       <p className="mb-1 text-center text-sm text-slate-400">{adminTabDescriptions[activeTab]}</p>
+      <details className="egg-dashboard-tools">
+        <summary>{t("admin.dashboardNav.moreTools", { defaultValue: "More tools" })}</summary>
+        <div>
+          <button type="button" onClick={() => setActiveTab("polls")}>{t("admin.nav.polls")}</button>
+          <button type="button" onClick={() => setActiveTab("woodpecker")}>{t("admin.nav.woodpecker")}</button>
+          <button type="button" onClick={() => setActiveTab("connection")}>{t("admin.nav.connection")}</button>
+        </div>
+      </details>
 
       {startSelection.goal && (
         <section className="goal-plan goal-workspace-plan" aria-labelledby="workspace-goal-title">
@@ -2169,6 +2243,7 @@ export default function Admin() {
                   <div className="space-y-3">
                     <h3 className="text-lg font-bold text-[#f4f7fb]">{t("admin.engagement.wizard.step3Title")}</h3>
                     <p className="text-xs text-[#93a3c2]">{t("admin.engagement.wizard.taskHint")}</p>
+                    {actionTasksError && <p role="alert" className="text-sm text-red-300">{t("admin.eggConnections.actionsUnavailable", { defaultValue: "Actions could not be loaded:" })} {actionTasksError}</p>}
                     <div className="flex min-w-0 gap-2">
                       <select
                         value={qrWizardActionId}
@@ -2384,7 +2459,7 @@ export default function Admin() {
               const previewUrl = new URL(url);
               previewUrl.searchParams.set("preview", "1");
               return (
-                <div key={campaign.id} className="gap-3 border border-gray-700 rounded p-3">
+                <div key={campaign.id} id={`egg-card-${campaign.id}`} className="gap-3 border border-gray-700 rounded p-3">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-semibold"><span className="text-amber-300">Egg</span> · {campaign.name}</p>
@@ -2428,6 +2503,21 @@ export default function Admin() {
                     </div>
                   )}
 
+                  <EggConnections
+                    campaign={campaign}
+                    polls={polls}
+                    items={itemsForCampaign(campaign.id)}
+                    tasks={actionTasks}
+                    tasksError={actionTasksError}
+                    canManage={canReuseQr}
+                    t={t}
+                    onOpenPoll={goToPoll}
+                    onAddPoll={addEggPoll}
+                    onRemoveItem={handleRemoveItem}
+                    onAttachAction={attachEggAction}
+                    onCreateAction={createEggAction}
+                    onOpenActions={() => setActiveTab("woodpecker")}
+                  />
                   <EggAiSetup campaign={campaign} t={t} />
 
                   <div className="mt-2 flex items-center gap-3">
@@ -3436,7 +3526,7 @@ export default function Admin() {
                       <button
                         key={`${qrCode.kind}-${qrCode.id}`}
                         type="button"
-                        onClick={() => setActiveTab("engagement")}
+                        onClick={() => goToEgg(qrCode.id)}
                         className="linked-qr-code-button rounded-full border border-teal-700 bg-teal-950/40 px-3 py-1 text-xs font-semibold text-teal-300"
                         title={t("admin.polls.card.tokenTitle", { token: qrCode.token })}
                       >
