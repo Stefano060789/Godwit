@@ -10,8 +10,10 @@ import EggAiAssistant from "../components/EggAiAssistant";
 import { accessibilityTagIcon, accessibilityTagLabel } from "../lib/accessibilityTags";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 import { normalizeEggAccessMethod } from "../lib/eggs";
+import { useTranslation } from "react-i18next";
 
 export default function QrRedirect() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { token } = useParams();
   const [searchParams] = useSearchParams();
@@ -72,7 +74,6 @@ export default function QrRedirect() {
       } catch (aiConfigError) {
         console.error("Unable to load Egg AI settings:", aiConfigError);
       }
-      eggAiEnabled = eggAiEnabled && !isPreview;
 
       if (!itemsError && Array.isArray(visibleItems) && visibleItems.length > 0) {
         await recordEggAccess(visibleItems[0].campaign_id);
@@ -108,12 +109,13 @@ export default function QrRedirect() {
           items: visibleItems,
           branding,
           hasWoodpeckerTasks,
-          aiEnabled: eggAiEnabled
+          aiEnabled: eggAiEnabled && !isPreview,
+          aiPreview: eggAiEnabled && isPreview
         });
         return;
       }
 
-      if (hasWoodpeckerTasks) {
+      if (hasWoodpeckerTasks && !eggAiEnabled) {
         const taskCampaignId = woodpeckerTasks[0]?.campaign_id;
         await recordEggAccess(taskCampaignId);
         navigate(`/qr/${token}/tasks`, { replace: true });
@@ -153,10 +155,26 @@ export default function QrRedirect() {
             }],
             branding,
             hasWoodpeckerTasks,
-            aiEnabled: true
+            aiEnabled: !isPreview,
+            aiPreview: isPreview
           });
           return;
         }
+      }
+
+      if (!campaignError && campaign && eggAiEnabled) {
+        await recordEggAccess(campaign.campaign_id);
+        setMenu({
+          campaignId: campaign.campaign_id,
+          portalTitle: null,
+          portalMessage: null,
+          items: [],
+          branding: getPollBranding(null),
+          hasWoodpeckerTasks,
+          aiEnabled: !isPreview,
+          aiPreview: isPreview
+        });
+        return;
       }
 
       const stableShortUrl = `${window.location.origin}/qr/${token}`;
@@ -232,7 +250,7 @@ export default function QrRedirect() {
         <section className="qr-portal-card qr-portal-menu">
           {branding.logoUrl && <img src={branding.logoUrl} alt={`${branding.brandName || "Venue"} logo`} className="qr-portal-logo" />}
           <p className="qr-portal-brand" style={{ color: branding.primaryColor }}>{branding.brandName || "Godwit"}</p>
-          <h1>{portalTitle || "Welcome! Choose an option below."}</h1>
+          <h1>{portalTitle || (items.length === 0 && (aiEnabled || menu.aiPreview) ? t("eggAi.welcome", { defaultValue: "Welcome. How can I help?" }) : "Welcome! Choose an option below.")}</h1>
           {portalMessage && <p>{portalMessage}</p>}
           <div className="qr-portal-menu-list">
             {items.map((item) => {
@@ -328,7 +346,7 @@ export default function QrRedirect() {
                 />
               ) : null;
             })()}
-            {aiEnabled && <EggAiAssistant token={token} />}
+            {(aiEnabled || menu.aiPreview) && <EggAiAssistant token={token} preview={menu.aiPreview} initiallyExpanded={menu.items.length === 0} />}
           </div>
         </section>
       </main>

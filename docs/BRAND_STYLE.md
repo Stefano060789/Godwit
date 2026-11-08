@@ -42,6 +42,23 @@ Use white text on teal, navy, or deep-gold controls. Use `--navy-deep` or
 
 ## Logo and print palette
 
+### Egg dashboard hub
+
+Keep the Egg as the visual center, not one tab among many. Business Data and
+Goal are the inputs on the left; Results is the output on the right; Settings
+sits below. Fine connector lines explain this relationship without extra copy.
+Keep this spatial arrangement on phones, with compact labels and icons.
+
+The hub uses warm paper (`#FFFDF7`), sage (`#E3EEDF`), and deep green
+(`#234238`) in light mode. Dark mode uses a green-navy surface (`#182D32`),
+pale text (`#E7F0E6`), and sage highlights (`#B5DFBD`). Gold belongs primarily
+to the Egg asset and its thin circular border. Selected nodes use a gentle
+sage fill, a clear border, and keyboard focus outlines.
+
+The selected page follows below the hub. Use a short heading, one supporting
+sentence, numbered setup steps, and expandable advanced controls. Do not
+restore standalone polls or actions to the main navigation.
+
 The Godwit mark uses a gold diagonal gradient:
 
 | Gradient stop | Hex |

@@ -1,4 +1,8 @@
 {
+  "eggAi": {
+    "welcome": "Willkommen. Wie kann ich helfen?",
+    "previewHint": "Kunden können Godwit Fragen zu Ihren Unternehmensinformationen stellen. Der Chat ist in dieser Vorschau deaktiviert."
+  },
   "nav": {
     "quickStart": "Erste Schritte",
     "support": "Support",
@@ -298,6 +302,90 @@
     }
   },
   "admin": {
+    "hub": {
+      "label": "Ihr Unternehmen, verbunden durch Eggs",
+      "business": "Unternehmensdaten",
+      "goal": "Ziel",
+      "eggs": "Eggs",
+      "results": "Ergebnisse",
+      "settings": "Einstellungen"
+    },
+    "settingsIntro": "Marke, Team und Kontoeinstellungen.",
+    "goal": {
+      "title": "Geben Sie Ihrem Egg ein Ziel",
+      "intro": "Wählen Sie ein Ziel und den Standort.",
+      "placementTitle": "Name und Standort",
+      "nameExample": "Galerie-Empfang",
+      "locationExample": "Haupteingang",
+      "chooseBusiness": "Unternehmensart wählen",
+      "managerRequired": "Eigentümer oder Bearbeiter können Eggs verwalten.",
+      "creating": "Wird erstellt...",
+      "create": "Egg erstellen",
+      "next": "Danach: Egg ansehen und QR- oder NFC-Zugang einrichten."
+    },
+    "businessData": {
+      "title": "Ihr Unternehmen an einem Ort",
+      "description": "Einmal hinzufügen. Jedes Egg kann die Informationen nutzen.",
+      "notesTitle": "Titel der Notizen",
+      "notes": "Unternehmensinformationen",
+      "addNotes": "Notizen hinzufügen",
+      "website": "Webseite",
+      "importWebsite": "Webseite importieren",
+      "instagram": "Instagram-Profillink",
+      "instagramHint": "Nur der Link wird gespeichert. Instagram-Inhalte werden nicht importiert.",
+      "saveInstagram": "Link speichern",
+      "sources": "Gemeinsame Quellen",
+      "remove": "Entfernen",
+      "saved": "Informationen aktualisiert.",
+      "error": "Informationen konnten nicht aktualisiert werden.",
+      "selectWorkspace": "Wählen Sie zuerst einen Arbeitsbereich.",
+      "managerOnly": "Eigentümer oder Bearbeiter können Informationen verwalten.",
+      "loading": "Informationen werden geladen...",
+      "retry": "Erneut versuchen",
+      "limit": "Maximal 8 gemeinsame Quellen. Entfernen Sie eine, um eine neue hinzuzufügen."
+    },
+    "eggList": {
+      "title": "Ihre Eggs vor Ort",
+      "intro": "Ein Standort. Ein Ziel. Scannen oder antippen.",
+      "advanced": "Erweiterte Einrichtung",
+      "content": "Assistent und verknüpfte Inhalte"
+    },
+    "eggResults": {
+      "title": "Was Ihre Eggs zurückbringen",
+      "intro": "Besuche, Antworten und Kontakte nach Standort.",
+      "all": "Alle Eggs",
+      "refresh": "Aktualisieren",
+      "empty": "Erstellen Sie Ihr erstes Egg, um Ergebnisse zu sammeln.",
+      "noGoal": "Kein Ziel festgelegt",
+      "qr": "QR-Besuche",
+      "nfc": "NFC-Besuche",
+      "responses": "Umfrageantworten",
+      "contacts": "Kontakte",
+      "answers": "Antworten ansehen",
+      "sharedPoll": "Der Bericht enthält alle Antworten zur Umfrage. Die Zahlen oben sind diesem Egg zugeordnet.",
+      "actions": "Verknüpfte Aktionen",
+      "sharedActions": "Der Aktionsstatus gilt überall, wo die Aktion verknüpft ist.",
+      "actionDetails": "Aktionsantworten und Verlauf",
+      "openEgg": "Egg öffnen",
+      "analytics": "Detaillierte Analyse",
+      "feedback": "Feedback und Nachverfolgung",
+      "contactDetails": "Kontakte und Exporte"
+    },
+    "nfc": {
+      "configure": "NFC einrichten",
+      "step1": "Öffnen Sie eine NFC-Schreib-App auf Ihrem Telefon.",
+      "step2": "Wählen Sie URL, fügen Sie den Link ein und beschreiben Sie den Tag.",
+      "step3": "Testen Sie den Tag durch Antippen und platzieren Sie ihn vor Ort.",
+      "link": "NFC-Link",
+      "copied": "Link kopiert. Fügen Sie ihn als URL in Ihre NFC-App ein.",
+      "copyError": "Kopieren fehlgeschlagen. Markieren und kopieren Sie den Link unten.",
+      "holdTag": "Halten Sie einen NFC-Tag an Ihr Telefon.",
+      "written": "Tag beschrieben. Tippen Sie ihn an, um Ihr Egg zu testen.",
+      "writeError": "Schreiben fehlgeschlagen. Prüfen Sie die Berechtigung und verwenden Sie einen beschreibbaren Tag.",
+      "directHint": "Oder direkt mit diesem Telefon schreiben. Der bisherige Inhalt wird ersetzt.",
+      "writing": "Warten auf Tag...",
+      "write": "Tag beschreiben"
+    },
     "dashboardTitle": "Dashboard",
     "dashboardSubtitle": "Alles, was Sie für QR-Feedback brauchen, geführt an einem Ort.",
     "onDuty": "{{name}} ist hier zuständig — {{role}}.",

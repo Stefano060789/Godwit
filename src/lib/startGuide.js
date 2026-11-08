@@ -1,19 +1,20 @@
 import { PERSONAS } from "./personas";
 
 export const START_GOALS = [
-  { key: "answers", tab: "engagement", action: "egg" },
-  { key: "feedback", tab: "engagement", action: "egg" },
-  { key: "information", tab: "engagement", action: "egg" },
-  { key: "next-step", tab: "engagement", action: "egg" },
-  { key: "contacts", tab: "engagement", action: "egg", feature: "leadCapture" },
-  { key: "reviews", tab: "settings", action: "reviews", feature: "publicReviewLinks" }
+  { key: "answers", tab: "goal", action: "egg" },
+  { key: "feedback", tab: "goal", action: "egg" },
+  { key: "information", tab: "goal", action: "egg" },
+  { key: "next-step", tab: "goal", action: "egg" },
+  { key: "contacts", tab: "goal", action: "egg", feature: "leadCapture" },
+  { key: "reviews", tab: "goal", action: "egg", feature: "publicReviewLinks" }
 ];
 
-const ADMIN_TABS = ["overview", "polls", "woodpecker", "connection", "engagement", "feedback", "settings"];
+const ADMIN_TABS = ["business", "goal", "results", "polls", "woodpecker", "connection", "engagement", "feedback", "settings"];
 
 export function getAdminTab(search) {
   const tab = new URLSearchParams(search).get("tab");
-  return ADMIN_TABS.includes(tab) ? tab : "overview";
+  if (tab === "overview") return "goal";
+  return ADMIN_TABS.includes(tab) ? tab : "engagement";
 }
 
 export function getStartSelection(search) {

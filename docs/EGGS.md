@@ -24,31 +24,50 @@ tag. Scan/tap counts are stored separately from submitted feedback.
 
 The public **Quick start** guide offers five business groups and a choice of
 starting goals. Category selection is optional. Each goal shows setup, sharing,
-and customer-result steps, then opens the relevant dashboard tab. The selected
-category and goal stay in the URL, including through workspace sign-in. A valid
-category also becomes the workspace's saved guide choice; older saved choices
-remain supported.
+and customer-result steps, then opens **Goal** in the dashboard. The selected
+category and goal stay in the URL, including through sign-in.
 
-This is a setup guide, not an automatically configured AI goal workflow. The
-manager still creates the poll or Egg, adds information, and enables the AI
-assistant explicitly. Enquiries use a business-provided contact or booking link,
+In **Goal**, choose a business type and target, then enter the Egg's name and
+location. **Create Egg** saves those details and opens the new Egg. Business
+information is shared across the workspace, while each Egg has its own goal
+and location. If shared information exists, this flow enables the assistant on
+creation; otherwise add Business Data and enable it in the Egg's assistant
+settings. The assistant uses the saved goal to guide relevant next steps.
+Polls and actions are still added explicitly, not automatically generated.
+Enquiries use a business-provided contact or booking link,
 not a Godwit enquiry inbox. Email capture requires the relevant plan and explicit
 consent. Any thank-you benefit must be independent of public reviews.
 
-Choose **Create Egg**, enter its name and optional placement, then select QR,
-NFC, or both for the setup instructions. Both is recommended so customers have
-a fallback. The selection guides the setup screen; it does not disable either
-method. The dashboard keeps both links available so the business can add or
-switch access methods later.
+The existing multi-step wizard remains under **Advanced setup**. Both QR and
+NFC remain available for every Egg. **Configure NFC** provides a copyable URL
+and phone-app instructions. Browsers supporting Web NFC can write a URL record
+directly after the operator presses **Write tag**. This replaces existing tag
+content; unsupported browsers use an NFC writer app instead.
 
 ## Dashboard and connections
 
-The main dashboard navigation is **Overview**, **Eggs**, **Results**, and
-**Workspace**. Existing `tab=engagement`, `tab=feedback`, and `tab=settings`
-links still open those sections. **More tools** retains the legacy polls,
-actions, and connection screens, including polls not attached to any Egg.
+The dashboard is a visual hub: **Business Data** and **Goal** on the left,
+a central **Eggs** circle with QR/NFC symbols, **Results** on the right, and
+**Settings** below. The chosen page opens underneath. `/admin` opens Eggs;
+legacy Overview links open Goal. Existing polls, actions, feedback, and
+connection URLs remain supported. **More tools** lives inside Settings.
 
-Each Egg lists its default poll and poll items, plus the Actions linked through
+**Business Data** holds notes, imported website snapshots, and Instagram
+profile links shared with every Egg. Instagram content is not scraped or
+imported: add relevant information as notes. Managers can add or remove up to
+eight shared sources. Data is stored in Supabase, not just browser storage.
+
+**Results** groups QR/NFC visits, attributed poll responses, and contacts by
+Egg, with an Egg filter. Poll answer links open the existing full poll report;
+that report includes all responses to a shared poll, not just this Egg.
+Connected action status is shared across its linked Eggs. Action history,
+feedback follow-up, analytics, and contact exports remain available through
+the detailed tools. Missing metrics are shown as unavailable, never as zero.
+AI conversation transcripts and public-review conversion are not currently
+recorded in these results.
+
+Each Egg prominently shows its name, location, target, and access tools.
+Its expandable content settings list the default poll and poll items, plus the Actions linked through
 the task-to-Egg relationship. Managers can add existing polls and Actions,
 create a simple scan Action, or remove a poll item from that Egg. Removing an
 item does not delete the poll or change an Egg's legacy default poll. To create
@@ -69,14 +88,20 @@ be visible from that screen; the Action portal link is available separately.
 Workspace managers can open an Egg's **AI business assistant** setup, import a
 public HTTPS website, or add FAQ/business information manually. Review and
 remove sources there; website content is imported as a snapshot and should be
-re-imported when it changes. Each Egg can have up to eight sources. The
-assistant stays off until a source is added and a manager enables it. Customers
+re-imported when it changes. Each Egg can have up to eight additional sources, alongside the workspace's
+eight shared sources. A goal-created Egg with shared sources enables AI at
+creation; legacy Eggs retain their saved settings. Without any sources the
+public assistant remains unavailable. Customers
 see a disclosure that they are chatting with Claude and should not share
 sensitive personal information. Managers can select the feedback topics shown
 to customers (such as service, quality, and speed). The assistant can use these
 topics along with the Egg's actual polls, information cards, and open tasks to
 suggest where the customer can go next. Suggestions are matched against the
 Egg's server-loaded options; the model cannot supply a destination URL.
+
+An AI-only Egg can open directly into the assistant without requiring a poll
+or information card. Dashboard previews show a non-interactive assistant
+placeholder; they do not send chat messages or count customer visits.
 
 Claude is called only from `api/egg-ai.js`; add `CLAUDE_API_KEY` to the server
 environment (never a `VITE_` variable). `CLAUDE_HAIKU_MODEL` can override the
@@ -103,3 +128,14 @@ deploying these changes. Existing scan events are classified as `qr`; the
 migration does not rewrite or remove them. Configure the server-side
 `CLAUDE_API_KEY` first. Without the AI migration and key, AI will remain
 unavailable; QR/NFC and non-AI Egg features continue to work.
+
+For the visual dashboard and shared data, also apply
+`supabase/20261108_workspace_business_data.sql` **before** deploying the
+updated API. It adds `qr_campaigns.goal_key`, `business_type`, and the
+manager-protected `workspace_ai_sources` table, and extends the existing
+AI turn reservation to accept shared sources without changing usage limits.
+The migration is additive; existing Eggs and their sources are preserved.
+The public campaign function keeps its existing five-column return type,
+including the portal title, message, and button label. If an earlier copy of
+this migration failed with `42P13`, rerun the corrected full migration; do not
+drop the public function separately.

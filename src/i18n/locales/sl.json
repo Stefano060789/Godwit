@@ -1,4 +1,8 @@
 {
+  "eggAi": {
+    "welcome": "Dobrodošli. Kako vam lahko pomagam?",
+    "previewHint": "Stranke lahko Godwitu postavljajo vprašanja na podlagi informacij podjetja. Klepet je v tem predogledu onemogočen."
+  },
   "nav": {
     "quickStart": "Hitri začetek",
     "support": "Podpora",
@@ -156,6 +160,90 @@
     "openDashboard": "Odpri nadzorno ploščo"
   },
   "admin": {
+    "hub": {
+      "label": "Vaše podjetje, povezano z Eggi",
+      "business": "Podatki podjetja",
+      "goal": "Cilj",
+      "eggs": "Egg",
+      "results": "Rezultati",
+      "settings": "Nastavitve"
+    },
+    "settingsIntro": "Znamka, ekipa in nastavitve računa.",
+    "goal": {
+      "title": "Dajte svojemu Eggu namen",
+      "intro": "Izberite cilj in mesto, kjer ga bodo ljudje našli.",
+      "placementTitle": "Ime in lokacija",
+      "nameExample": "Dobrodošli v galeriji",
+      "locationExample": "Glavni vhod",
+      "chooseBusiness": "Izberite vrsto podjetja",
+      "managerRequired": "Lastnik ali urednik lahko upravlja Egge.",
+      "creating": "Ustvarjanje...",
+      "create": "Ustvari Egg",
+      "next": "Nato: oglejte si Egg in nastavite dostop QR ali NFC."
+    },
+    "businessData": {
+      "title": "Vaše podjetje na enem mestu",
+      "description": "Informacije dodajte enkrat. Vsak Egg jih lahko uporabi.",
+      "notesTitle": "Naslov zapiskov",
+      "notes": "Informacije o podjetju",
+      "addNotes": "Dodaj zapiske",
+      "website": "Spletna stran",
+      "importWebsite": "Uvozi spletno stran",
+      "instagram": "Povezava do profila Instagram",
+      "instagramHint": "Shrani se samo povezava. Vsebina Instagrama se ne uvozi.",
+      "saveInstagram": "Shrani povezavo",
+      "sources": "Skupni viri",
+      "remove": "Odstrani",
+      "saved": "Informacije posodobljene.",
+      "error": "Informacij ni bilo mogoče posodobiti.",
+      "selectWorkspace": "Najprej izberite delovni prostor.",
+      "managerOnly": "Lastnik ali urednik lahko upravlja informacije.",
+      "loading": "Nalaganje informacij...",
+      "retry": "Poskusi znova",
+      "limit": "Največ 8 skupnih virov. Odstranite enega, da dodate novega."
+    },
+    "eggList": {
+      "title": "Vaši Eggi na terenu",
+      "intro": "Ena lokacija. En namen. Skenirajte ali približajte telefon.",
+      "advanced": "Napredna nastavitev",
+      "content": "Pomočnik in povezane vsebine"
+    },
+    "eggResults": {
+      "title": "Kaj prinašajo vaši Eggi",
+      "intro": "Obiski, odgovori in kontakti po lokaciji.",
+      "all": "Vsi Eggi",
+      "refresh": "Osveži",
+      "empty": "Ustvarite prvi Egg za zbiranje rezultatov.",
+      "noGoal": "Cilj ni nastavljen",
+      "qr": "Obiski QR",
+      "nfc": "Obiski NFC",
+      "responses": "Odgovori na ankete",
+      "contacts": "Kontakti",
+      "answers": "Ogled odgovorov",
+      "sharedPoll": "Poročilo vsebuje vse odgovore na anketo. Zgornji podatki so pripisani temu Eggu.",
+      "actions": "Povezana dejanja",
+      "sharedActions": "Stanje dejanja je skupno vsem mestom, kjer je povezano.",
+      "actionDetails": "Odgovori in zgodovina dejanj",
+      "openEgg": "Odpri Egg",
+      "analytics": "Podrobna analiza",
+      "feedback": "Povratne informacije in spremljanje",
+      "contactDetails": "Kontakti in izvozi"
+    },
+    "nfc": {
+      "configure": "Nastavi NFC",
+      "step1": "Odprite aplikacijo za zapis NFC na telefonu.",
+      "step2": "Izberite URL, prilepite povezavo in zapišite oznako.",
+      "step3": "Približajte telefon za preizkus, nato namestite oznako.",
+      "link": "Povezava NFC",
+      "copied": "Povezava kopirana. Prilepite jo kot URL v aplikacijo NFC.",
+      "copyError": "Kopiranje ni uspelo. Označite in kopirajte spodnjo povezavo.",
+      "holdTag": "Približajte oznako NFC telefonu.",
+      "written": "Oznaka zapisana. Preizkusite svoj Egg.",
+      "writeError": "Zapis ni uspel. Preverite dovoljenje in uporabite zapisljivo oznako.",
+      "directHint": "Ali zapišite neposredno s tem telefonom. Obstoječa vsebina bo zamenjana.",
+      "writing": "Čakanje na oznako...",
+      "write": "Zapiši oznako"
+    },
     "overview": {
       "goalGuideTitle": "Vaš vodnik Godwit",
       "goalGuideIntro": "Izberite cilj za svoje delo. Godwit odgovarja iz vaših informacij in stranke usmeri do anket, informacij ali dejanj.",

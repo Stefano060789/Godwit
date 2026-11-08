@@ -14,10 +14,10 @@ function createSessionId() {
   }
 }
 
-export default function EggAiAssistant({ token }) {
+export default function EggAiAssistant({ token, preview = false, initiallyExpanded = false }) {
   const { t } = useTranslation("translation", { keyPrefix: "eggAi" });
   const [enabled, setEnabled] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initiallyExpanded);
   const [messages, setMessages] = useState([]);
   const [feedbackTopics, setFeedbackTopics] = useState([]);
   const [input, setInput] = useState("");
@@ -26,6 +26,7 @@ export default function EggAiAssistant({ token }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (preview) return;
     let cancelled = false;
     fetch("/api/egg-ai", {
       method: "POST",
@@ -44,7 +45,7 @@ export default function EggAiAssistant({ token }) {
       })
       .catch((loadError) => console.error("Unable to load Egg AI settings:", loadError));
     return () => { cancelled = true; };
-  }, [token]);
+  }, [token, preview]);
 
   async function sendMessage(messageText) {
     const message = messageText.trim();
@@ -93,6 +94,10 @@ export default function EggAiAssistant({ token }) {
     return `#egg-option-${encodeURIComponent(suggestion.id)}`;
   }
 
+  if (preview) return <section className="qr-portal-menu-item">
+    <span className="qr-portal-menu-item-title">{t("title")}</span>
+    <p className="qr-portal-menu-item-body">{t("previewHint", { defaultValue: "Customers can ask Godwit using your business information. Chat is disabled in this preview." })}</p>
+  </section>;
   if (!enabled) return null;
   return (
     <section className="qr-portal-menu-item border border-violet-700" aria-label="AI business assistant">

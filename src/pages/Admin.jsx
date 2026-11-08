@@ -7,6 +7,12 @@ import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
 import { buildEggUrl } from "../lib/eggs";
 import EggAiSetup from "../components/EggAiSetup";
 import EggConnections from "../components/EggConnections";
+import DashboardHub from "../components/DashboardHub";
+import EggGoal from "../components/EggGoal";
+import EggResults from "../components/EggResults";
+import BusinessData from "../components/BusinessData";
+import EggNfcSetup from "../components/EggNfcSetup";
+import { listBusinessSources } from "../lib/businessData";
 import "../components/EggDashboard.css";
 import {
   loadQrCampaignItems,
@@ -28,7 +34,7 @@ import { loadApiKeys, createApiKey, deleteApiKey } from "../lib/apiKeys";
 import { getEntitlements, planLabel, minPlanLabelFor } from "../lib/entitlements";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 import { PERSONAS, findPersona } from "../lib/personas";
-import { getAdminTab, getStartSelection } from "../lib/startGuide";
+import { getAdminTab, getStartSelection, START_GOALS } from "../lib/startGuide";
 import Woodpecker from "./Woodpecker";
 import {
   getCurrentUserRole,
@@ -98,6 +104,8 @@ export default function Admin() {
   const [editingEggId, setEditingEggId] = useState(null);
   const [eggEditName, setEggEditName] = useState("");
   const [eggEditPlacement, setEggEditPlacement] = useState("");
+  const [eggEditGoal, setEggEditGoal] = useState("");
+  const [eggEditBusiness, setEggEditBusiness] = useState("");
   const [qrCampaignItems, setQrCampaignItems] = useState([]);
   const [actionTasks, setActionTasks] = useState([]);
   const [actionTasksError, setActionTasksError] = useState("");
@@ -357,7 +365,7 @@ export default function Admin() {
   }, [navigate]);
 
   useEffect(() => {
-    if (!workspaceUserId || activeTab !== "engagement") return;
+    if (!workspaceUserId || !["engagement", "results"].includes(activeTab)) return;
     let cancelled = false;
     supabase.from("woodpecker_tasks")
       .select("*, qr_campaigns!woodpecker_tasks_campaign_id_fkey(name), woodpecker_task_campaigns(campaign_id)")
@@ -693,6 +701,8 @@ export default function Admin() {
     setEditingEggId(campaign.id);
     setEggEditName(campaign.name || "");
     setEggEditPlacement(campaign.placement_label || "");
+    setEggEditGoal(campaign.goal_key || "");
+    setEggEditBusiness(campaign.business_type || "");
   }
 
   async function saveEggDetails(campaignId) {
@@ -701,15 +711,22 @@ export default function Admin() {
       alert(t("admin.engagement.campaigns.nameRequired"));
       return;
     }
+    const goal = START_GOALS.find((entry) => entry.key === eggEditGoal);
+    if (goal?.feature && !entitlements[goal.feature]) {
+      alert(t("admin.overview.availableOn", { plan: minPlanLabelFor(goal.feature) }));
+      return;
+    }
 
     const { data, error } = await supabase
       .from("qr_campaigns")
       .update({
         name,
-        placement_label: eggEditPlacement.trim() || null
+        placement_label: eggEditPlacement.trim() || null,
+        goal_key: eggEditGoal || null,
+        business_type: eggEditBusiness || null
       })
       .eq("id", campaignId)
-      .select("id, name, placement_label")
+      .select("id, name, placement_label, goal_key, business_type")
       .single();
 
     if (error) {
@@ -719,7 +736,7 @@ export default function Admin() {
     }
 
     setQrCampaigns((current) => current.map((campaign) => campaign.id === campaignId
-      ? { ...campaign, name: data.name, placement_label: data.placement_label }
+      ? { ...campaign, ...data }
       : campaign));
     setEditingEggId(null);
   }
@@ -1609,6 +1626,16 @@ export default function Admin() {
     navigate(`/admin?${params}`);
   }
 
+  async function createGoalEgg(fields) {
+    if (!canReuseQr || !workspaceUserId) throw new Error(t("admin.goal.managerRequired", { defaultValue: "An owner or editor can create Eggs." }));
+    const goal = START_GOALS.find((entry) => entry.key === fields.goalKey);
+    if (goal?.feature && !entitlements[goal.feature]) throw new Error(t("admin.overview.availableOn", { plan: minPlanLabelFor(goal.feature) }));
+    const sources = await listBusinessSources(workspaceUserId);
+    const campaign = await createQrCampaign({ ...fields, workspaceId: workspaceUserId, aiEnabled: sources.length > 0 });
+    setQrCampaigns((current) => [campaign, ...current]);
+    goToEgg(campaign.id);
+  }
+
   const filteredPolls = polls.filter((poll) => {
     const pollMeta = readPollMeta(poll.id);
     const locationName = poll.location_name ?? pollMeta.location_name ?? "";
@@ -1620,23 +1647,6 @@ export default function Admin() {
     const matchesLocation = locationFilter === "all" || locationName === locationFilter;
     return matchesSearch && matchesStatus && matchesLocation;
   });
-
-  const adminTabs = [
-    { key: "overview", label: t("admin.nav.overview") },
-    { key: "engagement", label: t("admin.dashboardNav.eggs", { defaultValue: "Eggs" }) },
-    { key: "feedback", label: t("admin.dashboardNav.results", { defaultValue: "Results" }) },
-    { key: "settings", label: t("admin.dashboardNav.workspace", { defaultValue: "Workspace" }) }
-  ];
-
-  const adminTabDescriptions = {
-    overview: t("admin.tabDescriptions.overview"),
-    polls: t("admin.tabDescriptions.polls"),
-    woodpecker: t("admin.tabDescriptions.woodpecker"),
-    engagement: t("admin.tabDescriptions.engagement"),
-    connection: t("admin.tabDescriptions.connection"),
-    feedback: t("admin.tabDescriptions.feedback"),
-    settings: t("admin.tabDescriptions.settings")
-  };
 
   const quickActions = [
     { key: "engagement", icon: "🥚", label: t("admin.quickActions.engagement.label"), description: t("admin.quickActions.engagement.description"), onSelect: () => setActiveTab("engagement") },
@@ -1651,70 +1661,17 @@ export default function Admin() {
   }
 
   return (
-    <div className="workspace-page max-w-3xl mx-auto p-6">
-      <div className="mb-6 text-center">
-        <h1 className="text-3xl font-bold">{t("admin.dashboardTitle")}</h1>
-        <p className="mt-2 text-sm text-slate-400">{t("admin.dashboardSubtitle")}</p>
+    <div className="workspace-page egg-workspace max-w-4xl mx-auto p-6">
+      <div className="dashboard-hub-header">
+        <p className="goal-eyebrow">Godwit</p>
+        <h1>{workspaceProfile.companyName}</h1>
       </div>
 
-      <nav className="egg-dashboard-nav" aria-label={t("admin.dashboardNav.label", { defaultValue: "Dashboard" })}>
-        {adminTabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            aria-current={activeTab === tab.key ? "page" : undefined}
-            className="egg-dashboard-nav-item"
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
-      <p className="mb-1 text-center text-sm text-slate-400">{adminTabDescriptions[activeTab]}</p>
-      <details className="egg-dashboard-tools">
-        <summary>{t("admin.dashboardNav.moreTools", { defaultValue: "More tools" })}</summary>
-        <div>
-          <button type="button" onClick={() => setActiveTab("polls")}>{t("admin.nav.polls")}</button>
-          <button type="button" onClick={() => setActiveTab("woodpecker")}>{t("admin.nav.woodpecker")}</button>
-          <button type="button" onClick={() => setActiveTab("connection")}>{t("admin.nav.connection")}</button>
-        </div>
-      </details>
+      <DashboardHub activeTab={["feedback", "woodpecker", "connection"].includes(activeTab) ? "results" : activeTab} onSelect={setActiveTab} t={t} />
 
-      {startSelection.goal && (
-        <section className="goal-plan goal-workspace-plan" aria-labelledby="workspace-goal-title">
-          <div className="goal-plan-heading">
-            <div>
-              <p className="goal-eyebrow">{t("quickStart.planEyebrow")}</p>
-              <h2 id="workspace-goal-title">{t(`quickStart.goals.${startSelection.goal.key}.title`)}</h2>
-            </div>
-            <Link className="goal-text-link" to={`/essentials?${new URLSearchParams({
-              goal: startSelection.goal.key,
-              ...(startSelection.business ? { business: startSelection.business.audienceKey } : {})
-            })}`}>{t("quickStart.changeGoal")}</Link>
-          </div>
-          <p>{t(`quickStart.goals.${startSelection.goal.key}.setup`)}</p>
-          {startSelection.goal.feature && !entitlements[startSelection.goal.feature] ? (
-            <p className="goal-plan-note">
-              {t("admin.overview.availableOn", { plan: minPlanLabelFor(startSelection.goal.feature) })}{" "}
-              <Link to="/admin/billing" className="goal-text-link">{t("admin.overview.upgrade")}</Link>
-            </p>
-          ) : startSelection.goal.action === "egg" ? (
-            <>
-              <button className="goal-primary-action" type="button" onClick={() => {
-                setActiveTab("engagement");
-                openQrWizard();
-              }}>{t("quickStart.openEggSetup")}</button>
-              {qrCampaigns.length > 0 && <p className="goal-plan-caption">{t("quickStart.existingEggHint")}</p>}
-            </>
-          ) : startSelection.goal.action === "reviews" ? (
-            <button className="goal-primary-action" type="button" onClick={() => openConnectionSetup("settings", "review-platform-settings")}>
-              {t("admin.overview.setupLinks.reviews")}
-            </button>
-          ) : (
-            <Link className="goal-primary-action" to="/create">{t("admin.overview.firstSteps.createPollCta")}</Link>
-          )}
-        </section>
-      )}
+      {activeTab === "business" && workspaceUserId && <BusinessData workspaceId={workspaceUserId} canManage={permission.canManageWorkspace} t={t} />}
+      {activeTab === "goal" && <EggGoal initialSelection={startSelection} canManage={canReuseQr && Boolean(workspaceUserId)} entitlements={entitlements} onCreate={createGoalEgg} t={t} />}
+      {activeTab === "results" && <EggResults campaigns={qrCampaigns} items={qrCampaignItems} polls={polls} tasks={actionTasks} tasksError={actionTasksError} onOpenEgg={goToEgg} onOpenFeedback={() => setActiveTab("feedback")} onOpenActions={() => setActiveTab("woodpecker")} onOpenContacts={() => setActiveTab("connection")} t={t} />}
 
       {activeTab === "overview" && (
       <>
@@ -2091,29 +2048,25 @@ export default function Admin() {
       )}
 
       {activeTab === "engagement" && (
-      <div className="mb-6 rounded border border-amber-700 bg-slate-900 p-5">
-        <p className="text-sm font-semibold uppercase tracking-wide text-amber-300">{t("admin.engagement.intro.eyebrow")}</p>
-        <h2 className="mt-2 text-2xl font-bold">{t("admin.engagement.intro.title")}</h2>
-        <p className="mt-2 max-w-2xl text-sm text-slate-300">
-          {t("admin.engagement.intro.body")}
-        </p>
-      </div>
+      <header className="hub-page-heading">
+        <p className="goal-eyebrow">{t("admin.hub.eggs", { defaultValue: "Eggs" })}</p>
+        <h2>{t("admin.eggList.title", { defaultValue: "Your Eggs, out in the world" })}</h2>
+        <p>{t("admin.eggList.intro", { defaultValue: "One location. One purpose. Scan or tap to connect." })}</p>
+      </header>
       )}
 
       {activeTab === "engagement" && (
-      <details className="mb-6 border rounded bg-gray-900" open>
-        <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.engagement.campaigns.title")}</summary>
+      <section className="egg-list mb-6 border rounded bg-gray-900">
         <div className="px-4 pb-4">
-          <p className="mb-3 text-sm text-slate-400">{t("admin.engagement.campaigns.description")}</p>
-          <p className="mb-4 text-xs text-slate-500">{t("admin.engagement.campaigns.tip")}</p>
           {eggAccessTrackingError && (
             <p className="mb-4 rounded border border-amber-700 bg-amber-950/40 p-3 text-sm text-amber-200" role="alert">
               {eggAccessTrackingError}
             </p>
           )}
-          <button onClick={openQrWizard} className="mb-4 bg-violet-600 text-white px-5 py-3 rounded font-semibold">
-            {t("admin.engagement.campaigns.createButton")}
-          </button>
+          <div className="egg-list-toolbar">
+            <button type="button" onClick={() => setActiveTab("goal")} className="goal-primary-action">{t("admin.goal.create", { defaultValue: "Create Egg" })}<span aria-hidden="true">+</span></button>
+            {canReuseQr && <button type="button" onClick={openQrWizard} className="goal-text-link">{t("admin.eggList.advanced", { defaultValue: "Advanced setup" })}</button>}
+          </div>
 
           {qrWizardOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
@@ -2459,25 +2412,19 @@ export default function Admin() {
               const previewUrl = new URL(url);
               previewUrl.searchParams.set("preview", "1");
               return (
-                <div key={campaign.id} id={`egg-card-${campaign.id}`} className="gap-3 border border-gray-700 rounded p-3">
+                <div key={campaign.id} id={`egg-card-${campaign.id}`} className="egg-location-card gap-3 border border-gray-700 rounded p-3">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-semibold"><span className="text-amber-300">Egg</span> · {campaign.name}</p>
+                      <p className="egg-target">{campaign.goal_key ? t(`quickStart.goals.${campaign.goal_key}.title`) : t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</p>
                       <p className="text-xs text-gray-400">
-                        {campaign.poll_id ? (
-                          <button type="button" onClick={() => goToPoll(campaign.poll_id)} className="font-semibold text-teal-300 underline">{t("admin.polls.card.pollNumber", { id: campaign.poll_id })}</button>
-                        ) : t("admin.engagement.campaigns.noDefaultPoll")}
-                        {" · "}{campaign.placement_label || t("admin.engagement.scanner.unlabeledPlacement")}{campaign.variant_label ? ` · ${campaign.variant_label}` : ""} · {campaign.is_active ? t("admin.engagement.campaigns.active") : t("admin.engagement.campaigns.paused")}
+                        {campaign.placement_label || t("admin.engagement.scanner.unlabeledPlacement")}{campaign.variant_label ? ` · ${campaign.variant_label}` : ""} · {campaign.is_active ? t("admin.engagement.campaigns.active") : t("admin.engagement.campaigns.paused")}
                       </p>
-                      <p className="truncate text-xs text-blue-300">QR · {url}</p>
-                      <p className="truncate text-xs text-violet-300">NFC · {nfcUrl}</p>
-                      <p className="text-xs text-slate-500">{t("admin.engagement.campaigns.nfcInstruction")}</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <button onClick={() => navigator.clipboard.writeText(url)} className="shrink-0 rounded bg-[#0f766e] px-3 py-2 font-semibold text-[#f8fafc] hover:bg-[#0d6259]">{t("admin.engagement.campaigns.copyLink")}</button>
-                      <button onClick={() => navigator.clipboard.writeText(nfcUrl)} className="shrink-0 rounded bg-violet-700 px-3 py-2 font-semibold text-white hover:bg-violet-600">{t("admin.engagement.campaigns.copyNfcLink")}</button>
-                      <button onClick={() => beginEditEgg(campaign)} className="shrink-0 rounded border border-slate-500 px-3 py-2 font-semibold text-slate-200 hover:bg-slate-800">{t("admin.engagement.campaigns.editEgg")}</button>
-                      <button onClick={() => handleDeleteQrCampaign(campaign.id, campaign.name)} className="shrink-0 rounded border border-[#c0392b] bg-white px-3 py-2 font-semibold text-[#c0392b] hover:bg-[#fdeceb]">{t("admin.engagement.campaigns.delete")}</button>
+                      {canReuseQr && <button onClick={() => beginEditEgg(campaign)} className="shrink-0 rounded border border-slate-500 px-3 py-2 font-semibold text-slate-200 hover:bg-slate-800">{t("admin.engagement.campaigns.editEgg")}</button>}
+                      {permission.canDeletePolls && <button onClick={() => handleDeleteQrCampaign(campaign.id, campaign.name)} className="shrink-0 rounded border border-[#c0392b] bg-white px-3 py-2 font-semibold text-[#c0392b] hover:bg-[#fdeceb]">{t("admin.engagement.campaigns.delete")}</button>}
                     </div>
                   </div>
 
@@ -2496,6 +2443,20 @@ export default function Admin() {
                         {t("admin.engagement.campaigns.placementLabel")}
                         <input value={eggEditPlacement} maxLength={80} onChange={(event) => setEggEditPlacement(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm text-black" />
                       </label>
+                      <label className="text-xs font-semibold text-slate-300">
+                        {t("admin.hub.goal", { defaultValue: "Goal" })}
+                        <select value={eggEditGoal} onChange={(event) => setEggEditGoal(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm">
+                          <option value="">{t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</option>
+                          {START_GOALS.map((goal) => <option key={goal.key} value={goal.key} disabled={Boolean(goal.feature && !entitlements[goal.feature])}>{t(`quickStart.goals.${goal.key}.title`)}</option>)}
+                        </select>
+                      </label>
+                      <label className="text-xs font-semibold text-slate-300">
+                        {t("quickStart.businessTitle")}
+                        <select value={eggEditBusiness} onChange={(event) => setEggEditBusiness(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm">
+                          <option value="">{t("admin.goal.chooseBusiness", { defaultValue: "Choose a business type" })}</option>
+                          {PERSONAS.map((business) => <option key={business.audienceKey} value={business.audienceKey}>{t(`landing.useCases.${business.audienceKey}Title`)}</option>)}
+                        </select>
+                      </label>
                       <div className="flex gap-2 sm:col-span-2">
                         <button onClick={() => saveEggDetails(campaign.id)} className="rounded bg-teal-600 px-3 py-2 text-sm font-semibold text-white">{t("admin.engagement.campaigns.saveEgg")}</button>
                         <button onClick={() => setEditingEggId(null)} className="rounded border border-slate-600 px-3 py-2 text-sm font-semibold text-slate-200">{t("admin.engagement.campaigns.cancelEditEgg")}</button>
@@ -2503,6 +2464,8 @@ export default function Admin() {
                     </div>
                   )}
 
+                  <details className="egg-content-settings">
+                    <summary>{t("admin.eggList.content", { defaultValue: "Assistant & connected content" })}</summary>
                   <EggConnections
                     campaign={campaign}
                     polls={polls}
@@ -2518,7 +2481,8 @@ export default function Admin() {
                     onCreateAction={createEggAction}
                     onOpenActions={() => setActiveTab("woodpecker")}
                   />
-                  <EggAiSetup campaign={campaign} t={t} />
+                  <EggAiSetup campaign={campaign} t={t} canManage={canReuseQr} onSettingsChange={(patch) => setQrCampaigns((current) => current.map((entry) => entry.id === campaign.id ? { ...entry, ...patch } : entry))} />
+                  </details>
 
                   <div className="mt-2 flex items-center gap-3">
                     <img
@@ -2527,6 +2491,7 @@ export default function Admin() {
                       className="h-16 w-16 rounded border border-slate-700 bg-white p-1"
                     />
                     <div className="flex flex-wrap gap-2">
+                      <EggNfcSetup url={nfcUrl} t={t} />
                       <button
                         onClick={() => window.open(previewUrl.toString(), "_blank", "noopener,noreferrer")}
                         className="bg-violet-600 text-white px-3 py-1.5 rounded text-sm font-semibold"
@@ -2553,7 +2518,7 @@ export default function Admin() {
                     const hasDonation = DONATION_FEATURE_ENABLED && items.some((item) => item.item_type === "donation");
                     const rewardCount = items.filter((item) => item.item_type === "reward").length;
                     if (pollCount <= 1 && infoCount === 0 && !hasDonation && rewardCount === 0) {
-                      return <p className="mt-2 text-xs text-slate-500">{t("admin.engagement.campaigns.summaryEmpty")}</p>;
+                      return null;
                     }
                     return (
                       <div className="mt-2 flex flex-wrap gap-1.5">
@@ -2593,7 +2558,7 @@ export default function Admin() {
                     </select>
                   </div>}
 
-                  {false && <details className="mt-3 rounded border border-slate-700">
+                  {canReuseQr && <details className="mt-3 rounded border border-slate-700">
                     <summary className="cursor-pointer p-2 text-sm font-semibold">
                       {t("admin.engagement.campaigns.itemsOnQr", { count: itemsForCampaign(campaign.id).length })}
                     </summary>
@@ -2804,17 +2769,13 @@ export default function Admin() {
             })}
           </div>
 
-          <div className="mt-6 border-t border-slate-800 pt-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{t("admin.engagement.campaigns.advancedTitle")}</p>
-            <p className="mb-3 text-xs text-slate-500">{t("admin.engagement.campaigns.advancedDescription")}</p>
-          </div>
         </div>
-      </details>
+      </section>
       )}
 
       {activeTab === "engagement" && (
-      <div className="mb-6 border rounded bg-gray-900 p-4">
-        <h2 className="text-xl font-bold">{t("admin.engagement.scanner.title")}</h2>
+      <details className="mb-6 border rounded bg-gray-900 p-4">
+        <summary className="text-xl font-bold">{t("admin.engagement.scanner.title")}</summary>
         <p className="mt-1 mb-3 text-sm text-slate-400">{t("admin.engagement.scanner.subtitle")}</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <button onClick={() => { setScannerOpen(true); setScanMessage(""); }} className="bg-teal-500 text-slate-950 px-4 py-2 rounded font-semibold">
@@ -2854,7 +2815,7 @@ export default function Admin() {
             </Link>
           </div>
         )}
-      </div>
+      </details>
       )}
 
       {qrModifier && (() => {
@@ -3082,6 +3043,19 @@ export default function Admin() {
 
       {activeTab === "settings" && (
       <>
+      <header className="hub-page-heading">
+        <p className="goal-eyebrow">{t("admin.hub.settings", { defaultValue: "Settings" })}</p>
+        <h2>{t("admin.hub.settings", { defaultValue: "Settings" })}</h2>
+        <p>{t("admin.settingsIntro", { defaultValue: "Brand, team and account preferences." })}</p>
+      </header>
+      <details className="egg-dashboard-tools">
+        <summary>{t("admin.dashboardNav.moreTools", { defaultValue: "More tools" })}</summary>
+        <div>
+          <button type="button" onClick={() => setActiveTab("polls")}>{t("admin.nav.polls")}</button>
+          <button type="button" onClick={() => setActiveTab("woodpecker")}>{t("admin.nav.woodpecker")}</button>
+          <button type="button" onClick={() => setActiveTab("connection")}>{t("admin.nav.connection")}</button>
+        </div>
+      </details>
       {DONATION_FEATURE_ENABLED && <details id="donation-settings" className="mb-6 border rounded bg-gray-900">
         <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.engagement.donations.title")}</summary>
         <div className="px-4 pb-4 space-y-3">

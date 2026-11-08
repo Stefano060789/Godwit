@@ -17,15 +17,19 @@ describe("starting guide navigation", () => {
 
   it("keeps category optional and ignores invalid URL inputs", () => {
     expect(getStartSelection("?goal=unknown&business=unknown")).toEqual({ business: null, goal: null });
-    expect(buildStartLink("feedback", "unknown")).toBe("/admin?tab=engagement&goal=feedback");
+    expect(buildStartLink("feedback", "unknown")).toBe("/admin?tab=goal&goal=feedback");
     expect(() => buildStartLink("unknown", "arts")).toThrow("Unknown starting goal");
   });
 
-  it("resolves valid dashboard tabs and falls back to overview", () => {
+  it("resolves hub tabs and preserves legacy destinations", () => {
     expect(getAdminTab("?tab=engagement")).toBe("engagement");
     expect(getAdminTab("?tab=woodpecker")).toBe("woodpecker");
-    expect(getAdminTab("?tab=unknown")).toBe("overview");
-    expect(getAdminTab("")).toBe("overview");
+    for (const tab of ["business", "goal", "results", "settings", "feedback", "connection", "polls"]) {
+      expect(getAdminTab(`?tab=${tab}`)).toBe(tab);
+    }
+    expect(getAdminTab("?tab=overview")).toBe("goal");
+    expect(getAdminTab("?tab=unknown")).toBe("engagement");
+    expect(getAdminTab("")).toBe("engagement");
   });
 
   it("respects existing plan requirements for contact and review goals", () => {
@@ -34,8 +38,8 @@ describe("starting guide navigation", () => {
   });
 
   it("starts every customer interaction goal from an Egg", () => {
-    for (const key of ["answers", "feedback", "information", "next-step", "contacts"]) {
-      expect(START_GOALS.find((goal) => goal.key === key)).toMatchObject({ tab: "engagement", action: "egg" });
+    for (const key of ["answers", "feedback", "information", "next-step", "contacts", "reviews"]) {
+      expect(START_GOALS.find((goal) => goal.key === key)).toMatchObject({ tab: "goal", action: "egg" });
     }
   });
 

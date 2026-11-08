@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { listBusinessSources } from "../lib/businessData";
+import { Link } from "react-router-dom";
 
 const FEEDBACK_TOPICS = ["service", "quality", "speed", "cleanliness", "atmosphere", "value", "other"];
 const DEFAULT_FEEDBACK_TOPICS = ["service", "quality", "speed", "cleanliness", "other"];
 
-export default function EggAiSetup({ campaign, t }) {
+export default function EggAiSetup({ campaign, t, canManage = true, onSettingsChange }) {
   const [expanded, setExpanded] = useState(false);
   const [sources, setSources] = useState([]);
+  const [sharedSourceCount, setSharedSourceCount] = useState(0);
+  const [sourcesLoaded, setSourcesLoaded] = useState(false);
   const [enabled, setEnabled] = useState(Boolean(campaign.ai_enabled));
   const [feedbackTopics, setFeedbackTopics] = useState(campaign.ai_feedback_topics || DEFAULT_FEEDBACK_TOPICS);
   const [websiteUrl, setWebsiteUrl] = useState("");
@@ -18,6 +22,7 @@ export default function EggAiSetup({ campaign, t }) {
   const sourceLimitReached = sources.length >= 8;
 
   async function loadSources() {
+    setSourcesLoaded(false);
     const { data, error } = await supabase
       .from("egg_ai_sources")
       .select("id, source_type, title, source_url, content, created_at")
@@ -28,12 +33,21 @@ export default function EggAiSetup({ campaign, t }) {
       setMessage(error.message);
       return;
     }
-    setSources(data || []);
+    try {
+      const shared = await listBusinessSources(campaign.workspace_id);
+      setSharedSourceCount(shared.length);
+      setSources(data || []);
+      setSourcesLoaded(true);
+    } catch (loadError) {
+      console.error("Unable to load shared Egg information", loadError);
+      setIsError(true);
+      setMessage(loadError.message);
+    }
   }
 
   useEffect(() => {
-    if (expanded) loadSources();
-  }, [campaign.id, expanded]);
+    if (expanded && canManage) loadSources();
+  }, [campaign.id, expanded, canManage]);
 
   async function toggleAiAssistant(event) {
     const nextEnabled = event.target.checked;
@@ -48,6 +62,7 @@ export default function EggAiSetup({ campaign, t }) {
       setMessage(error.message);
     } else {
       setEnabled(nextEnabled);
+      onSettingsChange?.({ ai_enabled: nextEnabled });
     }
     setBusy(false);
   }
@@ -72,6 +87,7 @@ export default function EggAiSetup({ campaign, t }) {
       setMessage(error.message);
     } else {
       setFeedbackTopics(nextTopics);
+      onSettingsChange?.({ ai_feedback_topics: nextTopics });
       setIsError(false);
     }
     setBusy(false);
@@ -133,7 +149,7 @@ export default function EggAiSetup({ campaign, t }) {
   async function deleteSource(sourceId) {
     setBusy(true);
     setMessage("");
-    if (enabled && sources.length === 1) {
+    if (enabled && sources.length === 1 && sharedSourceCount === 0) {
       const { error: disableError } = await supabase
         .from("qr_campaigns")
         .update({ ai_enabled: false })
@@ -145,6 +161,7 @@ export default function EggAiSetup({ campaign, t }) {
         return;
       }
       setEnabled(false);
+      onSettingsChange?.({ ai_enabled: false });
     }
     const { error } = await supabase.from("egg_ai_sources").delete().eq("id", sourceId);
     if (error) {
@@ -167,8 +184,10 @@ export default function EggAiSetup({ campaign, t }) {
         </span>
         <span aria-hidden="true" className="shrink-0 rounded border border-violet-800 px-2 py-0.5 text-violet-200">{expanded ? "−" : "+"}</span>
       </button>
-      {expanded && <>
-      <fieldset className="mt-3">
+      {expanded && !canManage && <p className="hub-notice">{t("admin.goal.managerRequired", { defaultValue: "An owner or editor can manage Eggs." })}</p>}
+      {expanded && canManage && <>
+      <p className="hub-notice">{t("admin.engagement.ai.sharedData", { defaultValue: "Uses your shared Business Data, plus any information added here." })} <Link className="goal-text-link" to="/admin?tab=business">{t("admin.hub.business", { defaultValue: "Business Data" })}</Link></p>
+      <fieldset className="mt-3" disabled={!sourcesLoaded}>
         <legend className="text-xs font-semibold text-slate-300">{t("admin.engagement.ai.feedbackTopicsTitle")}</legend>
         <p className="mb-2 text-xs text-slate-400">{t("admin.engagement.ai.feedbackTopicsHint")}</p>
         <div className="flex flex-wrap gap-2">
@@ -186,11 +205,11 @@ export default function EggAiSetup({ campaign, t }) {
         </div>
       </fieldset>
       <label className="mt-3 flex items-start gap-2 text-sm text-slate-200">
-        <input type="checkbox" checked={enabled} disabled={busy || (sources.length === 0 && !enabled)} onChange={toggleAiAssistant} className="mt-1" />
+        <input type="checkbox" checked={enabled} disabled={busy || !sourcesLoaded || (sources.length + sharedSourceCount === 0 && !enabled)} onChange={toggleAiAssistant} className="mt-1" />
         <span>
           {t("admin.engagement.ai.enable")}
           <span className="mt-1 block text-xs text-slate-400">{t("admin.engagement.ai.usageLimits")}</span>
-          {sources.length === 0 && <span className="mt-1 block text-xs text-amber-300">{t("admin.engagement.ai.addMaterialFirst")}</span>}
+          {sourcesLoaded && sources.length + sharedSourceCount === 0 && <span className="mt-1 block text-xs text-amber-300">{t("admin.engagement.ai.addMaterialFirst")}</span>}
         </span>
       </label>
 
@@ -208,7 +227,7 @@ export default function EggAiSetup({ campaign, t }) {
           />
         </label>
         <p className="text-xs text-slate-400">{t("admin.engagement.ai.websiteHint")}</p>
-        <button type="submit" disabled={busy || sourceLimitReached} className="rounded bg-violet-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
+        <button type="submit" disabled={busy || !sourcesLoaded || sourceLimitReached} className="rounded bg-violet-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
           {busy ? t("admin.engagement.ai.working") : t("admin.engagement.ai.importWebsite")}
         </button>
       </form>
@@ -222,7 +241,7 @@ export default function EggAiSetup({ campaign, t }) {
           {t("admin.engagement.ai.faqContentLabel")}
           <textarea required maxLength={8000} rows={4} value={faqContent} onChange={(event) => setFaqContent(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm text-black" placeholder={t("admin.engagement.ai.faqContentPlaceholder")} />
         </label>
-        <button type="submit" disabled={busy || sourceLimitReached} className="rounded bg-teal-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
+        <button type="submit" disabled={busy || !sourcesLoaded || sourceLimitReached} className="rounded bg-teal-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
           {t("admin.engagement.ai.addFaq")}
         </button>
       </form>
@@ -238,7 +257,7 @@ export default function EggAiSetup({ campaign, t }) {
                 <p className="text-xs uppercase text-slate-500">{t(`admin.engagement.ai.sourceTypes.${source.source_type}`)}</p>
                 <p className="mt-1 line-clamp-2 text-xs text-slate-400">{source.content}</p>
               </div>
-              <button type="button" disabled={busy} onClick={() => deleteSource(source.id)} className="shrink-0 rounded border border-red-900 px-2 py-1 text-xs text-red-300 disabled:opacity-50">
+              <button type="button" disabled={busy || !sourcesLoaded} onClick={() => deleteSource(source.id)} className="shrink-0 rounded border border-red-900 px-2 py-1 text-xs text-red-300 disabled:opacity-50">
                 {t("admin.engagement.ai.removeSource")}
               </button>
             </div>

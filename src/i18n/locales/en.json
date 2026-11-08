@@ -17,6 +17,8 @@
     "woodpecker": "Tasks"
   },
   "eggAi": {
+    "welcome": "Welcome. How can I help?",
+    "previewHint": "Customers can ask Godwit using your business information. Chat is disabled in this preview.",
     "title": "Ask the business assistant",
     "description": "AI answers using information provided by the business. For personal help, contact the business directly.",
     "privacyHint": "You're chatting with an AI powered by Claude. Your messages and the business information are processed to create answers. Avoid sharing sensitive personal information.",
@@ -399,6 +401,90 @@
     "enableBrowserNotifications": "Enable browser notifications"
   },
   "admin": {
+    "hub": {
+      "label": "Your business, connected by Eggs",
+      "business": "Business Data",
+      "goal": "Goal",
+      "eggs": "Eggs",
+      "results": "Results",
+      "settings": "Settings"
+    },
+    "settingsIntro": "Brand, team and account preferences.",
+    "goal": {
+      "title": "Give your Egg a purpose",
+      "intro": "Choose a target and where people will find it.",
+      "placementTitle": "Name & location",
+      "nameExample": "Gallery welcome",
+      "locationExample": "Main entrance",
+      "chooseBusiness": "Choose a business type",
+      "managerRequired": "An owner or editor can manage Eggs.",
+      "creating": "Creating...",
+      "create": "Create Egg",
+      "next": "Next: preview your Egg and set up QR or NFC access."
+    },
+    "businessData": {
+      "title": "Your business, in one place",
+      "description": "Add information once. Every Egg can use it.",
+      "notesTitle": "Notes title",
+      "notes": "Business notes",
+      "addNotes": "Add notes",
+      "website": "Website",
+      "importWebsite": "Import website",
+      "instagram": "Instagram profile link",
+      "instagramHint": "Only the link is saved. Instagram content is not imported.",
+      "saveInstagram": "Save link",
+      "sources": "Shared sources",
+      "remove": "Remove",
+      "saved": "Business information updated.",
+      "error": "Could not update business information.",
+      "selectWorkspace": "Select a workspace first.",
+      "managerOnly": "An owner or editor can manage business information.",
+      "loading": "Loading business information...",
+      "retry": "Try again",
+      "limit": "Maximum 8 shared sources. Remove one to add another."
+    },
+    "eggList": {
+      "title": "Your Eggs, out in the world",
+      "intro": "One location. One purpose. Scan or tap to connect.",
+      "advanced": "Advanced setup",
+      "content": "Assistant & connected content"
+    },
+    "eggResults": {
+      "title": "See what your Eggs bring back",
+      "intro": "Visits, responses and contacts, by location.",
+      "all": "All Eggs",
+      "refresh": "Refresh",
+      "empty": "Create your first Egg to start collecting results.",
+      "noGoal": "No target set",
+      "qr": "QR visits",
+      "nfc": "NFC visits",
+      "responses": "Poll responses",
+      "contacts": "Contacts",
+      "answers": "View poll answers",
+      "sharedPoll": "Poll reports include all responses to that poll. Counts above are attributed to this Egg.",
+      "actions": "Connected actions",
+      "sharedActions": "Action status is shared wherever that action is connected.",
+      "actionDetails": "Action responses & history",
+      "openEgg": "Open Egg",
+      "analytics": "Detailed analytics",
+      "feedback": "Feedback & follow-up",
+      "contactDetails": "Contacts & exports"
+    },
+    "nfc": {
+      "configure": "Configure NFC",
+      "step1": "Open an NFC writer app on your phone.",
+      "step2": "Choose URL, paste this link, and write the tag.",
+      "step3": "Tap the tag to test, then place it at your location.",
+      "link": "NFC link",
+      "copied": "Link copied. Paste it into your NFC writer app as a URL.",
+      "copyError": "Could not copy. Select and copy the link below.",
+      "holdTag": "Hold an NFC tag near your phone.",
+      "written": "Tag written. Tap it to test your Egg.",
+      "writeError": "Could not write this tag. Check permission and use a writable NFC tag.",
+      "directHint": "Or write directly with this phone. This replaces the tag's current content.",
+      "writing": "Waiting for tag...",
+      "write": "Write tag"
+    },
     "dashboardTitle": "Dashboard",
     "dashboardSubtitle": "Everything you need to create customer experiences with Eggs, guided in one place.",
     "onDuty": "{{name}} is on duty here — {{role}}.",
@@ -855,6 +941,7 @@
         "advancedDescription": "Track rewards configured after voting or run prize draws — all optional and managed as part of customer connection. Donations are set up in Settings."
       },
       "ai": {
+        "sharedData": "Uses your shared Business Data, plus any information added here.",
         "title": "AI business assistant",
         "description": "Answer customer questions using your website or FAQs, then suggest a relevant poll, information card, or open task. The assistant admits when it doesn't know; customers can still contact you directly.",
         "enable": "Show the AI assistant on this Egg",

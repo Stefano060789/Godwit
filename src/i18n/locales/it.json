@@ -1,4 +1,8 @@
 {
+  "eggAi": {
+    "welcome": "Benvenuto. Come posso aiutarti?",
+    "previewHint": "I clienti possono fare domande a Godwit usando le informazioni dell'attività. La chat è disattivata in questa anteprima."
+  },
   "nav": {
     "quickStart": "Per iniziare",
     "support": "Assistenza",
@@ -298,6 +302,90 @@
     }
   },
   "admin": {
+    "hub": {
+      "label": "La tua attività, collegata dagli Egg",
+      "business": "Dati attività",
+      "goal": "Obiettivo",
+      "eggs": "Egg",
+      "results": "Risultati",
+      "settings": "Impostazioni"
+    },
+    "settingsIntro": "Marchio, team e preferenze dell'account.",
+    "goal": {
+      "title": "Dai uno scopo al tuo Egg",
+      "intro": "Scegli un obiettivo e dove le persone lo troveranno.",
+      "placementTitle": "Nome e posizione",
+      "nameExample": "Benvenuto in galleria",
+      "locationExample": "Ingresso principale",
+      "chooseBusiness": "Scegli il tipo di attività",
+      "managerRequired": "Un proprietario o editor può gestire gli Egg.",
+      "creating": "Creazione...",
+      "create": "Crea Egg",
+      "next": "Poi: visualizza l'Egg e configura l'accesso QR o NFC."
+    },
+    "businessData": {
+      "title": "La tua attività, in un unico posto",
+      "description": "Aggiungi le informazioni una volta. Ogni Egg può usarle.",
+      "notesTitle": "Titolo delle note",
+      "notes": "Informazioni sull'attività",
+      "addNotes": "Aggiungi note",
+      "website": "Sito web",
+      "importWebsite": "Importa sito",
+      "instagram": "Link al profilo Instagram",
+      "instagramHint": "Viene salvato solo il link. I contenuti Instagram non vengono importati.",
+      "saveInstagram": "Salva link",
+      "sources": "Fonti condivise",
+      "remove": "Rimuovi",
+      "saved": "Informazioni aggiornate.",
+      "error": "Impossibile aggiornare le informazioni.",
+      "selectWorkspace": "Seleziona prima uno spazio di lavoro.",
+      "managerOnly": "Un proprietario o editor può gestire le informazioni.",
+      "loading": "Caricamento informazioni...",
+      "retry": "Riprova",
+      "limit": "Massimo 8 fonti condivise. Rimuovine una per aggiungerne un'altra."
+    },
+    "eggList": {
+      "title": "I tuoi Egg, sul territorio",
+      "intro": "Una posizione. Uno scopo. Scansiona o avvicina il telefono.",
+      "advanced": "Configurazione avanzata",
+      "content": "Assistente e contenuti collegati"
+    },
+    "eggResults": {
+      "title": "Scopri cosa raccolgono i tuoi Egg",
+      "intro": "Visite, risposte e contatti, per posizione.",
+      "all": "Tutti gli Egg",
+      "refresh": "Aggiorna",
+      "empty": "Crea il primo Egg per iniziare a raccogliere risultati.",
+      "noGoal": "Nessun obiettivo impostato",
+      "qr": "Visite QR",
+      "nfc": "Visite NFC",
+      "responses": "Risposte ai sondaggi",
+      "contacts": "Contatti",
+      "answers": "Vedi risposte",
+      "sharedPoll": "Il report include tutte le risposte al sondaggio. I conteggi sopra sono attribuiti a questo Egg.",
+      "actions": "Azioni collegate",
+      "sharedActions": "Lo stato dell'azione è condiviso ovunque sia collegata.",
+      "actionDetails": "Risposte e cronologia delle azioni",
+      "openEgg": "Apri Egg",
+      "analytics": "Analisi dettagliate",
+      "feedback": "Feedback e follow-up",
+      "contactDetails": "Contatti ed esportazioni"
+    },
+    "nfc": {
+      "configure": "Configura NFC",
+      "step1": "Apri un'app di scrittura NFC sul telefono.",
+      "step2": "Scegli URL, incolla il link e scrivi il tag.",
+      "step3": "Avvicina il telefono per testare il tag, poi posizionalo.",
+      "link": "Link NFC",
+      "copied": "Link copiato. Incollalo nell'app NFC come URL.",
+      "copyError": "Copia non riuscita. Seleziona e copia il link qui sotto.",
+      "holdTag": "Avvicina un tag NFC al telefono.",
+      "written": "Tag scritto. Avvicina il telefono per testare l'Egg.",
+      "writeError": "Scrittura non riuscita. Verifica i permessi e usa un tag scrivibile.",
+      "directHint": "Oppure scrivi direttamente con questo telefono. Il contenuto del tag verrà sostituito.",
+      "writing": "In attesa del tag...",
+      "write": "Scrivi tag"
+    },
     "dashboardTitle": "Pannello di controllo",
     "dashboardSubtitle": "Tutto ciò che serve per gestire il feedback via QR, guidato in un unico posto.",
     "onDuty": "{{name}} è di turno qui — {{role}}.",
