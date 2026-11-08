@@ -1,50 +1,41 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import egg from "../assets/birds/egg.svg";
+import { getCampaignGoalKeys } from "../lib/startGuide";
 
-export function eggPollIds(campaign, items) {
-  return [...new Set([
-    ...(campaign.poll_id ? [String(campaign.poll_id)] : []),
-    ...items.filter((item) => String(item.campaign_id) === String(campaign.id) && item.item_type === "poll").map((item) => String(item.poll_id))
-  ])];
-}
-
-export default function EggResults({ campaigns, items, polls, tasks, tasksError, onOpenEgg, onOpenFeedback, onOpenActions, onOpenContacts, t }) {
-  const [metrics, setMetrics] = useState(null);
-  const [access, setAccess] = useState(null);
+export default function EggResults({ campaigns, canViewMessages, onOpenEgg, onOpenFeedback, t }) {
+  const [summaries, setSummaries] = useState(null);
   const [errors, setErrors] = useState([]);
   const [selected, setSelected] = useState("all");
   const [refresh, setRefresh] = useState(0);
   useEffect(() => {
+    if (!canViewMessages) return undefined;
     let cancelled = false;
-    setMetrics(null);
-    setAccess(null);
+    setSummaries(null);
     setErrors([]);
-    Promise.all([
-      supabase.rpc("get_workspace_campaign_metrics"),
-      supabase.rpc("get_workspace_egg_access_metrics")
-    ]).then(([outcomes, visits]) => {
+    supabase.rpc("get_workspace_egg_message_summaries").then((result) => {
       if (cancelled) return;
-      const failures = [outcomes.error, visits.error].filter(Boolean);
-      failures.forEach((failure) => console.error("Unable to load Egg results", failure));
-      setErrors(failures.map((failure) => failure.message));
-      if (!outcomes.error) setMetrics(Object.fromEntries((outcomes.data || []).map((row) => [String(row.campaign_id), row])));
-      if (!visits.error) setAccess(Object.fromEntries((visits.data || []).map((row) => [String(row.campaign_id), row])));
+      if (result.error) {
+        console.error("Unable to load Egg message summaries", result.error);
+        setErrors([result.error.message]);
+      } else {
+        setSummaries(Object.fromEntries((result.data || []).map((row) => [String(row.campaign_id), row])));
+      }
     }).catch((failure) => {
       if (cancelled) return;
-      console.error("Unable to load Egg results", failure);
+      console.error("Unable to load Egg message summaries", failure);
       setErrors([failure.message]);
     });
     return () => { cancelled = true; };
-  }, [refresh]);
+  }, [canViewMessages, refresh]);
 
   const visible = campaigns.filter((campaign) => selected === "all" || String(campaign.id) === selected);
+  const visibleMessageCount = visible.reduce((count, campaign) => count + Number(summaries?.[String(campaign.id)]?.message_count || 0), 0);
   return <section className="hub-page" aria-labelledby="egg-results-title">
     <header className="hub-page-heading">
       <p className="goal-eyebrow">{t("admin.hub.results", { defaultValue: "Results" })}</p>
-      <h2 id="egg-results-title">{t("admin.eggResults.title", { defaultValue: "See what your Eggs bring back" })}</h2>
-      <p>{t("admin.eggResults.intro", { defaultValue: "Visits, responses and contacts, by location." })}</p>
+      <h2 id="egg-results-title">{t("admin.eggResults.title", { defaultValue: "What customers are telling you" })}</h2>
+      <p>{t("admin.eggResults.intro", { defaultValue: "Read private messages customers have sent through your Eggs." })}</p>
     </header>
     <div className="egg-results-toolbar">
       <label>{t("admin.hub.eggs", { defaultValue: "Eggs" })}<select value={selected} onChange={(event) => setSelected(event.target.value)}>
@@ -55,40 +46,41 @@ export default function EggResults({ campaigns, items, polls, tasks, tasksError,
     </div>
     {errors.map((error, index) => <p key={index} role="alert" className="hub-error">{error}</p>)}
     {!campaigns.length && <p className="hub-empty">{t("admin.eggResults.empty", { defaultValue: "Create your first Egg to start collecting results." })}</p>}
+    {campaigns.length > 0 && canViewMessages && summaries && <p className="egg-message-total">
+      {t("admin.eggResults.messageTotal", { count: visibleMessageCount, defaultValue: `Customer messages: ${visibleMessageCount}` })}
+    </p>}
     <div className="egg-results-grid">
       {visible.map((campaign) => {
-        const outcomes = metrics?.[String(campaign.id)];
-        const visits = access?.[String(campaign.id)];
-        const ids = eggPollIds(campaign, items);
-        const linkedTasks = tasks.filter((task) => (task.woodpecker_task_campaigns || []).some((link) => String(link.campaign_id) === String(campaign.id)));
-        const stats = [
-          [t("admin.eggResults.qr", { defaultValue: "QR visits" }), visits ? Number(visits.qr_access_count) : null],
-          [t("admin.eggResults.nfc", { defaultValue: "NFC visits" }), visits ? Number(visits.nfc_access_count) : null],
-          [t("admin.eggResults.responses", { defaultValue: "Poll responses" }), outcomes ? Number(outcomes.response_count) : null],
-          [t("admin.eggResults.contacts", { defaultValue: "Contacts" }), outcomes ? Number(outcomes.lead_count) : null]
-        ];
+        const summary = summaries?.[String(campaign.id)];
+        const goalKeys = getCampaignGoalKeys(campaign);
+        const messages = Array.isArray(summary?.latest_messages) ? summary.latest_messages : [];
         return <article key={campaign.id} className="egg-result-card">
           <div className="egg-result-heading"><img src={egg} alt="" width="40" height="40" /><div><h3>{campaign.name}</h3><p>{campaign.placement_label || t("admin.engagement.scanner.unlabeledPlacement")}</p></div></div>
-          <p className="egg-target">{campaign.goal_key ? t(`quickStart.goals.${campaign.goal_key}.title`) : t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</p>
-          <dl className="egg-result-stats">{stats.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value === null ? "\u2014" : value}</dd></div>)}</dl>
-          {ids.length > 0 && <details className="egg-result-details"><summary>{t("admin.eggResults.answers", { defaultValue: "View poll answers" })}</summary>
-            <p className="hub-caption">{t("admin.eggResults.sharedPoll", { defaultValue: "Poll reports include all responses to that poll. Counts above are attributed to this Egg." })}</p>
-            {ids.map((id) => <Link key={id} to={`/results/${encodeURIComponent(id)}`}>{polls.find((poll) => String(poll.id) === id)?.question || t("admin.polls.card.pollNumber", { id })}</Link>)}
-          </details>}
-          {tasksError ? <p role="alert" className="hub-error">{tasksError}</p> : linkedTasks.length > 0 && <details className="egg-result-details">
-            <summary>{t("admin.eggResults.actions", { defaultValue: "Connected actions" })}</summary>
-            <p className="hub-caption">{t("admin.eggResults.sharedActions", { defaultValue: "Action status is shared wherever that action is connected." })}</p>
-            {linkedTasks.map((task) => <p key={task.id}>{task.title} · {t(`woodpecker.status.${task.status}`, { defaultValue: task.status })}</p>)}
-            <button type="button" className="goal-text-link" onClick={onOpenActions}>{t("admin.eggResults.actionDetails", { defaultValue: "Action responses & history" })}</button>
-          </details>}
+          <p className="egg-target">{goalKeys.length
+            ? goalKeys.map((key) => t(`quickStart.goals.${key}.title`)).join(" · ")
+            : t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</p>
+          <div className="egg-result-messages">
+            <h4>{t("admin.eggResults.customerMessages", { defaultValue: "Customer messages" })} <span>{summary?.message_count ?? "—"}</span></h4>
+            {!canViewMessages
+              ? <p className="hub-caption">{t("admin.eggResults.managerOnly", { defaultValue: "Only workspace owners and editors can view private customer messages." })}</p>
+              : errors.length
+                ? <p className="hub-caption">{t("admin.eggResults.unavailable", { defaultValue: "Message summary is unavailable. Try refreshing." })}</p>
+                : !summary
+              ? <p className="hub-caption">{t("admin.eggResults.loading", { defaultValue: "Loading messages…" })}</p>
+              : messages.length === 0
+                ? <p className="hub-caption">{t("admin.eggResults.noMessages", { defaultValue: "No customer messages yet." })}</p>
+                : <ul>{messages.map((message) => <li key={message.id}>
+                  <p>{message.message}</p>
+                  <time dateTime={message.created_at}>{new Date(message.created_at).toLocaleDateString()}</time>
+                  {message.reply_email && <a href={`mailto:${encodeURIComponent(message.reply_email)}`}>{message.reply_email}</a>}
+                </li>)}</ul>}
+          </div>
           <button type="button" className="goal-text-link" onClick={() => onOpenEgg(campaign.id)}>{t("admin.eggResults.openEgg", { defaultValue: "Open Egg" })} &rarr;</button>
         </article>;
       })}
     </div>
     <div className="egg-results-links">
-      <Link className="goal-text-link" to="/admin/analytics">{t("admin.eggResults.analytics", { defaultValue: "Detailed analytics" })}</Link>
-      <button type="button" className="goal-text-link" onClick={onOpenFeedback}>{t("admin.eggResults.feedback", { defaultValue: "Feedback & follow-up" })}</button>
-      <button type="button" className="goal-text-link" onClick={onOpenContacts}>{t("admin.eggResults.contactDetails", { defaultValue: "Contacts & exports" })}</button>
+      <button type="button" className="goal-text-link" onClick={onOpenFeedback}>{t("admin.eggResults.allMessages", { defaultValue: "Open message inbox" })} &rarr;</button>
     </div>
   </section>;
 }

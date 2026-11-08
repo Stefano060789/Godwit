@@ -1615,12 +1615,12 @@ textarea {
 .goal-guide,
 .goal-plan,
 .auth-page {
-  --guide-ink: #173b3a;
-  --guide-muted: #415c55;
+  --guide-ink: #1b2c3b;
+  --guide-muted: #526676;
   --guide-surface: #ffffff;
-  --guide-line: #6f8d83;
-  --guide-selection: #e7f2ec;
-  --guide-accent: #0b5f59;
+  --guide-line: #a9bac6;
+  --guide-selection: #dceeea;
+  --guide-accent: #176b63;
   color: var(--guide-ink);
 }
 
@@ -1900,19 +1900,19 @@ textarea {
 }
 
 :root:not([data-theme="dark"]) .workspace-page .goal-choice[aria-pressed="true"] {
-  background: var(--guide-accent);
+  background: var(--guide-selection);
   border-color: var(--guide-accent);
-  color: #ffffff;
-  box-shadow: inset 0 0 0 1px var(--guide-accent), 0 3px 10px rgba(23, 59, 58, 0.12);
+  color: var(--guide-ink);
+  box-shadow: inset 0 0 0 1px var(--guide-accent), 0 3px 10px rgba(23, 59, 58, 0.08);
 }
 
 :root:not([data-theme="dark"]) .goal-choice[aria-pressed="true"] .goal-choice-title,
 :root:not([data-theme="dark"]) .goal-choice[aria-pressed="true"] .goal-choice-check {
-  color: #ffffff;
+  color: var(--guide-accent);
 }
 
 :root:not([data-theme="dark"]) .goal-choice[aria-pressed="true"] .goal-choice-detail {
-  color: #e7f2ec;
+  color: var(--guide-muted);
 }
 
 :root:not([data-theme="dark"]) .goal-plan-note {

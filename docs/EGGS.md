@@ -27,16 +27,23 @@ starting goals. Category selection is optional. Each goal shows setup, sharing,
 and customer-result steps, then opens **Goal** in the dashboard. The selected
 category and goal stay in the URL, including through sign-in.
 
-In **Goal**, choose a business type and target, then enter the Egg's name and
-location. **Create Egg** saves those details and opens the new Egg. Business
+In **Goal**, choose a business type and one or more targets, then enter the Egg's
+name and location. **Create Egg** saves those details and opens the new Egg. Business
 information is shared across the workspace, while each Egg has its own goal
 and location. If shared information exists, this flow enables the assistant on
 creation; otherwise add Business Data and enable it in the Egg's assistant
-settings. The assistant uses the saved goal to guide relevant next steps.
-Polls and actions are still added explicitly, not automatically generated.
+settings. The assistant combines the selected goals to guide relevant next steps.
+Godwit also generates and attaches one goal-based poll and one text-response
+customer action when the Egg is created. If generation or saving fails, the
+creation reports the error and removes any partial setup.
 Enquiries use a business-provided contact or booking link,
 not a Godwit enquiry inbox. Email capture requires the relevant plan and explicit
 consent. Any thank-you benefit must be independent of public reviews.
+The **Customer benefits** area links to the existing poll-level email benefit
+settings. A voucher or discount is offered only after a customer chooses to
+share an email and consents to follow-up. Review links for Google, Tripadvisor,
+or other platforms are configured in **Settings**; public reviews are optional
+and cannot be exchanged for a reward.
 
 The existing multi-step wizard remains under **Advanced setup**. Both QR and
 NFC remain available for every Egg. **Configure NFC** provides a copyable URL
@@ -57,14 +64,13 @@ profile links shared with every Egg. Instagram content is not scraped or
 imported: add relevant information as notes. Managers can add or remove up to
 eight shared sources. Data is stored in Supabase, not just browser storage.
 
-**Results** groups QR/NFC visits, attributed poll responses, and contacts by
-Egg, with an Egg filter. Poll answer links open the existing full poll report;
-that report includes all responses to a shared poll, not just this Egg.
-Connected action status is shared across its linked Eggs. Action history,
-feedback follow-up, analytics, and contact exports remain available through
-the detailed tools. Missing metrics are shown as unavailable, never as zero.
-AI conversation transcripts and public-review conversion are not currently
-recorded in these results.
+**Results** summarizes private organizer messages by Egg, including the total
+message count and the three most recent messages. Messages may include a
+reply email only when the customer chose to provide one. Use the customer
+messages view for the full inbox. Poll counts, visit counts, and shared action
+status are left to their detailed tools because they do not summarize what
+customers are telling the business. AI conversation transcripts and
+public-review conversion are not recorded in these results.
 
 Each Egg prominently shows its name, location, target, and access tools.
 Its expandable content settings list the default poll and poll items, plus the Actions linked through
@@ -102,6 +108,11 @@ Egg's server-loaded options; the model cannot supply a destination URL.
 An AI-only Egg can open directly into the assistant without requiring a poll
 or information card. Dashboard previews show a non-interactive assistant
 placeholder; they do not send chat messages or count customer visits.
+
+Apply `supabase/20261109_multiple_egg_goals.sql` after the workspace business
+data migration to store multiple goals per Egg. Existing single goals are
+backfilled, and the legacy `goal_key` column remains synchronized for older
+readers.
 
 Claude is called only from `api/egg-ai.js`; add `CLAUDE_API_KEY` to the server
 environment (never a `VITE_` variable). `CLAUDE_HAIKU_MODEL` can override the

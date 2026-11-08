@@ -13,6 +13,8 @@ import EggResults from "../components/EggResults";
 import BusinessData from "../components/BusinessData";
 import EggNfcSetup from "../components/EggNfcSetup";
 import { listBusinessSources } from "../lib/businessData";
+import { createGoalEggSetup } from "../lib/goalEggSetup";
+import { isRestrictedTopic } from "../lib/restrictedContent";
 import "../components/EggDashboard.css";
 import {
   loadQrCampaignItems,
@@ -34,7 +36,7 @@ import { loadApiKeys, createApiKey, deleteApiKey } from "../lib/apiKeys";
 import { getEntitlements, planLabel, minPlanLabelFor } from "../lib/entitlements";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 import { PERSONAS, findPersona } from "../lib/personas";
-import { getAdminTab, getStartSelection, START_GOALS } from "../lib/startGuide";
+import { getAdminTab, getCampaignGoalKeys, getStartSelection, START_GOALS } from "../lib/startGuide";
 import Woodpecker from "./Woodpecker";
 import {
   getCurrentUserRole,
@@ -104,7 +106,7 @@ export default function Admin() {
   const [editingEggId, setEditingEggId] = useState(null);
   const [eggEditName, setEggEditName] = useState("");
   const [eggEditPlacement, setEggEditPlacement] = useState("");
-  const [eggEditGoal, setEggEditGoal] = useState("");
+  const [eggEditGoals, setEggEditGoals] = useState([]);
   const [eggEditBusiness, setEggEditBusiness] = useState("");
   const [qrCampaignItems, setQrCampaignItems] = useState([]);
   const [actionTasks, setActionTasks] = useState([]);
@@ -701,7 +703,7 @@ export default function Admin() {
     setEditingEggId(campaign.id);
     setEggEditName(campaign.name || "");
     setEggEditPlacement(campaign.placement_label || "");
-    setEggEditGoal(campaign.goal_key || "");
+    setEggEditGoals(getCampaignGoalKeys(campaign));
     setEggEditBusiness(campaign.business_type || "");
   }
 
@@ -711,9 +713,11 @@ export default function Admin() {
       alert(t("admin.engagement.campaigns.nameRequired"));
       return;
     }
-    const goal = START_GOALS.find((entry) => entry.key === eggEditGoal);
-    if (goal?.feature && !entitlements[goal.feature]) {
-      alert(t("admin.overview.availableOn", { plan: minPlanLabelFor(goal.feature) }));
+    const lockedGoal = eggEditGoals
+      .map((key) => START_GOALS.find((entry) => entry.key === key))
+      .find((goal) => goal?.feature && !entitlements[goal.feature]);
+    if (lockedGoal) {
+      alert(t("admin.overview.availableOn", { plan: minPlanLabelFor(lockedGoal.feature) }));
       return;
     }
 
@@ -722,11 +726,12 @@ export default function Admin() {
       .update({
         name,
         placement_label: eggEditPlacement.trim() || null,
-        goal_key: eggEditGoal || null,
+        goal_keys: eggEditGoals.length ? eggEditGoals : null,
+        goal_key: eggEditGoals[0] || null,
         business_type: eggEditBusiness || null
       })
       .eq("id", campaignId)
-      .select("id, name, placement_label, goal_key, business_type")
+      .select("id, name, placement_label, goal_key, goal_keys, business_type")
       .single();
 
     if (error) {
@@ -1628,11 +1633,71 @@ export default function Admin() {
 
   async function createGoalEgg(fields) {
     if (!canReuseQr || !workspaceUserId) throw new Error(t("admin.goal.managerRequired", { defaultValue: "An owner or editor can create Eggs." }));
-    const goal = START_GOALS.find((entry) => entry.key === fields.goalKey);
-    if (goal?.feature && !entitlements[goal.feature]) throw new Error(t("admin.overview.availableOn", { plan: minPlanLabelFor(goal.feature) }));
+    const lockedGoal = fields.goalKeys
+      .map((key) => START_GOALS.find((entry) => entry.key === key))
+      .find((goal) => goal?.feature && !entitlements[goal.feature]);
+    if (lockedGoal) throw new Error(t("admin.overview.availableOn", { plan: minPlanLabelFor(lockedGoal.feature) }));
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user?.id) throw new Error(userError?.message || t("admin.goal.managerRequired", { defaultValue: "An owner or editor can create Eggs." }));
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session?.access_token) throw new Error(sessionError?.message || t("admin.goal.managerRequired", { defaultValue: "An owner or editor can create Eggs." }));
+    const generationResponse = await fetch("/api/egg-ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({
+        action: "generate-goal-setup",
+        workspaceId: workspaceUserId,
+        businessType: fields.businessType,
+        goalKeys: fields.goalKeys,
+        name: fields.name,
+        placementLabel: fields.placementLabel,
+        language: navigator.language
+      })
+    });
+    const generated = await generationResponse.json().catch(() => ({}));
+    if (!generationResponse.ok) {
+      throw new Error(generated.error || t("admin.goal.generationFailed", { defaultValue: "Unable to generate this Egg's poll and action. Please try again." }));
+    }
+    if (
+      !generated
+      || typeof generated !== "object"
+      || typeof generated.poll?.question !== "string"
+      || !Array.isArray(generated.poll.answers)
+      || generated.poll.answers.some((answer) => typeof answer !== "string")
+      || typeof generated.action?.title !== "string"
+      || typeof generated.action?.description !== "string"
+      || isRestrictedTopic(generated.poll.question)
+      || generated.poll.answers.some((answer) => isRestrictedTopic(answer))
+    ) {
+      throw new Error(t("admin.goal.generationInvalid", { defaultValue: "The generated poll needs review. Please try creating the Egg again." }));
+    }
+
     const sources = await listBusinessSources(workspaceUserId);
     const campaign = await createQrCampaign({ ...fields, workspaceId: workspaceUserId, aiEnabled: sources.length > 0 });
+    let setup;
+    try {
+      setup = await createGoalEggSetup({
+        campaign,
+        workspaceId: workspaceUserId,
+        userId: user.id,
+        pollDraft: generated.poll,
+        actionDraft: generated.action
+      });
+    } catch (error) {
+      const { error: campaignCleanupError } = await supabase.from("qr_campaigns").delete().eq("id", campaign.id);
+      if (campaignCleanupError) throw new Error(`${error.message} Egg cleanup was incomplete: ${campaignCleanupError.message}.`);
+      throw error;
+    }
+
     setQrCampaigns((current) => [campaign, ...current]);
+    setPolls((current) => [setup.poll, ...current]);
+    setQrCampaignItems((current) => [setup.pollItem, ...current]);
+    setActionTasks((current) => [setup.task, ...current]);
+    setAnalytics((current) => ({ ...current, total: current.total + 1, active: current.active + 1 }));
     goToEgg(campaign.id);
   }
 
@@ -1670,8 +1735,16 @@ export default function Admin() {
       <DashboardHub activeTab={["feedback", "woodpecker", "connection"].includes(activeTab) ? "results" : activeTab} onSelect={setActiveTab} t={t} />
 
       {activeTab === "business" && workspaceUserId && <BusinessData workspaceId={workspaceUserId} canManage={permission.canManageWorkspace} t={t} />}
-      {activeTab === "goal" && <EggGoal initialSelection={startSelection} canManage={canReuseQr && Boolean(workspaceUserId)} entitlements={entitlements} onCreate={createGoalEgg} t={t} />}
-      {activeTab === "results" && <EggResults campaigns={qrCampaigns} items={qrCampaignItems} polls={polls} tasks={actionTasks} tasksError={actionTasksError} onOpenEgg={goToEgg} onOpenFeedback={() => setActiveTab("feedback")} onOpenActions={() => setActiveTab("woodpecker")} onOpenContacts={() => setActiveTab("connection")} t={t} />}
+      {activeTab === "goal" && <EggGoal
+        initialSelection={startSelection}
+        canManage={canReuseQr && Boolean(workspaceUserId)}
+        entitlements={entitlements}
+        onCreate={createGoalEgg}
+        onOpenPolls={() => setActiveTab("polls")}
+        onOpenReviewSettings={() => openConnectionSetup("settings", "review-platform-settings")}
+        t={t}
+      />}
+      {activeTab === "results" && <EggResults campaigns={qrCampaigns} canViewMessages={permission.canManageWorkspace} onOpenEgg={goToEgg} onOpenFeedback={() => setActiveTab("feedback")} t={t} />}
 
       {activeTab === "overview" && (
       <>
@@ -2411,46 +2484,65 @@ export default function Admin() {
               const accessCounts = eggAccessCounts[String(campaign.id)] || { qr: 0, nfc: 0 };
               const previewUrl = new URL(url);
               previewUrl.searchParams.set("preview", "1");
+              const goalKeys = getCampaignGoalKeys(campaign);
               return (
                 <div key={campaign.id} id={`egg-card-${campaign.id}`} className="egg-location-card gap-3 border border-gray-700 rounded p-3">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-semibold"><span className="text-amber-300">Egg</span> · {campaign.name}</p>
-                      <p className="egg-target">{campaign.goal_key ? t(`quickStart.goals.${campaign.goal_key}.title`) : t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</p>
+                      <p className="font-semibold"><span className="egg-type-label">Egg</span> · {campaign.name}</p>
+                      <p className="egg-target">{goalKeys.length
+                        ? goalKeys.map((key) => t(`quickStart.goals.${key}.title`)).join(" · ")
+                        : t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</p>
                       <p className="text-xs text-gray-400">
                         {campaign.placement_label || t("admin.engagement.scanner.unlabeledPlacement")}{campaign.variant_label ? ` · ${campaign.variant_label}` : ""} · {campaign.is_active ? t("admin.engagement.campaigns.active") : t("admin.engagement.campaigns.paused")}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <button onClick={() => navigator.clipboard.writeText(url)} className="shrink-0 rounded bg-[#0f766e] px-3 py-2 font-semibold text-[#f8fafc] hover:bg-[#0d6259]">{t("admin.engagement.campaigns.copyLink")}</button>
-                      {canReuseQr && <button onClick={() => beginEditEgg(campaign)} className="shrink-0 rounded border border-slate-500 px-3 py-2 font-semibold text-slate-200 hover:bg-slate-800">{t("admin.engagement.campaigns.editEgg")}</button>}
+                      {canReuseQr && <button onClick={() => beginEditEgg(campaign)} className="egg-edit-trigger shrink-0 rounded border px-3 py-2 font-semibold">{t("admin.engagement.campaigns.editEgg")}</button>}
                       {permission.canDeletePolls && <button onClick={() => handleDeleteQrCampaign(campaign.id, campaign.name)} className="shrink-0 rounded border border-[#c0392b] bg-white px-3 py-2 font-semibold text-[#c0392b] hover:bg-[#fdeceb]">{t("admin.engagement.campaigns.delete")}</button>}
                     </div>
                   </div>
 
-                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400" aria-label="Egg access counts">
+                  <div className="egg-access-counts mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs" aria-label="Egg access counts">
                     <span>{t("admin.engagement.campaigns.qrAccessCount", { count: accessCounts.qr })}</span>
                     <span>{t("admin.engagement.campaigns.nfcAccessCount", { count: accessCounts.nfc })}</span>
                   </div>
 
                   {editingEggId === campaign.id && (
-                    <div className="mt-3 grid gap-2 rounded border border-slate-700 bg-slate-950/60 p-3 sm:grid-cols-2">
-                      <label className="text-xs font-semibold text-slate-300">
+                    <div className="egg-edit-form mt-3 grid gap-2 rounded border p-3 sm:grid-cols-2">
+                      <label className="text-xs font-semibold">
                         {t("admin.engagement.campaigns.nameLabel")}
-                        <input value={eggEditName} maxLength={120} onChange={(event) => setEggEditName(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm text-black" />
+                        <input value={eggEditName} maxLength={120} onChange={(event) => setEggEditName(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm" />
                       </label>
-                      <label className="text-xs font-semibold text-slate-300">
+                      <label className="text-xs font-semibold">
                         {t("admin.engagement.campaigns.placementLabel")}
-                        <input value={eggEditPlacement} maxLength={80} onChange={(event) => setEggEditPlacement(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm text-black" />
+                        <input value={eggEditPlacement} maxLength={80} onChange={(event) => setEggEditPlacement(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm" />
                       </label>
-                      <label className="text-xs font-semibold text-slate-300">
-                        {t("admin.hub.goal", { defaultValue: "Goal" })}
-                        <select value={eggEditGoal} onChange={(event) => setEggEditGoal(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm">
-                          <option value="">{t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</option>
-                          {START_GOALS.map((goal) => <option key={goal.key} value={goal.key} disabled={Boolean(goal.feature && !entitlements[goal.feature])}>{t(`quickStart.goals.${goal.key}.title`)}</option>)}
-                        </select>
-                      </label>
-                      <label className="text-xs font-semibold text-slate-300">
+                      <fieldset className="egg-edit-goals sm:col-span-2">
+                        <legend className="text-xs font-semibold">{t("admin.hub.goal", { defaultValue: "Goal" })}</legend>
+                        <div className="egg-edit-goal-list">
+                          {START_GOALS.map((goal) => {
+                            const selectedGoal = eggEditGoals.includes(goal.key);
+                            const lockedGoal = Boolean(goal.feature && !entitlements[goal.feature]);
+                            return <label key={goal.key} className={selectedGoal ? "is-selected" : ""}>
+                              <input
+                                type="checkbox"
+                                checked={selectedGoal}
+                                disabled={lockedGoal && !selectedGoal}
+                                onChange={() => setEggEditGoals((current) => selectedGoal
+                                  ? current.filter((key) => key !== goal.key)
+                                  : [...current, goal.key])}
+                              />
+                              <span>{t(`quickStart.goals.${goal.key}.title`)}</span>
+                            </label>;
+                          })}
+                        </div>
+                        {eggEditGoals.length > 0 && <button type="button" className="egg-edit-clear-goals" onClick={() => setEggEditGoals([])}>
+                          {t("admin.eggResults.noGoal", { defaultValue: "No target set" })}
+                        </button>}
+                      </fieldset>
+                      <label className="text-xs font-semibold">
                         {t("quickStart.businessTitle")}
                         <select value={eggEditBusiness} onChange={(event) => setEggEditBusiness(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm">
                           <option value="">{t("admin.goal.chooseBusiness", { defaultValue: "Choose a business type" })}</option>
@@ -2458,8 +2550,8 @@ export default function Admin() {
                         </select>
                       </label>
                       <div className="flex gap-2 sm:col-span-2">
-                        <button onClick={() => saveEggDetails(campaign.id)} className="rounded bg-teal-600 px-3 py-2 text-sm font-semibold text-white">{t("admin.engagement.campaigns.saveEgg")}</button>
-                        <button onClick={() => setEditingEggId(null)} className="rounded border border-slate-600 px-3 py-2 text-sm font-semibold text-slate-200">{t("admin.engagement.campaigns.cancelEditEgg")}</button>
+                        <button onClick={() => saveEggDetails(campaign.id)} className="egg-edit-save rounded px-3 py-2 text-sm font-semibold">{t("admin.engagement.campaigns.saveEgg")}</button>
+                        <button onClick={() => setEditingEggId(null)} className="egg-edit-cancel rounded border px-3 py-2 text-sm font-semibold">{t("admin.engagement.campaigns.cancelEditEgg")}</button>
                       </div>
                     </div>
                   )}

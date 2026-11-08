@@ -17,12 +17,21 @@ describe("goal-led Egg persistence", () => {
       name: "Gallery", placement_label: "Entrance", goal_key: "feedback", business_type: "arts", workspace_id: "workspace-id", poll_id: null, ai_enabled: true
     }));
   });
+  it("saves multiple goals while keeping the first goal available to legacy readers", async () => {
+    await createQrCampaign({ name: "Gallery", goalKeys: ["feedback", "answers", "feedback"] });
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({
+      goal_keys: ["feedback", "answers"],
+      goal_key: "feedback"
+    }));
+  });
   it("preserves legacy creation without requiring new columns", async () => {
     await createQrCampaign({ name: "Legacy" });
     expect(insert.mock.calls[0][0]).not.toHaveProperty("goal_key");
   });
   it("rejects unknown goals and business types before writing", async () => {
     await expect(createQrCampaign({ name: "Egg", goalKey: "invalid" })).rejects.toThrow("valid Egg goal");
+    await expect(createQrCampaign({ name: "Egg", goalKeys: [] })).rejects.toThrow("at least one Egg goal");
+    await expect(createQrCampaign({ name: "Egg", goalKeys: ["feedback", "invalid"] })).rejects.toThrow("valid Egg goal");
     await expect(createQrCampaign({ name: "Egg", businessType: "invalid" })).rejects.toThrow("valid business type");
     expect(insert).not.toHaveBeenCalled();
   });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PERSONAS } from "./personas";
-import { START_GOALS, buildStartLink, getAdminTab, getLoginReturnPath, getStartSelection } from "./startGuide";
+import { getCampaignGoalKeys, START_GOALS, buildStartLink, getAdminTab, getLoginReturnPath, getStartSelection } from "./startGuide";
 
 describe("starting guide navigation", () => {
   it("carries every valid category and goal to the right dashboard tab", () => {
@@ -41,6 +41,12 @@ describe("starting guide navigation", () => {
     for (const key of ["answers", "feedback", "information", "next-step", "contacts", "reviews"]) {
       expect(START_GOALS.find((goal) => goal.key === key)).toMatchObject({ tab: "goal", action: "egg" });
     }
+  });
+
+  it("reads multiple goals and falls back to the legacy single-goal column", () => {
+    expect(getCampaignGoalKeys({ goal_keys: ["feedback", "answers", "feedback", "invalid"] })).toEqual(["feedback", "answers"]);
+    expect(getCampaignGoalKeys({ goal_key: "reviews" })).toEqual(["reviews"]);
+    expect(getCampaignGoalKeys({ goal_keys: null, goal_key: null })).toEqual([]);
   });
 
   it.each([undefined, "", "https://example.com", "//example.com", "/admin/../login", "/administrator", "/\\example.com"])(

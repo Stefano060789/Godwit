@@ -18,11 +18,16 @@ export async function loadQrCampaigns() {
   return data ?? [];
 }
 
-export async function createQrCampaign({ name, pollId, token, placementLabel, variantLabel, portalTitle, portalMessage, portalButtonLabel, goalKey, businessType, workspaceId, aiEnabled }) {
-  if (goalKey && !START_GOALS.some((goal) => goal.key === goalKey)) throw new Error("Choose a valid Egg goal.");
+export async function createQrCampaign({ name, pollId, token, placementLabel, variantLabel, portalTitle, portalMessage, portalButtonLabel, goalKey, goalKeys, businessType, workspaceId, aiEnabled }) {
+  if (goalKeys !== undefined && !Array.isArray(goalKeys)) throw new Error("Choose valid Egg goals.");
+  const selectedGoalKeys = goalKeys === undefined ? (goalKey ? [goalKey] : []) : [...new Set(goalKeys)];
+  if (selectedGoalKeys.some((key) => !START_GOALS.some((goal) => goal.key === key))) throw new Error("Choose a valid Egg goal.");
+  if (goalKeys !== undefined && selectedGoalKeys.length === 0) throw new Error("Choose at least one Egg goal.");
   if (businessType && !PERSONAS.some((business) => business.audienceKey === businessType)) throw new Error("Choose a valid business type.");
   const goalFields = {
-    ...(goalKey ? { goal_key: goalKey } : {}),
+    ...(goalKeys !== undefined
+      ? { goal_keys: selectedGoalKeys, goal_key: selectedGoalKeys[0] }
+      : goalKey ? { goal_key: goalKey } : {}),
     ...(businessType ? { business_type: businessType } : {}),
     ...(workspaceId ? { workspace_id: workspaceId } : {}),
     ...(typeof aiEnabled === "boolean" ? { ai_enabled: aiEnabled } : {})

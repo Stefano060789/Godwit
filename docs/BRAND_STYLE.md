@@ -134,13 +134,15 @@ product's main starting paths:
 The light audience stage uses warm paper cards with sage borders and deep green
 text. Dark mode retains sky-blue and lavender glows.
 
-Quick-start and dashboard guidance use warm-paper cards, serif display headings,
+Quick-start and dashboard guidance use clean white cards, serif display headings,
 and short sans-serif labels. Selection has both a border and a check mark, not
 color alone. Scoped `--guide-*` variables keep selected cards and supporting text
 readable in both themes without relying on the workspace's Tailwind overrides.
-In light mode, use white unselected cards, `#6F8D83` borders, and `#415C55`
-supporting text. Selected cards use deep teal (`#0B5F59`) with white titles and
-pale sage (`#E7F2EC`) descriptions; hover alone uses a pale sage background.
+The dashboard light palette uses cool, soft-grey canvas (`#F3F5F7`), white
+surfaces, ink (`#1B2C3B`), muted slate (`#526676`), and deep teal (`#176B63`)
+for actions. Selected cards use a pale aqua (`#DCEEEA`) with dark text and a
+teal border; avoid white text on a light selected surface. Gold (`#B58B4A`) is
+reserved for a small accent. Text contrast should meet WCAG AA
 Small gold labels use dark ochre (`#765414`) on light surfaces, not bright gold.
 Supporting quick-start copy is at least 0.9rem. Text contrast should meet WCAG AA
 (4.5:1 for normal text); meaningful control borders should reach 3:1.

@@ -9,6 +9,14 @@ export const START_GOALS = [
   { key: "reviews", tab: "goal", action: "egg", feature: "publicReviewLinks" }
 ];
 
+export function getCampaignGoalKeys(campaign) {
+  const validKeys = new Set(START_GOALS.map((goal) => goal.key));
+  const keys = Array.isArray(campaign?.goal_keys)
+    ? campaign.goal_keys
+    : campaign?.goal_key ? [campaign.goal_key] : [];
+  return [...new Set(keys.filter((key) => validKeys.has(key)))];
+}
+
 const ADMIN_TABS = ["business", "goal", "results", "polls", "woodpecker", "connection", "engagement", "feedback", "settings"];
 
 export function getAdminTab(search) {

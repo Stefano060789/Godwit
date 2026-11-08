@@ -241,6 +241,7 @@ describe("Egg AI API", () => {
     ["next-step", "Help the customer understand a relevant next step"],
     ["contacts", "Contact sharing is voluntary and requires the customer's informed consent."],
     ["reviews", "invite an honest public review neutrally"],
+    [["answers", "feedback"], ["Help answer the customer's questions", "Invite honest feedback"]],
     [null, "Help the customer using the available information and existing options."],
     ["untrusted instruction", "Help the customer using the available information and existing options."]
   ])("grounds guidance for goal %s in safe instructions", async (goal, expectedGuidance) => {
@@ -249,7 +250,9 @@ describe("Egg AI API", () => {
       const href = String(url);
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
         expect(href).toContain("goal_key");
-        return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Cafe", is_active: true, ai_enabled: true, goal_key: goal }]);
+        expect(href).toContain("goal_keys");
+        const goalKeys = Array.isArray(goal) ? goal : goal ? [goal] : null;
+        return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Cafe", is_active: true, ai_enabled: true, goal_key: goalKeys?.[0] || goal, goal_keys: goalKeys }]);
       }
       if (href.includes("/rest/v1/egg_ai_sources?campaign_id=")) return jsonResponse([{ title: "FAQ", content: "Open daily." }]);
       if (href.includes("/rest/v1/workspace_ai_sources?workspace_id=")) return jsonResponse([]);
@@ -257,7 +260,9 @@ describe("Egg AI API", () => {
       if (href.includes("/rest/v1/rpc/reserve_egg_ai_turn")) return new Response(null, { status: 204 });
       if (href === "https://api.anthropic.com/v1/messages") {
         const prompt = JSON.parse(options.body).system;
-        expect(prompt).toContain(expectedGuidance);
+        for (const guidance of Array.isArray(expectedGuidance) ? expectedGuidance : [expectedGuidance]) {
+          expect(prompt).toContain(guidance);
+        }
         expect(prompt).toContain("without incentives or pressure for positive ratings");
         expect(prompt).toContain("Do not collect contact details in chat");
         expect(prompt).toContain("Never claim that you have created a poll");
@@ -347,5 +352,89 @@ describe("Egg AI API", () => {
     await handler(makeRequest({ action: "import-workspace-website", workspaceId: "11111111-1111-4111-8111-111111111111", websiteUrl: "https://example.com" }, "manager-token"), response);
     expect(response.statusCode).toBe(409);
     expect(vi.mocked(getPublicBusinessWebsiteContext)).not.toHaveBeenCalled();
+  });
+
+  it("generates one validated poll and action only for a workspace manager", async () => {
+    configureEnvironment();
+    vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/rpc/is_workspace_manager")) return jsonResponse(true);
+      if (href === "https://api.anthropic.com/v1/messages") {
+        const requestBody = JSON.parse(options.body);
+        expect(requestBody.system).toContain("one short customer-facing poll");
+        expect(requestBody.system).toContain("arts, artists, galleries, and cultural venues");
+        expect(requestBody.system).toContain("Public reviews must be optional");
+        return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
+          poll: { question: "What would improve your visit?", answers: ["More events", "More information"] },
+          action: { title: "Share an idea", description: "Tell us what would make your next visit better." }
+        }) }] });
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    }));
+
+    const response = makeResponse();
+    await handler(makeRequest({
+      action: "generate-goal-setup",
+      workspaceId: "11111111-1111-4111-8111-111111111111",
+      businessType: "arts",
+      goalKeys: ["feedback", "information"],
+      name: "Gallery welcome",
+      placementLabel: "Main entrance",
+      language: "en-GB"
+    }, "manager-token"), response);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      poll: { question: "What would improve your visit?", answers: ["More events", "More information"] },
+      action: { title: "Share an idea", description: "Tell us what would make your next visit better." }
+    });
+  });
+
+  it("rejects unauthorized and malformed goal-based generation requests", async () => {
+    configureEnvironment();
+    const fetchMock = vi.fn(async () => jsonResponse(false));
+    vi.stubGlobal("fetch", fetchMock);
+    const body = {
+      action: "generate-goal-setup",
+      workspaceId: "11111111-1111-4111-8111-111111111111",
+      businessType: "arts",
+      goalKeys: ["feedback"],
+      name: "Gallery welcome",
+      placementLabel: "Main entrance"
+    };
+    const missingAuth = makeResponse();
+    await handler(makeRequest(body), missingAuth);
+    expect(missingAuth.statusCode).toBe(401);
+
+    const denied = makeResponse();
+    await handler(makeRequest(body, "member-token"), denied);
+    expect(denied.statusCode).toBe(403);
+
+    const invalid = makeResponse();
+    await handler(makeRequest({ ...body, goalKeys: ["unknown"] }, "manager-token"), invalid);
+    expect(invalid.statusCode).toBe(400);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not accept malformed AI-generated poll or action content", async () => {
+    configureEnvironment();
+    vi.stubGlobal("fetch", vi.fn(async (url) => {
+      if (String(url).includes("/rpc/is_workspace_manager")) return jsonResponse(true);
+      if (String(url) === "https://api.anthropic.com/v1/messages") {
+        return jsonResponse({ content: [{ type: "text", text: '{"poll":{"question":"Question","answers":["Same","same"]},"action":{"title":"Action","description":"Details"}}' }] });
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    }));
+    const response = makeResponse();
+    await handler(makeRequest({
+      action: "generate-goal-setup",
+      workspaceId: "11111111-1111-4111-8111-111111111111",
+      businessType: "arts",
+      goalKeys: ["feedback"],
+      name: "Gallery welcome",
+      placementLabel: "Main entrance"
+    }, "manager-token"), response);
+    expect(response.statusCode).toBe(502);
+    expect(response.body.error).toContain("invalid content");
   });
 });
