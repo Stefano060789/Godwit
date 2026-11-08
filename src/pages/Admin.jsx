@@ -2151,7 +2151,6 @@ export default function Admin() {
           )}
           <div className="egg-list-toolbar">
             <button type="button" onClick={() => setActiveTab("goal")} className="goal-primary-action">{t("admin.goal.create", { defaultValue: "Create Egg" })}<span aria-hidden="true">+</span></button>
-            {canReuseQr && <button type="button" onClick={openQrWizard} className="goal-text-link">{t("admin.eggList.advanced", { defaultValue: "Advanced setup" })}</button>}
           </div>
 
           {qrWizardOpen && (

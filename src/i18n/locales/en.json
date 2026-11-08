@@ -463,7 +463,6 @@
     "eggList": {
       "title": "Your Eggs, out in the world",
       "intro": "One location. One purpose. Scan or tap to connect.",
-      "advanced": "Advanced setup",
       "content": "Assistant & connected content"
     },
     "eggResults": {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
-import godwitLockup from "../assets/godwit-logo-lockup.svg";
+import godwitMark from "../assets/godwit-mark.svg";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 
 const stepKeys = [
@@ -69,7 +69,10 @@ export default function Landing() {
           <p className="landing-note">{t("note")}</p>
         </div>
         <div className="landing-hero-visual" aria-hidden="true">
-          <img src={godwitLockup} alt="" />
+          <div className="landing-brand-lockup">
+            <img src={godwitMark} alt="" />
+            <span className="landing-brand-wordmark">Godwit</span>
+          </div>
         </div>
       </section>
 
