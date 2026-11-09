@@ -13,7 +13,9 @@ describe("Egg dashboard hub", () => {
   it("places inputs left, the Egg in the center, results right and settings below", () => {
     const t = (key, options) => options.defaultValue;
     const markup = renderToStaticMarkup(createElement(DashboardHub, { activeTab: "engagement", onSelect: vi.fn(), t }));
+    expect(markup.indexOf("Your Business")).toBeLessThan(markup.indexOf("Business Data"));
     expect(markup).toContain("Business Data");
+    expect(markup).toContain("dashboard-hub-your-business");
     expect(markup).toContain("Goal");
     expect(markup).toContain('class="dashboard-hub-egg" aria-current="page"');
     expect(markup).toContain("dashboard-hub-results");
@@ -28,7 +30,7 @@ describe("Egg dashboard hub", () => {
   it.each(["en", "de", "it", "sl"])("localizes new dashboard pages in %s", async (language) => {
     const i18n = createInstance();
     await i18n.init({ lng: language, fallbackLng: false, resources: { [language]: { translation: locales[language] } } });
-    for (const section of ["hub", "goal", "businessData", "eggList", "eggResults", "nfc"]) {
+    for (const section of ["hub", "goal", "businessProfile", "businessData", "eggList", "eggResults", "nfc"]) {
       for (const key of Object.keys(en.admin[section])) {
         expect(i18n.exists(`admin.${section}.${key}`)).toBe(true);
       }

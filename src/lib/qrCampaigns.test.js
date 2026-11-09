@@ -24,6 +24,10 @@ describe("goal-led Egg persistence", () => {
       goal_key: "feedback"
     }));
   });
+  it("accepts a detailed workspace business type for a new Egg", async () => {
+    await createQrCampaign({ name: "Breakfast menu", businessType: "cafe-pub" });
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ business_type: "cafe-pub" }));
+  });
   it("preserves legacy creation without requiring new columns", async () => {
     await createQrCampaign({ name: "Legacy" });
     expect(insert.mock.calls[0][0]).not.toHaveProperty("goal_key");

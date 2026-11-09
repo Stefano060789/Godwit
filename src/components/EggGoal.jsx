@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { PERSONAS } from "../lib/personas";
 import { START_GOALS } from "../lib/startGuide";
 import { minPlanLabelFor } from "../lib/entitlements";
 import { normalizeEggEmailBenefit } from "../lib/eggBenefits";
 
-export default function EggGoal({ initialSelection, canManage, entitlements, onCreate, onOpenReviewSettings, t }) {
-  const [business, setBusiness] = useState(initialSelection.business?.audienceKey || "");
+export default function EggGoal({ businessType, initialSelection, canManage, entitlements, onCreate, onOpenReviewSettings, t }) {
   const [goalKeys, setGoalKeys] = useState(() => initialSelection.goal ? [initialSelection.goal.key] : []);
   const [name, setName] = useState("");
   const [placement, setPlacement] = useState("");
@@ -26,7 +24,7 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
 
   async function submit(event) {
     event.preventDefault();
-    if (busy || !canManage || !business || !selectedGoals.length || lockedGoals.length) return;
+    if (busy || !canManage || !businessType || !selectedGoals.length || lockedGoals.length) return;
     setBusy(true);
     setError("");
     try {
@@ -36,7 +34,7 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
       } catch {
         throw new Error(t("admin.goal.benefitInvalid", { defaultValue: "Enter a voucher or discount code, or a valid HTTPS redemption link." }));
       }
-      await onCreate({ name: name.trim(), placementLabel: placement.trim(), businessType: business, goalKeys, emailBenefit });
+      await onCreate({ name: name.trim(), placementLabel: placement.trim(), businessType, goalKeys, emailBenefit });
     } catch (failure) {
       console.error("Unable to create goal-led Egg", failure);
       setError(failure.message);
@@ -48,23 +46,16 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
   return <section className="hub-page" aria-labelledby="egg-goal-title">
     <header className="hub-page-heading"><p className="goal-eyebrow">{t("admin.hub.goal", { defaultValue: "Goal" })}</p>
       <h2 id="egg-goal-title">{t("admin.goal.title", { defaultValue: "Give your Egg a purpose" })}</h2>
-      <p>{t("admin.goal.intro", { defaultValue: "Choose a target and where people will find it." })}</p>
+      <p>{t("admin.goal.intro", { defaultValue: "Choose customer outcomes for your business and where people will find this Egg." })}</p>
     </header>
     <form onSubmit={submit} className="egg-goal-form">
-      <fieldset disabled={!canManage || busy}>
-        <legend><span className="hub-step">01</span>{t("quickStart.businessTitle")}</legend>
-        <p className="goal-multi-hint">{t("admin.goal.businessHint")}</p>
-        <div className="goal-business-grid">
-          {PERSONAS.map((entry) => <button type="button" key={entry.audienceKey} className="goal-choice" aria-pressed={business === entry.audienceKey} onClick={() => setBusiness(entry.audienceKey)}>
-            <span className="goal-choice-title">{t(`landing.useCases.${entry.audienceKey}Title`)}</span>
-            <span className="goal-choice-detail">{t(`quickStart.businesses.${entry.audienceKey}`, { defaultValue: entry.pitch })}</span>
-            <span className="goal-choice-check" aria-hidden="true">{business === entry.audienceKey ? "\u2713" : "+"}</span>
-          </button>)}
-        </div>
-      </fieldset>
-      <fieldset disabled={!canManage || busy}>
-        <legend><span className="hub-step">02</span>{t("quickStart.goalTitle")}</legend>
-        <p className="goal-multi-hint">{t(`admin.goal.businessGuidance.${business}`, { defaultValue: t("admin.goal.businessGuidance.default") })}</p>
+      {!businessType && <p className="hub-notice">
+        {t("admin.goal.businessRequired", { defaultValue: "Set your business type before creating an Egg." })}{" "}
+        <Link to="/admin?tab=your-business">{t("admin.hub.yourBusiness", { defaultValue: "Your Business" })}</Link>
+      </p>}
+      <fieldset disabled={!canManage || busy || !businessType}>
+        <legend><span className="hub-step">01</span>{t("quickStart.goalTitle")}</legend>
+        <p className="goal-multi-hint">{t(`admin.goal.businessGuidance.${businessType}`, { defaultValue: t("admin.goal.businessGuidance.default") })}</p>
         <p className="goal-multi-hint">{t("admin.goal.multipleGoalsHint", { defaultValue: "Choose one or more outcomes that matter for this Egg." })}</p>
         <div className="goal-options-grid">
           {START_GOALS.map((entry) => <button type="button" key={entry.key} className="goal-choice" aria-pressed={goalKeys.includes(entry.key)} onClick={() => toggleGoal(entry.key)}>
@@ -74,8 +65,8 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
           </button>)}
         </div>
       </fieldset>
-      <fieldset disabled={!canManage || busy}>
-        <legend><span className="hub-step">03</span>{t("admin.goal.placementTitle", { defaultValue: "Name & location" })}</legend>
+      <fieldset disabled={!canManage || busy || !businessType}>
+        <legend><span className="hub-step">02</span>{t("admin.goal.placementTitle", { defaultValue: "Name & location" })}</legend>
         <div className="hub-form-grid">
           <label>{t("admin.engagement.campaigns.nameLabel")}<input required maxLength={120} value={name} onChange={(event) => setName(event.target.value)} placeholder={t("admin.goal.nameExample", { defaultValue: "Gallery welcome" })} /></label>
           <label>{t("admin.engagement.campaigns.placementLabel")}<input required maxLength={80} value={placement} onChange={(event) => setPlacement(event.target.value)} placeholder={t("admin.goal.locationExample", { defaultValue: "Main entrance" })} /></label>
@@ -120,7 +111,7 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
       {lockedGoals.length > 0 && <p className="hub-notice">{t("admin.overview.availableOn", { plan: minPlanLabelFor(lockedGoals[0].feature) })} <Link to="/admin/billing">{t("admin.overview.upgrade")}</Link></p>}
       {!canManage && <p className="hub-notice">{t("admin.goal.managerRequired", { defaultValue: "An owner or editor can create Eggs." })}</p>}
       {error && <p role="alert" className="hub-error">{error}</p>}
-      <button type="submit" className="goal-primary-action" disabled={busy || !canManage || !business || !selectedGoals.length || !name.trim() || !placement.trim() || lockedGoals.length > 0}>
+      <button type="submit" className="goal-primary-action" disabled={busy || !canManage || !businessType || !selectedGoals.length || !name.trim() || !placement.trim() || lockedGoals.length > 0}>
         {busy ? t("admin.goal.creating", { defaultValue: "Creating..." }) : t("admin.goal.create", { defaultValue: "Create Egg" })}<span aria-hidden="true">&rarr;</span>
       </button>
       <p className="hub-caption">{t("admin.goal.next", { defaultValue: "Next: preview your Egg and set up QR or NFC access." })}</p>

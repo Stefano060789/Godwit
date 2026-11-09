@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 import { START_GOALS } from "./startGuide";
-import { PERSONAS } from "./personas";
+import { isBusinessType, PERSONAS } from "./personas";
 
 // Unique token generator for a QR code's public URL (/qr/<token>). Originally lived in
 // qrLocations.js (the now-removed legacy single-poll QR tool) - moved here since qr_campaigns
@@ -23,7 +23,9 @@ export async function createQrCampaign({ name, pollId, token, placementLabel, va
   const selectedGoalKeys = goalKeys === undefined ? (goalKey ? [goalKey] : []) : [...new Set(goalKeys)];
   if (selectedGoalKeys.some((key) => !START_GOALS.some((goal) => goal.key === key))) throw new Error("Choose a valid Egg goal.");
   if (goalKeys !== undefined && selectedGoalKeys.length === 0) throw new Error("Choose at least one Egg goal.");
-  if (businessType && !PERSONAS.some((business) => business.audienceKey === businessType)) throw new Error("Choose a valid business type.");
+  if (businessType && !isBusinessType(businessType) && !PERSONAS.some((business) => business.audienceKey === businessType)) {
+    throw new Error("Choose a valid business type.");
+  }
   const goalFields = {
     ...(goalKeys !== undefined
       ? { goal_keys: selectedGoalKeys, goal_key: selectedGoalKeys[0] }

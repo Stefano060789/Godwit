@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { getPublicBusinessWebsiteContext } from "../lib/cron/publicBusinessEmail.js";
 import { captureError } from "../lib/errorReporting.js";
+import { BUSINESS_TYPES } from "../src/lib/personas.js";
 
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{4,120}$/;
 const SESSION_PATTERN = /^[0-9a-f-]{36}$/i;
@@ -20,7 +21,16 @@ const GOAL_SETUP_BUSINESSES = new Map([
   ["hospitality", "cafes, restaurants, pubs, and hospitality venues"],
   ["places", "museums, attractions, tourism, and public places"],
   ["events", "events and communities"],
-  ["shops", "shops and local services"]
+  ["shops", "shops and local services"],
+  ...BUSINESS_TYPES.map(({ key, aiContext }) => [key, aiContext])
+]);
+const BUSINESS_GUIDANCE = new Map([
+  ...BUSINESS_TYPES.map(({ key, aiGuidance }) => [key, aiGuidance]),
+  ["arts", "For arts and culture, help visitors explore stories, exhibitions, tours, opening times, accessibility, and supplied visitor information. Use only facts in the business sources."],
+  ["hospitality", "For hospitality businesses, help with supplied menu and event information, opening hours, accessibility, and existing booking or contact links. Never invent availability, prices, or policies."],
+  ["places", "For destinations and attractions, help visitors with supplied directions, opening times, accessibility, and practical local information. Do not invent conditions or availability."],
+  ["events", "For events and communities, help with supplied schedules, entry information, accessibility, participation, and relevant existing action links. Do not invent event details."],
+  ["shops", "For shops and local services, explain supplied product or service information and existing purchase, booking, or contact links. Never invent stock, prices, or policies."]
 ]);
 
 function getBearer(request) {
@@ -59,10 +69,13 @@ async function supabaseRequest(path, { key, token = key, method = "GET", body } 
 
 async function loadCampaign(token) {
   const rows = await supabaseRequest(
-    `/rest/v1/qr_campaigns?token=eq.${encodeURIComponent(token)}&select=id,workspace_id,name,is_active,ai_enabled,ai_feedback_topics,goal_key,goal_keys`,
+    `/rest/v1/qr_campaigns?token=eq.${encodeURIComponent(token)}&select=id,workspace_id,name,is_active,ai_enabled,ai_feedback_topics,goal_key,goal_keys,business_type,workspaces(business_type)`,
     { key: getSupabaseConfig().serviceKey }
   );
-  return rows?.[0] || null;
+  const campaign = rows?.[0];
+  if (!campaign) return null;
+  const workspace = Array.isArray(campaign.workspaces) ? campaign.workspaces[0] : campaign.workspaces;
+  return { ...campaign, business_type: workspace?.business_type || campaign.business_type || "" };
 }
 
 async function loadEggOptions(token, campaign) {
@@ -171,6 +184,7 @@ async function handleGenerateGoalSetup(request, response) {
   const goalDescriptions = goalKeys.map((key) => GOAL_GUIDANCE.get(key)).join("\n");
   const eggDetails = JSON.stringify({
     businessType: GOAL_SETUP_BUSINESSES.get(businessType),
+    businessGuidance: BUSINESS_GUIDANCE.get(businessType),
     name,
     placementLabel
   });
@@ -432,10 +446,12 @@ async function handleChat(request, token, response) {
     details: option.details
   }));
   const goalKeys = Array.isArray(campaign.goal_keys) ? campaign.goal_keys : campaign.goal_key ? [campaign.goal_key] : [];
-  const goalGuidance = goalKeys
+  let goalGuidance = goalKeys
     .map((key) => GOAL_GUIDANCE.get(key))
     .filter(Boolean)
     .join("\n") || "Help the customer using the available information and existing options.";
+  const businessGuidance = BUSINESS_GUIDANCE.get(campaign.business_type);
+  if (businessGuidance) goalGuidance += `\nBusiness context: ${businessGuidance}`;
   const history = normalizeHistory(request.body?.history);
   const completion = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",

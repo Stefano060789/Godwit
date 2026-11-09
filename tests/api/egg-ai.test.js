@@ -71,7 +71,14 @@ describe("Egg AI API", () => {
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
-        return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Cafe", is_active: true, ai_enabled: true }]);
+        return jsonResponse([{
+          id: 42,
+          workspace_id: "workspace-1",
+          name: "Cafe",
+          is_active: true,
+          ai_enabled: true,
+          workspaces: { business_type: "cafe-pub" }
+        }]);
       }
       if (href.includes("/rest/v1/egg_ai_sources?campaign_id=")) {
         return jsonResponse([{ title: "Accessibility", content: "The entrance has a step-free ramp." }]);
@@ -93,6 +100,7 @@ describe("Egg AI API", () => {
         expect(requestBody.max_tokens).toBe(280);
         expect(requestBody.system).toContain("The entrance has a step-free ramp.");
         expect(requestBody.system).toContain("The cafe opens at nine.");
+        expect(requestBody.system).toContain("For a cafe or pub, help with menu and drink information");
         expect(requestBody.system).toContain("How was the service?");
         expect(requestBody.messages.at(-1).content).toBe("Do you have step-free access?");
         return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
@@ -393,6 +401,37 @@ describe("Egg AI API", () => {
       poll: { question: "What would improve your visit?", answers: ["More events", "More information"] },
       action: { title: "Share an idea", description: "Tell us what would make your next visit better." }
     });
+  });
+
+  it("uses the detailed business type when generating an Egg setup", async () => {
+    configureEnvironment();
+    vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/rpc/is_workspace_manager")) return jsonResponse(true);
+      if (href === "https://api.anthropic.com/v1/messages") {
+        const requestBody = JSON.parse(options.body);
+        expect(requestBody.system).toContain("a cafe, coffee shop, pub, or bar");
+        expect(requestBody.system).toContain("opening hours, events, accessibility");
+        return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
+          poll: { question: "What would you like to see next?", answers: ["More events", "More menu choices"] },
+          action: { title: "Share an idea", description: "Tell us what would help your next visit." }
+        }) }] });
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    }));
+
+    const response = makeResponse();
+    await handler(makeRequest({
+      action: "generate-goal-setup",
+      workspaceId: "11111111-1111-4111-8111-111111111111",
+      businessType: "cafe-pub",
+      goalKeys: ["feedback"],
+      name: "Cafe welcome",
+      placementLabel: "Main entrance",
+      language: "en"
+    }, "manager-token"), response);
+
+    expect(response.statusCode).toBe(200);
   });
 
   it("rejects unauthorized and malformed goal-based generation requests", async () => {

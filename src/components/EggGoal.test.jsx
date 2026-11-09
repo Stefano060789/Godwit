@@ -10,19 +10,18 @@ const t = (key, options = {}) => key.split(".").reduce((value, part) => value?.[
 function render(overrides = {}) {
   return renderToStaticMarkup(createElement(MemoryRouter, null, createElement(EggGoal, {
     initialSelection: getStartSelection("?business=arts&goal=feedback"),
+    businessType: "cafe-pub",
     canManage: true, entitlements: {}, onCreate: vi.fn(), t, ...overrides
   })));
 }
 describe("Egg goal setup", () => {
-  it("restores the business and goal and asks for separate Egg identity and location", () => {
+  it("uses the saved business profile and restores the selected goal", () => {
     const markup = render();
-    expect(markup.match(/aria-pressed="true"/g)).toHaveLength(2);
+    expect(markup.match(/aria-pressed="true"/g)).toHaveLength(1);
     expect(markup).toContain("Give your Egg a purpose");
-    expect(markup).toContain("Choose the closest fit.");
-    expect(markup).toContain("For artists, galleries, and museums");
+    expect(markup).toContain("For cafes and pubs");
     expect(markup).toContain("Choose one or more outcomes that matter for this Egg.");
-    expect(markup).not.toContain("Godwit creates and connects the polls");
-    expect(markup).toContain('aria-pressed="true"');
+    expect(markup).not.toContain("goal-business-grid");
     expect(markup).toContain('maxLength="120"');
     expect(markup).toContain('maxLength="80"');
     expect(markup).toContain("Create Egg");
@@ -34,7 +33,13 @@ describe("Egg goal setup", () => {
     expect(markup).not.toContain("admin.goal.");
   });
   it("disables the form for viewers", () => {
-    expect(render({ canManage: false }).match(/<fieldset disabled=""/g)).toHaveLength(3);
+    expect(render({ canManage: false }).match(/<fieldset disabled=""/g)).toHaveLength(2);
+  });
+  it("requires a saved business profile before creating an Egg", () => {
+    const markup = render({ businessType: "" });
+    expect(markup).toContain("Set your business type before creating an Egg.");
+    expect(markup).toContain('href="/admin?tab=your-business"');
+    expect(markup).toContain('disabled=""');
   });
   it("retains the upgrade route for gated goals", () => {
     expect(render({ initialSelection: getStartSelection("?business=arts&goal=contacts") })).toContain('href="/admin/billing"');
@@ -48,7 +53,6 @@ describe("Egg goal setup", () => {
   });
   it("presents distinct customer outcomes and explicitly includes cafes and pubs", () => {
     const markup = render();
-    expect(markup).toContain("Cafes, pubs &amp; hospitality");
     expect(markup).toContain("Answer customer questions");
     expect(markup).toContain("Show menus, stories &amp; details");
     expect(markup).toContain("Collect private feedback");
@@ -56,10 +60,10 @@ describe("Egg goal setup", () => {
     expect(markup).toContain("Grow a consented email list");
     expect(markup).toContain("Invite honest reviews");
   });
-  it("adapts the outcome guidance to hospitality businesses", () => {
-    const markup = render({ initialSelection: getStartSelection("?business=hospitality") });
-    expect(markup).toContain("For cafes, pubs, restaurants, and hotels");
-    expect(markup).toContain("share menus or events");
-    expect(markup).toContain("link to bookings");
+  it("adapts the outcome guidance to the saved business type", () => {
+    const markup = render({ businessType: "restaurant-food" });
+    expect(markup).toContain("For restaurants and food venues");
+    expect(markup).toContain("share menus and dietary information");
+    expect(markup).toContain("ordering and reservations");
   });
 });

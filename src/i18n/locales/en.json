@@ -100,7 +100,7 @@
     "changeGoal": "Change goal",
     "pickGoal": "Choose a goal",
     "openEggSetup": "Create an Egg",
-    "existingEggHint": "For an existing Egg, open its AI assistant or Manage experience section below.",
+    "existingEggHint": "Open your Egg from the Eggs section to preview and share it.",
     "businesses": {
       "arts": "Artists, galleries, museums",
       "hospitality": "Cafes, pubs, restaurants, hotels",
@@ -403,6 +403,7 @@
   "admin": {
     "hub": {
       "label": "Your business, connected by Eggs",
+      "yourBusiness": "Your Business",
       "business": "Business Data",
       "goal": "Goal",
       "eggs": "Eggs",
@@ -412,7 +413,7 @@
     "settingsIntro": "Brand, team and account preferences.",
     "goal": {
       "title": "Give your Egg a purpose",
-      "intro": "Choose the business or place, the customer outcomes to support, and where people will find this Egg.",
+      "intro": "Choose customer outcomes for your business and where people will find this Egg.",
       "businessHint": "Choose the closest fit. The examples help you see how an Egg can work across different businesses and places.",
       "multipleGoalsHint": "Choose one or more outcomes that matter for this Egg.",
       "businessGuidance": {
@@ -421,8 +422,18 @@
         "hospitality": "For cafes, pubs, restaurants, and hotels: share menus or events, answer guest questions, collect feedback, or link to bookings.",
         "places": "For destinations, attractions, and city teams: share directions or local information, answer visitor questions, collect feedback, or link to activities.",
         "events": "For events and communities: share schedules or updates, answer attendee questions, collect feedback, or make it easier to take part.",
-        "shops": "For shops and local services: explain products or services, answer common questions, collect feedback, or link to bookings and enquiries."
+        "shops": "For shops and local services: explain products or services, answer common questions, collect feedback, or link to bookings and enquiries.",
+        "cafe-pub": "For cafes and pubs: share menus, drinks, opening hours, events, and accessibility details; collect feedback or link to bookings.",
+        "restaurant-food": "For restaurants and food venues: share menus and dietary information, answer guest questions, collect feedback, or link to ordering and reservations.",
+        "accommodation": "For accommodation: share guest information, amenities, accessibility, local tips, and booking or contact links.",
+        "arts-culture": "For arts, culture, and museums: share exhibition details and stories, answer visitor questions, collect feedback, or invite enquiries.",
+        "visitor-attraction": "For attractions and destinations: share directions, opening times, ticket details, accessibility, and practical local information.",
+        "event-venue": "For events and venues: share schedules, entry details, facilities, and ways to participate; gather attendee feedback.",
+        "retail-market": "For shops and markets: explain products using supplied information, answer common questions, collect feedback, or link to purchase.",
+        "local-service": "For local services: explain services, appointment preparation, accessibility, and existing booking or enquiry options.",
+        "community-space": "For community and public spaces: share services, programs, opening times, accessibility, and ways to take part."
       },
+      "businessRequired": "Set your business type before creating an Egg.",
       "generationFailed": "Unable to generate this Egg's poll and action. Please try again.",
       "generationInvalid": "The generated poll needs review. Please try creating the Egg again.",
       "placementTitle": "Name & location",
@@ -446,6 +457,55 @@
       "creating": "Creating...",
       "create": "Create Egg",
       "next": "Next: preview your Egg and set up QR or NFC access."
+    },
+    "businessProfile": {
+      "title": "Tell Godwit about your business",
+      "description": "Choose the closest fit so Godwit can tailor customer guidance and goal-based Eggs to your business.",
+      "choose": "What kind of business or place is this?",
+      "save": "Save business type",
+      "saving": "Saving...",
+      "saved": "Business type saved.",
+      "error": "Could not save your business type.",
+      "selectWorkspace": "Select a workspace first.",
+      "managerOnly": "A workspace owner or editor can update this profile.",
+      "types": {
+        "cafe-pub": {
+          "title": "Cafe or pub",
+          "description": "Cafe, coffee shop, pub, bar, or neighborhood gathering place."
+        },
+        "restaurant-food": {
+          "title": "Restaurant or food venue",
+          "description": "Restaurant, bakery, food hall, takeaway, or other food business."
+        },
+        "accommodation": {
+          "title": "Hotel or accommodation",
+          "description": "Hotel, guest house, holiday rental, campsite, or other accommodation."
+        },
+        "arts-culture": {
+          "title": "Arts, culture, or museum",
+          "description": "Museum, gallery, studio, heritage site, or cultural organization."
+        },
+        "visitor-attraction": {
+          "title": "Tourist attraction or destination",
+          "description": "Visitor attraction, landmark, destination, or tourism organization."
+        },
+        "event-venue": {
+          "title": "Event or venue",
+          "description": "Festival, conference, performance venue, club, or community event."
+        },
+        "retail-market": {
+          "title": "Shop or market",
+          "description": "Retail shop, market stall, artisan shop, or product business."
+        },
+        "local-service": {
+          "title": "Local or appointment-based service",
+          "description": "Salon, repair shop, professional practice, or appointment-based business."
+        },
+        "community-space": {
+          "title": "Community or public space",
+          "description": "Community center, library, public space, nonprofit, or civic service."
+        }
+      }
     },
     "businessData": {
       "title": "Your business, in one place",

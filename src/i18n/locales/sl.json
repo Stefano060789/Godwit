@@ -40,7 +40,7 @@
     "changeGoal": "Spremeni cilj",
     "pickGoal": "Izberi cilj",
     "openEggSetup": "Ustvari Egg",
-    "existingEggHint": "Pri obstoječem Egg spodaj odprite pomočnika umetne inteligence ali upravljanje vsebine.",
+    "existingEggHint": "Egg odprite v razdelku Eggi, da si ga ogledate in delite.",
     "businesses": {
       "arts": "Umetniki, galerije, muzeji",
       "hospitality": "Kavarne, pubi, restavracije, hoteli",
@@ -162,6 +162,7 @@
   "admin": {
     "hub": {
       "label": "Vaše podjetje, povezano z Eggi",
+      "yourBusiness": "Vaše podjetje",
       "business": "Podatki podjetja",
       "goal": "Cilj",
       "eggs": "Egg",
@@ -180,8 +181,18 @@
         "hospitality": "Za kavarne, pube, restavracije in hotele: delite menije ali dogodke, odgovarjajte gostom, zbirajte mnenja ali dodajte povezave do rezervacij.",
         "places": "Za destinacije, znamenitosti in mestne ekipe: delite navodila ali lokalne informacije, odgovarjajte obiskovalcem, zbirajte mnenja ali povežite do dejavnosti.",
         "events": "Za dogodke in skupnosti: delite urnike ali novosti, odgovarjajte udeležencem, zbirajte mnenja ali olajšajte sodelovanje.",
-        "shops": "Za trgovine in lokalne storitve: predstavite izdelke ali storitve, odgovarjajte na vprašanja, zbirajte mnenja ali dodajte povezave za termine in povpraševanja."
+        "shops": "Za trgovine in lokalne storitve: predstavite izdelke ali storitve, odgovarjajte na vprašanja, zbirajte mnenja ali dodajte povezave za termine in povpraševanja.",
+        "cafe-pub": "Za kavarne in pube: delite menije, pijačo, odpiralni čas, dogodke in dostopnost; zbirajte mnenja ali dodajte povezavo za rezervacije.",
+        "restaurant-food": "Za restavracije in lokale: delite menije in podatke o prehrani, odgovarjajte gostom, zbirajte mnenja ali povežite do naročil in rezervacij.",
+        "accommodation": "Za nastanitve: delite informacije za goste, opremo, dostopnost, lokalne nasvete ter povezave za rezervacije ali stik.",
+        "arts-culture": "Za umetnost, kulturo in muzeje: delite razstave in zgodbe, odgovarjajte obiskovalcem, zbirajte mnenja ali povabila k povpraševanju.",
+        "visitor-attraction": "Za znamenitosti in destinacije: delite navodila, odpiralni čas, vstopnice, dostopnost in lokalne informacije.",
+        "event-venue": "Za dogodke in prizorišča: delite urnike, vstop, ponudbo in možnosti sodelovanja ter zbirajte mnenja obiskovalcev.",
+        "retail-market": "Za trgovine in tržnice: predstavite izdelke na podlagi razpoložljivih informacij, odgovarjajte na vprašanja ali povežite do nakupa.",
+        "local-service": "Za lokalne storitve: pojasnite storitve, pripravo na termin, dostopnost ter možnosti rezervacije ali povpraševanja.",
+        "community-space": "Za skupnostne in javne prostore: delite storitve, programe, odpiralni čas, dostopnost in možnosti sodelovanja."
       },
+      "businessRequired": "Pred ustvarjanjem Egga določite vrsto podjetja.",
       "generationFailed": "Ankete in dejanja za ta Egg ni bilo mogoče ustvariti. Poskusite znova.",
       "generationInvalid": "Ustvarjeno anketo je treba pregledati. Poskusite znova ustvariti Egg.",
       "placementTitle": "Ime in lokacija",
@@ -205,6 +216,28 @@
       "creating": "Ustvarjanje...",
       "create": "Ustvari Egg",
       "next": "Nato: oglejte si Egg in nastavite dostop QR ali NFC."
+    },
+    "businessProfile": {
+      "title": "Povejte Godwitu več o svojem podjetju",
+      "description": "Izberite najprimernejšo kategorijo, da bo Godwit prilagodil pomoč strankam in Egge vašemu podjetju.",
+      "choose": "Za kakšno podjetje ali kraj gre?",
+      "save": "Shrani vrsto podjetja",
+      "saving": "Shranjevanje...",
+      "saved": "Vrsta podjetja je shranjena.",
+      "error": "Vrste podjetja ni bilo mogoče shraniti.",
+      "selectWorkspace": "Najprej izberite delovni prostor.",
+      "managerOnly": "Profil lahko posodobita lastnik ali urednik delovnega prostora.",
+      "types": {
+        "cafe-pub": { "title": "Kavarna ali pub", "description": "Kavarna, čajnica, pub, bar ali lokalno zbirališče." },
+        "restaurant-food": { "title": "Restavracija ali gostinski lokal", "description": "Restavracija, pekarna, tržnica s hrano, okrepčevalnica ali druga gostinska dejavnost." },
+        "accommodation": { "title": "Hotel ali nastanitev", "description": "Hotel, gostišče, počitniška nastanitev, kamp ali druga nastanitev." },
+        "arts-culture": { "title": "Umetnost, kultura ali muzej", "description": "Muzej, galerija, atelje, dediščinska lokacija ali kulturna organizacija." },
+        "visitor-attraction": { "title": "Turistična znamenitost ali destinacija", "description": "Znamenitost, kraj, destinacija ali turistična organizacija." },
+        "event-venue": { "title": "Dogodek ali prizorišče", "description": "Festival, konferenca, prizorišče, klub ali skupnostni dogodek." },
+        "retail-market": { "title": "Trgovina ali tržnica", "description": "Trgovina, tržna stojnica, rokodelska trgovina ali prodaja izdelkov." },
+        "local-service": { "title": "Lokalna storitev ali storitev po dogovoru", "description": "Salon, servis, strokovna praksa ali storitev po dogovoru." },
+        "community-space": { "title": "Skupnostni ali javni prostor", "description": "Skupnostni center, knjižnica, javni prostor, neprofitna ali javna služba." }
+      }
     },
     "businessData": {
       "title": "Vaše podjetje na enem mestu",

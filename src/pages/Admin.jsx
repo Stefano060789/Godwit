@@ -5,11 +5,10 @@ import { supabase } from "../lib/supabase";
 import { appendAuditLog, readAuditLog, readPollMeta, savePollMeta, isPollClosed } from "../lib/pollMeta";
 import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
 import { buildEggUrl } from "../lib/eggs";
-import EggAiSetup from "../components/EggAiSetup";
-import EggConnections from "../components/EggConnections";
 import DashboardHub from "../components/DashboardHub";
 import EggGoal from "../components/EggGoal";
 import EggResults from "../components/EggResults";
+import BusinessProfile from "../components/BusinessProfile";
 import BusinessData from "../components/BusinessData";
 import EggNfcSetup from "../components/EggNfcSetup";
 import { listBusinessSources } from "../lib/businessData";
@@ -23,11 +22,9 @@ import {
   addQrCampaignInfoItem,
   addQrCampaignDonationItem,
   addQrCampaignRewardItem,
-  removeQrCampaignItem,
   swapQrCampaignItemPositions
 } from "../lib/qrCampaignItems";
 import { extractQrToken, reassignManagedCampaignPoll, resolveManagedQrToken } from "../lib/qrManage";
-import { ACCESSIBILITY_TAGS } from "../lib/accessibilityTags";
 import QrScanner from "../components/QrScanner";
 import LockedFeature from "../components/LockedFeature";
 import { loadLeadNurtureSettings, saveLeadNurtureSettings } from "../lib/leadNurture";
@@ -92,6 +89,7 @@ export default function Admin() {
     accentColor: "#172b2b",
     webhookUrl: "",
     reviewPlatforms: [],
+    businessType: "",
     role: "owner",
     plan: "free"
   });
@@ -108,11 +106,9 @@ export default function Admin() {
   const [eggEditName, setEggEditName] = useState("");
   const [eggEditPlacement, setEggEditPlacement] = useState("");
   const [eggEditGoals, setEggEditGoals] = useState([]);
-  const [eggEditBusiness, setEggEditBusiness] = useState("");
   const [qrCampaignItems, setQrCampaignItems] = useState([]);
   const [actionTasks, setActionTasks] = useState([]);
   const [actionTasksError, setActionTasksError] = useState("");
-  const [itemFormCampaignId, setItemFormCampaignId] = useState(null);
   const [itemPollId, setItemPollId] = useState("");
   const [itemTitle, setItemTitle] = useState("");
   const [itemBody, setItemBody] = useState("");
@@ -705,7 +701,6 @@ export default function Admin() {
     setEggEditName(campaign.name || "");
     setEggEditPlacement(campaign.placement_label || "");
     setEggEditGoals(getCampaignGoalKeys(campaign));
-    setEggEditBusiness(campaign.business_type || "");
   }
 
   async function saveEggDetails(campaignId) {
@@ -728,11 +723,10 @@ export default function Admin() {
         name,
         placement_label: eggEditPlacement.trim() || null,
         goal_keys: eggEditGoals.length ? eggEditGoals : null,
-        goal_key: eggEditGoals[0] || null,
-        business_type: eggEditBusiness || null
+        goal_key: eggEditGoals[0] || null
       })
       .eq("id", campaignId)
-      .select("id, name, placement_label, goal_key, goal_keys, business_type")
+      .select("id, name, placement_label, goal_key, goal_keys")
       .single();
 
     if (error) {
@@ -747,16 +741,6 @@ export default function Admin() {
     setEditingEggId(null);
   }
 
-  async function reassignQrCampaignPoll(campaignId, nextPollId) {
-    if (!nextPollId) return;
-    const { error } = await supabase.from("qr_campaigns").update({ poll_id: Number(nextPollId) }).eq("id", campaignId);
-    if (error) {
-      alert(error.message);
-      return;
-    }
-    setQrCampaigns((current) => current.map((item) => item.id === campaignId ? { ...item, poll_id: Number(nextPollId) } : item));
-  }
-
   // --- QR code items: let one QR code show a menu of several polls and/or info cards at once ---
 
   function itemsForCampaign(campaignId) {
@@ -765,13 +749,14 @@ export default function Admin() {
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
   }
 
-  async function handleAddCurrentPollAsItem(campaign) {
-    try {
-      const item = await addQrCampaignPollItem(campaign.id, campaign.poll_id);
-      setQrCampaignItems((current) => [...current, item]);
-    } catch (error) {
+  async function reassignQrCampaignPoll(campaignId, nextPollId) {
+    if (!nextPollId) return;
+    const { error } = await supabase.from("qr_campaigns").update({ poll_id: Number(nextPollId) }).eq("id", campaignId);
+    if (error) {
       alert(error.message);
+      return;
     }
+    setQrCampaigns((current) => current.map((item) => item.id === campaignId ? { ...item, poll_id: Number(nextPollId) } : item));
   }
 
   async function handleAddPollItem(campaignId) {
@@ -786,66 +771,6 @@ export default function Admin() {
     } catch (error) {
       alert(error.message);
     }
-  }
-
-  // Lets a poll card offer "add this poll to a QR code" directly, without going to the QR
-  // codes tab first. Same underlying operation as the QR tab's "Add a poll..." form.
-  async function assignPollToQrCode(pollId, campaignId) {
-    try {
-      const item = await addQrCampaignPollItem(campaignId, pollId);
-      setQrCampaignItems((current) => [...current, item]);
-    } catch (error) {
-      alert(error.message);
-    }
-
-  }
-
-  async function addEggPoll(campaignId, pollId) {
-    const item = await addQrCampaignPollItem(campaignId, pollId);
-    setQrCampaignItems((current) => [...current, item]);
-  }
-
-  async function attachEggAction(campaign, taskId) {
-    const { error } = await supabase.from("woodpecker_task_campaigns")
-      .upsert({ task_id: Number(taskId), campaign_id: campaign.id }, { onConflict: "task_id,campaign_id" });
-    if (error) throw error;
-    setActionTasks((current) => current.map((task) => Number(task.id) === Number(taskId)
-      ? { ...task, woodpecker_task_campaigns: [...(task.woodpecker_task_campaigns || []).filter((link) => Number(link.campaign_id) !== Number(campaign.id)), { campaign_id: campaign.id }] }
-      : task));
-  }
-
-  async function createEggAction(campaign, title) {
-    const { data, error } = await supabase.from("woodpecker_tasks")
-      .insert({ workspace_id: workspaceUserId, campaign_id: campaign.id, title: title.trim() })
-      .select("*, woodpecker_task_campaigns(campaign_id)").single();
-    if (error) throw error;
-    if (!data) throw new Error("The action was not created.");
-    setActionTasks((current) => [data, ...current]);
-  }
-
-  async function handleAddInfoItem(campaignId) {
-    if (!itemTitle.trim()) {
-      alert("Give the info card a title.");
-      return;
-    }
-    try {
-      const item = await addQrCampaignInfoItem(campaignId, { title: itemTitle, body: itemBody, linkUrl: itemLinkUrl, linkLabel: itemLinkLabel, imageUrl: itemImageUrl, accessibilityTags: itemAccessibilityTags });
-      setQrCampaignItems((current) => [...current, item]);
-      setItemTitle("");
-      setItemBody("");
-      setItemLinkUrl("");
-      setItemLinkLabel("");
-      setItemImageUrl("");
-      setItemAccessibilityTags([]);
-    } catch (error) {
-      alert(error.message);
-    }
-  }
-
-  function toggleItemAccessibilityTag(value) {
-    setItemAccessibilityTags((current) =>
-      current.includes(value) ? current.filter((tag) => tag !== value) : [...current, value]
-    );
   }
 
   async function handleAddRewardItem(campaignId) {
@@ -883,38 +808,6 @@ export default function Admin() {
     }
   }
 
-  async function handleRemoveItem(itemId) {
-    if (!confirm("Remove this item from the Egg?")) return;
-    try {
-      await removeQrCampaignItem(itemId);
-      setQrCampaignItems((current) => current.filter((item) => item.id !== itemId));
-    } catch (error) {
-      alert(error.message);
-    }
-  }
-
-  async function handleMoveItem(campaignId, itemId, direction) {
-    const items = itemsForCampaign(campaignId);
-    const index = items.findIndex((item) => item.id === itemId);
-    const swapIndex = direction === "up" ? index - 1 : index + 1;
-    if (index < 0 || swapIndex < 0 || swapIndex >= items.length) return;
-    const current = items[index];
-    const swapWith = items[swapIndex];
-    try {
-      await swapQrCampaignItemPositions(current, swapWith);
-      setQrCampaignItems((prev) => prev.map((item) => {
-        if (item.id === current.id) return { ...item, sort_order: swapWith.sort_order };
-        if (item.id === swapWith.id) return { ...item, sort_order: current.sort_order };
-        return item;
-      }));
-    } catch (error) {
-      alert(error.message);
-    }
-  }
-
-  // Same reordering as handleMoveItem, but scoped to one item type (poll/info/donation) so the
-  // Polls/Info/Donation sections in the QR tab can each have their own independent up/down
-  // controls, instead of moving an item past unrelated items of a different type.
   async function handleMoveItemWithinType(campaignId, itemId, itemType, direction) {
     const items = itemsForCampaign(campaignId).filter((item) => item.item_type === itemType);
     const index = items.findIndex((item) => item.id === itemId);
@@ -924,7 +817,7 @@ export default function Admin() {
     const swapWith = items[swapIndex];
     try {
       await swapQrCampaignItemPositions(current, swapWith);
-      setQrCampaignItems((prev) => prev.map((item) => {
+      setQrCampaignItems((previous) => previous.map((item) => {
         if (item.id === current.id) return { ...item, sort_order: swapWith.sort_order };
         if (item.id === swapWith.id) return { ...item, sort_order: current.sort_order };
         return item;
@@ -932,6 +825,18 @@ export default function Admin() {
     } catch (error) {
       alert(error.message);
     }
+  }
+
+  // Lets a poll card offer "add this poll to a QR code" directly, without going to the QR
+  // codes tab first. Same underlying operation as the QR tab's "Add a poll..." form.
+  async function assignPollToQrCode(pollId, campaignId) {
+    try {
+      const item = await addQrCampaignPollItem(campaignId, pollId);
+      setQrCampaignItems((current) => [...current, item]);
+    } catch (error) {
+      alert(error.message);
+    }
+
   }
 
   async function handleCreateApiKey() {
@@ -1634,6 +1539,7 @@ export default function Admin() {
 
   async function createGoalEgg(fields) {
     if (!canReuseQr || !workspaceUserId) throw new Error(t("admin.goal.managerRequired", { defaultValue: "An owner or editor can create Eggs." }));
+    if (!workspaceProfile.businessType) throw new Error(t("admin.goal.businessRequired", { defaultValue: "Set your business type before creating an Egg." }));
     const lockedGoal = fields.goalKeys
       .map((key) => START_GOALS.find((entry) => entry.key === key))
       .find((goal) => goal?.feature && !entitlements[goal.feature]);
@@ -1656,7 +1562,7 @@ export default function Admin() {
       body: JSON.stringify({
         action: "generate-goal-setup",
         workspaceId: workspaceUserId,
-        businessType: fields.businessType,
+        businessType: workspaceProfile.businessType,
         goalKeys: fields.goalKeys,
         name: fields.name,
         placementLabel: fields.placementLabel,
@@ -1682,7 +1588,12 @@ export default function Admin() {
     }
 
     const sources = await listBusinessSources(workspaceUserId);
-    const campaign = await createQrCampaign({ ...fields, workspaceId: workspaceUserId, aiEnabled: sources.length > 0 });
+    const campaign = await createQrCampaign({
+      ...fields,
+      businessType: workspaceProfile.businessType,
+      workspaceId: workspaceUserId,
+      aiEnabled: sources.length > 0
+    });
     let setup;
     try {
       setup = await createGoalEggSetup({
@@ -1748,8 +1659,16 @@ export default function Admin() {
 
       <DashboardHub activeTab={["feedback", "woodpecker", "connection"].includes(activeTab) ? "results" : activeTab} onSelect={setActiveTab} t={t} />
 
+      {activeTab === "your-business" && workspaceUserId && <BusinessProfile
+        workspaceId={workspaceUserId}
+        businessType={workspaceProfile.businessType}
+        canManage={permission.canManageWorkspace}
+        onSaved={(profile) => setWorkspaceProfile((current) => ({ ...current, ...profile }))}
+        t={t}
+      />}
       {activeTab === "business" && workspaceUserId && <BusinessData workspaceId={workspaceUserId} canManage={permission.canManageWorkspace} t={t} />}
       {activeTab === "goal" && <EggGoal
+        businessType={workspaceProfile.businessType}
         initialSelection={startSelection}
         canManage={canReuseQr && Boolean(workspaceUserId)}
         entitlements={entitlements}
@@ -2554,13 +2473,6 @@ export default function Admin() {
                           {t("admin.eggResults.noGoal", { defaultValue: "No target set" })}
                         </button>}
                       </fieldset>
-                      <label className="text-xs font-semibold">
-                        {t("quickStart.businessTitle")}
-                        <select value={eggEditBusiness} onChange={(event) => setEggEditBusiness(event.target.value)} className="mt-1 w-full rounded border p-2 text-sm">
-                          <option value="">{t("admin.goal.chooseBusiness", { defaultValue: "Choose a business type" })}</option>
-                          {PERSONAS.map((business) => <option key={business.audienceKey} value={business.audienceKey}>{t(`landing.useCases.${business.audienceKey}Title`)}</option>)}
-                        </select>
-                      </label>
                       <div className="flex gap-2 sm:col-span-2">
                         <button onClick={() => saveEggDetails(campaign.id)} className="egg-edit-save rounded px-3 py-2 text-sm font-semibold">{t("admin.engagement.campaigns.saveEgg")}</button>
                         <button onClick={() => setEditingEggId(null)} className="egg-edit-cancel rounded border px-3 py-2 text-sm font-semibold">{t("admin.engagement.campaigns.cancelEditEgg")}</button>
@@ -2568,25 +2480,7 @@ export default function Admin() {
                     </div>
                   )}
 
-                  <details className="egg-content-settings">
-                    <summary>{t("admin.eggList.content", { defaultValue: "Assistant & connected content" })}</summary>
-                  <EggConnections
-                    campaign={campaign}
-                    polls={polls}
-                    items={itemsForCampaign(campaign.id)}
-                    tasks={actionTasks}
-                    tasksError={actionTasksError}
-                    canManage={canReuseQr}
-                    t={t}
-                    onOpenPoll={goToPoll}
-                    onAddPoll={addEggPoll}
-                    onRemoveItem={handleRemoveItem}
-                    onAttachAction={attachEggAction}
-                    onCreateAction={createEggAction}
-                    onOpenActions={() => setActiveTab("woodpecker")}
-                  />
-                  <EggAiSetup campaign={campaign} t={t} canManage={canReuseQr} onSettingsChange={(patch) => setQrCampaigns((current) => current.map((entry) => entry.id === campaign.id ? { ...entry, ...patch } : entry))} />
-                  </details>
+
 
                   <div className="mt-2 flex items-center gap-3">
                     <img
@@ -2662,212 +2556,7 @@ export default function Admin() {
                     </select>
                   </div>}
 
-                  {canReuseQr && <details className="mt-3 rounded border border-slate-700">
-                    <summary className="cursor-pointer p-2 text-sm font-semibold">
-                      {t("admin.engagement.campaigns.itemsOnQr", { count: itemsForCampaign(campaign.id).length })}
-                    </summary>
-                    <div className="space-y-4 p-3">
-                      <p className="text-xs text-slate-400">
-                        {t("admin.engagement.campaigns.itemsHint")}
-                      </p>
 
-                      {/* INFO */}
-                      <div className="rounded-lg border border-slate-600 bg-slate-800/20 p-3">
-                        <p className="text-sm font-bold text-slate-200">📄 {t("admin.engagement.items.sectionInfo")}</p>
-                        <p className="mt-0.5 text-xs text-slate-400">{t("admin.engagement.items.sectionInfoHint")}</p>
-
-                        {(() => {
-                          const infoItems = itemsForCampaign(campaign.id).filter((item) => item.item_type === "info");
-                          return infoItems.length > 0 && (
-                            <div className="mt-2 space-y-1.5">
-                              {infoItems.map((item, index, all) => (
-                                <div key={item.id} className="flex items-center justify-between gap-2 rounded border border-slate-700 bg-slate-950/60 p-2 text-sm">
-                                  <div className="min-w-0">
-                                    <p className="truncate">{item.title}{item.link_url ? ` · ${item.link_label || t("admin.engagement.items.link")}` : ""}</p>
-                                    {item.accessibility_tags?.length > 0 && (
-                                      <p className="truncate text-xs text-slate-400">
-                                        {item.accessibility_tags.map((tag) => ACCESSIBILITY_TAGS.find((entry) => entry.value === tag)?.icon).filter(Boolean).join(" ")}
-                                      </p>
-                                    )}
-                                  </div>
-                                  <div className="flex shrink-0 items-center gap-1">
-                                    <button type="button" onClick={() => handleMoveItemWithinType(campaign.id, item.id, "info", "up")} disabled={index === 0} className="rounded px-2 py-1 disabled:opacity-30">↑</button>
-                                    <button type="button" onClick={() => handleMoveItemWithinType(campaign.id, item.id, "info", "down")} disabled={index === all.length - 1} className="rounded px-2 py-1 disabled:opacity-30">↓</button>
-                                    <button type="button" onClick={() => handleRemoveItem(item.id)} className="rounded px-2 py-1 font-semibold text-red-400">{t("admin.engagement.items.remove")}</button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        })()}
-
-                        <div className="mt-2 grid gap-2 md:grid-cols-2">
-                          <input
-                            value={itemFormCampaignId === campaign.id ? itemTitle : ""}
-                            onChange={(event) => { setItemFormCampaignId(campaign.id); setItemTitle(event.target.value); }}
-                            maxLength={120}
-                            className="border p-2 rounded text-black"
-                            placeholder={t("admin.engagement.items.infoTitlePlaceholder")}
-                          />
-                          <input
-                            value={itemFormCampaignId === campaign.id ? itemLinkUrl : ""}
-                            onChange={(event) => { setItemFormCampaignId(campaign.id); setItemLinkUrl(event.target.value); }}
-                            className="border p-2 rounded text-black"
-                            placeholder={t("admin.engagement.items.linkUrlPlaceholder")}
-                          />
-                          <textarea
-                            value={itemFormCampaignId === campaign.id ? itemBody : ""}
-                            onChange={(event) => { setItemFormCampaignId(campaign.id); setItemBody(event.target.value); }}
-                            maxLength={2000}
-                            rows="2"
-                            className="border p-2 rounded text-black md:col-span-2"
-                            placeholder={t("admin.engagement.items.infoBodyPlaceholder")}
-                          />
-                          <input
-                            value={itemFormCampaignId === campaign.id ? itemLinkLabel : ""}
-                            onChange={(event) => { setItemFormCampaignId(campaign.id); setItemLinkLabel(event.target.value); }}
-                            maxLength={60}
-                            className="border p-2 rounded text-black"
-                            placeholder={t("admin.engagement.items.linkLabelPlaceholder")}
-                          />
-                          <input
-                            value={itemFormCampaignId === campaign.id ? itemImageUrl : ""}
-                            onChange={(event) => { setItemFormCampaignId(campaign.id); setItemImageUrl(event.target.value); }}
-                            className="border p-2 rounded text-black md:col-span-2"
-                            placeholder={t("admin.engagement.items.imageUrlPlaceholder")}
-                          />
-                          <fieldset className="md:col-span-2 rounded border border-slate-700 p-2">
-                            <legend className="text-xs font-semibold text-slate-300 px-1">{t("admin.engagement.items.accessibilityLegend")}</legend>
-                            <div className="flex flex-wrap gap-3 pt-1">
-                              {ACCESSIBILITY_TAGS.map((tag) => (
-                                <label key={tag.value} className="flex items-center gap-1 text-sm text-slate-200">
-                                  <input
-                                    type="checkbox"
-                                    checked={itemFormCampaignId === campaign.id && itemAccessibilityTags.includes(tag.value)}
-                                    onChange={() => { setItemFormCampaignId(campaign.id); toggleItemAccessibilityTag(tag.value); }}
-                                  />
-                                  <span aria-hidden="true">{tag.icon}</span> {t(tag.labelKey)}
-                                </label>
-                              ))}
-                            </div>
-                          </fieldset>
-                          <button type="button" onClick={() => handleAddInfoItem(campaign.id)} className="bg-slate-600 text-white px-3 py-2 rounded font-semibold">{t("admin.engagement.items.addInfoCard")}</button>
-                        </div>
-                      </div>
-
-                      {/* POLLS */}
-                      <div className="rounded-lg border border-blue-800 bg-blue-950/10 p-3">
-                        <p className="text-sm font-bold text-blue-300">📊 {t("admin.engagement.items.sectionPolls")}</p>
-                        <p className="mt-0.5 text-xs text-slate-400">{t("admin.engagement.items.sectionPollsHint")}</p>
-
-                        {campaign.poll_id && !itemsForCampaign(campaign.id).some((item) => item.item_type === "poll" && item.poll_id === campaign.poll_id) && (
-                          <button
-                            type="button"
-                            onClick={() => handleAddCurrentPollAsItem(campaign)}
-                            className="mt-2 text-xs font-semibold text-blue-300 underline"
-                          >
-                            {t("admin.engagement.items.addCurrentPoll", { id: campaign.poll_id })}
-                          </button>
-                        )}
-
-                        {(() => {
-                          const pollItems = itemsForCampaign(campaign.id).filter((item) => item.item_type === "poll");
-                          return pollItems.length > 0 && (
-                            <div className="mt-2 space-y-1.5">
-                              {pollItems.map((item, index, all) => (
-                                <div key={item.id} className="flex items-center justify-between gap-2 rounded border border-slate-700 bg-slate-950/60 p-2 text-sm">
-                                  <p className="min-w-0 truncate">
-                                    <button type="button" onClick={() => goToPoll(item.poll_id)} className="font-semibold text-teal-300 underline">{t("admin.polls.card.pollNumber", { id: item.poll_id })}</button>
-                                    {" - "}{polls.find((poll) => poll.id === item.poll_id)?.question || t("admin.engagement.items.unknownPoll")}
-                                  </p>
-                                  <div className="flex shrink-0 items-center gap-1">
-                                    <button type="button" onClick={() => handleMoveItemWithinType(campaign.id, item.id, "poll", "up")} disabled={index === 0} title="Move poll up" aria-label="Move poll up" className="rounded border border-slate-600 px-2 py-1 disabled:opacity-30">↑</button>
-                                    <button type="button" onClick={() => handleMoveItemWithinType(campaign.id, item.id, "poll", "down")} disabled={index === all.length - 1} title="Move poll down" aria-label="Move poll down" className="rounded border border-slate-600 px-2 py-1 disabled:opacity-30">↓</button>
-                                    <button type="button" onClick={() => handleRemoveItem(item.id)} className="rounded px-2 py-1 font-semibold text-red-400">{t("admin.engagement.items.remove")}</button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        })()}
-
-                        <div className="mt-2 grid gap-2 md:grid-cols-3">
-                          <select
-                            value={itemFormCampaignId === campaign.id ? itemPollId : ""}
-                            onChange={(event) => { setItemFormCampaignId(campaign.id); setItemPollId(event.target.value); }}
-                            className="w-full min-w-0 border p-2 rounded text-black md:col-span-2"
-                          >
-                            <option value="">{t("admin.engagement.items.addPollOption")}</option>
-                            {polls.map((poll) => <option key={poll.id} value={String(poll.id)}>#{poll.id} - {poll.question}</option>)}
-                          </select>
-                          <button type="button" onClick={() => handleAddPollItem(campaign.id)} className="bg-blue-700 text-white px-3 py-2 rounded font-semibold">{t("admin.engagement.items.addPoll")}</button>
-                        </div>
-                      </div>
-
-                      {/* DONATION */}
-                      {DONATION_FEATURE_ENABLED && (
-                      <div className="rounded-lg border border-amber-700 bg-amber-950/10 p-3">
-                        <p className="text-sm font-bold text-amber-300">💛 {t("admin.engagement.items.sectionDonation")}</p>
-                        <p className="mt-0.5 text-xs text-slate-400">{t("admin.engagement.items.sectionDonationHint")}</p>
-
-                        {(() => {
-                          const donationItems = itemsForCampaign(campaign.id).filter((item) => item.item_type === "donation");
-                          return donationItems.length > 0 && (
-                            <div className="mt-2 space-y-1.5">
-                              {donationItems.map((item) => (
-                                <div key={item.id} className="flex items-center justify-between gap-2 rounded border border-slate-700 bg-slate-950/60 p-2 text-sm">
-                                  <p className="truncate">{item.title ? item.title : t("admin.engagement.items.default")}</p>
-                                  <button type="button" onClick={() => handleRemoveItem(item.id)} className="rounded px-2 py-1 font-semibold text-red-400">{t("admin.engagement.items.remove")}</button>
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        })()}
-
-                        {DONATION_FEATURE_ENABLED && donationSettings.is_enabled ? (
-                          itemsForCampaign(campaign.id).some((item) => item.item_type === "donation") ? null : (
-                            <button type="button" onClick={() => handleAddDonationItem(campaign.id)} className="mt-2 bg-amber-500 text-slate-950 px-3 py-2 rounded font-semibold">
-                              {t("admin.engagement.items.addDonationOption")}
-                            </button>
-                          )
-                        ) : (
-                          <p className="mt-2 text-xs text-slate-500">
-                            {DONATION_FEATURE_ENABLED
-                              ? t("admin.engagement.items.enableDonationsNote")
-                              : t("admin.engagement.donations.notEnabled")}
-                          </p>
-                        )}
-                      </div>
-                      )}
-
-                      {/* REWARD & PRIZE */}
-                      <div className="rounded-lg border border-fuchsia-700 bg-fuchsia-950/10 p-3">
-                        <p className="text-sm font-bold text-fuchsia-300">🎁 {t("admin.engagement.items.sectionReward")}</p>
-                        <p className="mt-0.5 text-xs text-slate-400">{t("admin.engagement.items.sectionRewardHint")}</p>
-
-                        {(() => {
-                          const rewardItems = itemsForCampaign(campaign.id).filter((item) => item.item_type === "reward");
-                          return rewardItems.length > 0 && (
-                            <div className="mt-2 space-y-1.5">
-                              {rewardItems.map((item, index, all) => (
-                                <div key={item.id} className="flex items-center justify-between gap-2 rounded border border-slate-700 bg-slate-950/60 p-2 text-sm">
-                                  <div className="min-w-0">
-                                    <p className="truncate">{item.title}{item.reward_code ? ` · ${t("admin.engagement.items.rewardCodeLabel", { code: item.reward_code })}` : ""}</p>
-                                  </div>
-                                  <div className="flex shrink-0 items-center gap-1">
-                                    <button type="button" onClick={() => handleMoveItemWithinType(campaign.id, item.id, "reward", "up")} disabled={index === 0} className="rounded px-2 py-1 disabled:opacity-30">↑</button>
-                                    <button type="button" onClick={() => handleMoveItemWithinType(campaign.id, item.id, "reward", "down")} disabled={index === all.length - 1} className="rounded px-2 py-1 disabled:opacity-30">↓</button>
-                                    <button type="button" onClick={() => handleRemoveItem(item.id)} className="rounded px-2 py-1 font-semibold text-red-400">{t("admin.engagement.items.remove")}</button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        })()}
-
-                      </div>
-                    </div>
-                  </details>}
                 </div>
               );
             })}

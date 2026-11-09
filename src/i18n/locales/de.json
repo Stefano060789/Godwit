@@ -39,7 +39,7 @@
     "changeGoal": "Ziel ändern",
     "pickGoal": "Ziel wählen",
     "openEggSetup": "Egg erstellen",
-    "existingEggHint": "Öffnen Sie bei einem vorhandenen Egg unten den KI-Assistenten oder die Verwaltung der Inhalte.",
+    "existingEggHint": "Öffnen Sie Ihr Egg im Bereich Eggs, um es anzusehen und zu teilen.",
     "businesses": {
       "arts": "Kunstschaffende, Galerien, Museen",
       "hospitality": "Cafés, Pubs, Restaurants, Hotels",
@@ -304,6 +304,7 @@
   "admin": {
     "hub": {
       "label": "Ihr Unternehmen, verbunden durch Eggs",
+      "yourBusiness": "Ihr Unternehmen",
       "business": "Unternehmensdaten",
       "goal": "Ziel",
       "eggs": "Eggs",
@@ -322,8 +323,18 @@
         "hospitality": "Für Cafés, Pubs, Restaurants und Hotels: Speisekarten oder Veranstaltungen teilen, Gästefragen beantworten, Feedback sammeln oder Buchungen verlinken.",
         "places": "Für Reiseziele, Sehenswürdigkeiten und Stadtteams: Wegbeschreibungen oder lokale Informationen teilen, Besucherfragen beantworten, Feedback sammeln oder Aktivitäten verlinken.",
         "events": "Für Veranstaltungen und Gemeinschaften: Zeitpläne oder Neuigkeiten teilen, Fragen der Teilnehmenden beantworten, Feedback sammeln oder die Teilnahme erleichtern.",
-        "shops": "Für Geschäfte und lokale Dienstleistungen: Produkte oder Leistungen erklären, häufige Fragen beantworten, Feedback sammeln oder Termine und Anfragen verlinken."
+        "shops": "Für Geschäfte und lokale Dienstleistungen: Produkte oder Leistungen erklären, häufige Fragen beantworten, Feedback sammeln oder Termine und Anfragen verlinken.",
+        "cafe-pub": "Für Cafés und Pubs: Speisekarten, Getränke, Öffnungszeiten, Veranstaltungen und Barrierefreiheit teilen; Feedback sammeln oder Buchungen verlinken.",
+        "restaurant-food": "Für Restaurants und Gastronomie: Speisekarten und Ernährungsinformationen teilen, Fragen beantworten, Feedback sammeln oder Bestellungen und Reservierungen verlinken.",
+        "accommodation": "Für Unterkünfte: Gästeinformationen, Ausstattung, Barrierefreiheit, lokale Tipps sowie Buchungs- und Kontaktlinks bereitstellen.",
+        "arts-culture": "Für Kunst, Kultur und Museen: Ausstellungen und Geschichten teilen, Besucherfragen beantworten, Feedback sammeln oder Anfragen ermöglichen.",
+        "visitor-attraction": "Für Sehenswürdigkeiten und Reiseziele: Wegbeschreibungen, Öffnungszeiten, Tickets, Barrierefreiheit und lokale Informationen teilen.",
+        "event-venue": "Für Veranstaltungen und Veranstaltungsorte: Zeitpläne, Einlass, Ausstattung und Teilnahmemöglichkeiten teilen; Feedback sammeln.",
+        "retail-market": "Für Geschäfte und Märkte: Produkte anhand vorhandener Informationen erklären, Fragen beantworten, Feedback sammeln oder Kaufmöglichkeiten verlinken.",
+        "local-service": "Für lokale Dienstleistungen: Leistungen, Terminvoraussetzungen, Barrierefreiheit sowie Buchungs- und Anfrageoptionen erklären.",
+        "community-space": "Für Gemeinschafts- und öffentliche Einrichtungen: Angebote, Programme, Öffnungszeiten, Barrierefreiheit und Mitmachmöglichkeiten teilen."
       },
+      "businessRequired": "Legen Sie vor dem Erstellen eines Eggs Ihre Unternehmensart fest.",
       "generationFailed": "Die Umfrage und Aktion für dieses Egg konnten nicht erstellt werden. Bitte versuchen Sie es erneut.",
       "generationInvalid": "Die erstellte Umfrage muss überprüft werden. Bitte versuchen Sie erneut, das Egg zu erstellen.",
       "placementTitle": "Name und Standort",
@@ -347,6 +358,28 @@
       "creating": "Wird erstellt...",
       "create": "Egg erstellen",
       "next": "Danach: Egg ansehen und QR- oder NFC-Zugang einrichten."
+    },
+    "businessProfile": {
+      "title": "Erzählen Sie Godwit von Ihrem Unternehmen",
+      "description": "Wählen Sie die passendste Kategorie, damit Godwit Kunden und zielorientierte Eggs passend unterstützen kann.",
+      "choose": "Um welches Unternehmen oder welchen Ort handelt es sich?",
+      "save": "Unternehmensart speichern",
+      "saving": "Wird gespeichert...",
+      "saved": "Unternehmensart gespeichert.",
+      "error": "Unternehmensart konnte nicht gespeichert werden.",
+      "selectWorkspace": "Wählen Sie zuerst einen Arbeitsbereich.",
+      "managerOnly": "Nur Eigentümer oder Bearbeiter können dieses Profil ändern.",
+      "types": {
+        "cafe-pub": { "title": "Café oder Pub", "description": "Café, Kaffeeladen, Pub, Bar oder lokaler Treffpunkt." },
+        "restaurant-food": { "title": "Restaurant oder Gastronomie", "description": "Restaurant, Bäckerei, Food Hall, Imbiss oder anderes Gastronomieunternehmen." },
+        "accommodation": { "title": "Hotel oder Unterkunft", "description": "Hotel, Pension, Ferienunterkunft, Campingplatz oder andere Unterkunft." },
+        "arts-culture": { "title": "Kunst, Kultur oder Museum", "description": "Museum, Galerie, Atelier, Kulturdenkmal oder Kulturorganisation." },
+        "visitor-attraction": { "title": "Sehenswürdigkeit oder Reiseziel", "description": "Attraktion, Wahrzeichen, Reiseziel oder Tourismusorganisation." },
+        "event-venue": { "title": "Veranstaltung oder Veranstaltungsort", "description": "Festival, Konferenz, Veranstaltungsort, Club oder Gemeinschaftsevent." },
+        "retail-market": { "title": "Geschäft oder Markt", "description": "Einzelhandelsgeschäft, Marktstand, Kunsthandwerk oder Produktunternehmen." },
+        "local-service": { "title": "Lokaler oder terminbasierter Dienst", "description": "Salon, Reparaturbetrieb, Praxis oder terminbasierter Dienstleister." },
+        "community-space": { "title": "Gemeinschafts- oder öffentlicher Ort", "description": "Gemeinschaftszentrum, Bibliothek, öffentlicher Ort, gemeinnützige oder kommunale Einrichtung." }
+      }
     },
     "businessData": {
       "title": "Ihr Unternehmen an einem Ort",

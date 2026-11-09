@@ -9,6 +9,8 @@ export function HubIcon({ type }) {
       </> : type === "nfc" ? <>
         <path d="M8 8a6 6 0 0 1 0 8M12 5a10 10 0 0 1 0 14M16 2a14 14 0 0 1 0 20" />
         <circle cx="4" cy="12" r="1" />
+      </> : type === "yourBusiness" ? <>
+        <path d="M3 10h18v11H3zM2 10l2-7h16l2 7M7 14h4v7M15 14h3M7 7h.01M12 7h.01M17 7h.01" />
       </> : type === "business" ? <>
         <path d="M4 21V5h10v16M14 10h6v11M2 21h20M7 8h4M7 12h4M7 16h4M17 13v2M17 17v2" />
       </> : type === "goal" ? <>
@@ -24,6 +26,7 @@ export function HubIcon({ type }) {
 
 export default function DashboardHub({ activeTab, onSelect, t }) {
   const labels = {
+    "your-business": t("admin.hub.yourBusiness", { defaultValue: "Your Business" }),
     business: t("admin.hub.business", { defaultValue: "Business Data" }),
     goal: t("admin.hub.goal", { defaultValue: "Goal" }),
     engagement: t("admin.hub.eggs", { defaultValue: "Eggs" }),
@@ -39,9 +42,9 @@ export default function DashboardHub({ activeTab, onSelect, t }) {
   return (
     <nav className="dashboard-hub" aria-label={t("admin.hub.label", { defaultValue: "Your business, connected by Eggs" })}>
       <svg className="dashboard-hub-lines" viewBox="0 0 1000 260" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M220 58C350 58 350 95 500 95M220 132C350 132 350 95 500 95M500 95H780M500 95V225" />
+        <path d="M220 35C350 35 350 110 500 110M220 110H500M220 185C350 185 350 110 500 110M500 110H780M500 110V225" />
       </svg>
-      <div className="dashboard-hub-inputs">{node("business", "business")}{node("goal", "goal")}</div>
+      <div className="dashboard-hub-inputs">{node("your-business", "yourBusiness")}{node("business", "business")}{node("goal", "goal")}</div>
       <button type="button" className="dashboard-hub-egg" aria-current={activeTab === "engagement" ? "page" : undefined} onClick={() => onSelect("engagement")}>
         <img src={egg} alt="" width="84" height="84" />
         <strong>{labels.engagement}</strong>

@@ -24,7 +24,7 @@ describe("starting guide navigation", () => {
   it("resolves hub tabs and preserves legacy destinations", () => {
     expect(getAdminTab("?tab=engagement")).toBe("engagement");
     expect(getAdminTab("?tab=woodpecker")).toBe("woodpecker");
-    for (const tab of ["business", "goal", "results", "settings", "feedback", "connection", "polls"]) {
+    for (const tab of ["your-business", "business", "goal", "results", "settings", "feedback", "connection", "polls"]) {
       expect(getAdminTab(`?tab=${tab}`)).toBe(tab);
     }
     expect(getAdminTab("?tab=overview")).toBe("goal");

@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { isBusinessType } from "./personas";
 
 const PROFILE_STORAGE_KEY = "ivote_workspace_profile";
 
@@ -70,20 +71,22 @@ export async function loadWorkspaceProfile() {
     throw new Error(`Unable to open workspace: ${workspaceError?.message || "No workspace found."}`);
   }
 
-  let { data: workspace, error } = await supabase
-    .from("workspaces")
-    .select("id, name, logo_url, primary_color, accent_color, webhook_url, vote_retention_days, review_platforms")
-    .eq("id", workspaceId)
-    .single();
-
-  // Keep existing workspaces usable while a deployment is waiting for the additive
-  // review-platforms migration. The feature remains empty until that column exists.
-  if (error?.code === "42703" || error?.message?.includes("review_platforms")) {
+  const baseColumns = "id, name, logo_url, primary_color, accent_color, webhook_url, vote_retention_days";
+  let optionalColumns = ["review_platforms", "business_type"];
+  let workspace;
+  let error;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
     ({ data: workspace, error } = await supabase
       .from("workspaces")
-      .select("id, name, logo_url, primary_color, accent_color, webhook_url, vote_retention_days")
+      .select([baseColumns, ...optionalColumns].join(", "))
       .eq("id", workspaceId)
       .single());
+    if (!error) break;
+    if (!["42703", "PGRST204"].includes(error.code)) break;
+    const missingColumn = optionalColumns.find((column) => error.message?.includes(column));
+    optionalColumns = missingColumn
+      ? optionalColumns.filter((column) => column !== missingColumn)
+      : [];
   }
 
   if (error || !workspace) {
@@ -102,6 +105,7 @@ export async function loadWorkspaceProfile() {
     webhookUrl: workspace.webhook_url || "",
     voteRetentionDays: workspace.vote_retention_days || "",
     reviewPlatforms: Array.isArray(workspace.review_platforms) ? workspace.review_platforms : [],
+    businessType: workspace.business_type || "",
     role,
     plan
   };
@@ -119,8 +123,31 @@ export async function loadWorkspacePlan(workspaceId) {
   return data || "free";
 }
 
+export async function saveWorkspaceBusinessType(workspaceId, businessType) {
+  if (!workspaceId) throw new Error("A workspace is required.");
+  if (!isBusinessType(businessType)) throw new Error("Choose a valid business type.");
+
+  const { error } = await supabase
+    .from("workspaces")
+    .update({ business_type: businessType })
+    .eq("id", workspaceId);
+  if (error && (error.code === "42703" || error.message?.includes("business_type"))) {
+    throw new Error("Business type settings are unavailable until the workspace business profile migration is applied.");
+  }
+  if (error) throw new Error(`Unable to save business type: ${error.message}`);
+
+  const profiles = readAllProfiles();
+  const key = String(workspaceId);
+  profiles[key] = { ...(profiles[key] ?? {}), businessType };
+  writeAllProfiles(profiles);
+  return { businessType };
+}
+
 export async function saveWorkspaceProfile(workspaceId, patch = {}) {
   if (!workspaceId) throw new Error("A workspace is required.");
+  if (patch.businessType !== undefined && patch.businessType && !isBusinessType(patch.businessType)) {
+    throw new Error("Choose a valid business type.");
+  }
   const profiles = readAllProfiles();
   const key = String(workspaceId);
   const current = profiles[key] ?? {};
@@ -140,6 +167,7 @@ export async function saveWorkspaceProfile(workspaceId, patch = {}) {
     accent_color: next.accentColor,
     webhook_url: patch.webhookUrl?.trim() || null,
     vote_retention_days: patch.voteRetentionDays ? Number(patch.voteRetentionDays) : null,
+    ...(!patch.businessType ? {} : { business_type: patch.businessType }),
     reviewPlatforms: Array.isArray(patch.reviewPlatforms)
       ? patch.reviewPlatforms
         .filter((platform) => platform?.name?.trim() && platform?.url?.trim())
@@ -154,14 +182,16 @@ export async function saveWorkspaceProfile(workspaceId, patch = {}) {
 
   if (error) throw new Error(`Unable to save workspace settings: ${error.message}`);
 
-  const { error: reviewPlatformsError } = await supabase
-    .from("workspaces")
-    .update({ review_platforms: reviewPlatforms })
-    .eq("id", workspaceId);
-  if (reviewPlatformsError && (reviewPlatformsError.code === "42703" || reviewPlatformsError.message?.includes("review_platforms"))) {
-    throw new Error("Workspace settings saved, but review sites are unavailable until the review-platforms database migration is applied.");
+  if (patch.reviewPlatforms !== undefined) {
+    const { error: reviewPlatformsError } = await supabase
+      .from("workspaces")
+      .update({ review_platforms: reviewPlatforms })
+      .eq("id", workspaceId);
+    if (reviewPlatformsError && (reviewPlatformsError.code === "42703" || reviewPlatformsError.message?.includes("review_platforms"))) {
+      throw new Error("Workspace settings saved, but review sites are unavailable until the review-platforms database migration is applied.");
+    }
+    if (reviewPlatformsError) throw new Error(`Unable to save review sites: ${reviewPlatformsError.message}`);
   }
-  if (reviewPlatformsError) throw new Error(`Unable to save review sites: ${reviewPlatformsError.message}`);
 
   // Cache only after every database update succeeds so a failed save cannot
   // make a later local read appear newer than the workspace record.
