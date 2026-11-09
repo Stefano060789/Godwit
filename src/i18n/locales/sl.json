@@ -1,8 +1,48 @@
 {
   "eggAi": {
     "welcome": "Dobrodošli. Kako vam lahko pomagam?",
-    "previewHint": "Stranke lahko Godwitu postavljajo vprašanja na podlagi informacij podjetja. Klepet je v tem predogledu onemogočen.",
-    "pollUnavailable": "V tem klepetu trenutno ne morem dodati nove ankete, lahko pa uporabiš že razpoložljive možnosti."
+    "previewHint": "Interaktivni predogled: preizkusi pomočnika, ki ga bodo uporabljali obiskovalci. Poskusna sporočila štejejo v AI-kvoto tega Egga.",
+    "title": "Vprašaj pomočnika",
+    "description": "Zastavi vprašanje ali izberi začetek. Informacije in ankete ostanejo na voljo spodaj.",
+    "privacyHint": "Pomočnik z umetno inteligenco obdeluje sporočila in podatke o podjetju. Ne deli občutljivih osebnih podatkov.",
+    "you": "Ti",
+    "assistant": "Pomočnik",
+    "questionLabel": "Zastavi vprašanje",
+    "questionPlaceholder": "Kaj želiš izvedeti?",
+    "thinking": "Razmišljam…",
+    "ask": "Vprašaj",
+    "assistantError": "Pomočnik ni mogel odgovoriti. Poskusi znova ali se obrni na podjetje.",
+    "usageLimit": "AI-kvota za ta Egg je dosežena. Še vedno lahko uporabiš spodnje informacije in ankete.",
+    "guidedPromptLabel": "Ali izberi začetek",
+    "guidedPrompts": {
+      "askQuestion": { "label": "Vprašaj o tem kraju", "prompt": "Kaj moram vedeti pred obiskom?" },
+      "sharePreference": { "label": "Deli željo", "prompt": "Rad bi povedal, kaj mi je najpomembnejše." },
+      "findInformation": { "label": "Poišči koristne informacije", "prompt": "Pokaži mi najbolj koristne informacije za moj obisk." },
+      "findNextStep": { "label": "Poišči naslednji korak", "prompt": "Kaj lahko tukaj počnem ali rezerviram?" },
+      "stayInTouch": { "label": "Ostani v stiku", "prompt": "Kako lahko sam izberem, ali želim prejemati novice?" },
+      "shareFeedback": { "label": "Deli iskreno mnenje", "prompt": "Kako lahko iskreno ocenim svoj obisk?" }
+    },
+    "suggestedOptions": "Nadaljuješ lahko tukaj:",
+    "pollUnavailable": "V tem klepetu trenutno ne morem dodati nove ankete, lahko pa uporabiš že razpoložljive možnosti.",
+    "optionTypes": { "poll": "Oddaj mnenje", "info": "Poglej informacije", "task": "Odpri opravilo" },
+    "topicPrompts": {
+      "service": "Rad bi podal mnenje o storitvi.",
+      "quality": "Rad bi podal mnenje o kakovosti izdelka ali hrane.",
+      "speed": "Rad bi podal mnenje o hitrosti storitve.",
+      "cleanliness": "Rad bi podal mnenje o čistoči.",
+      "atmosphere": "Rad bi podal mnenje o vzdušju.",
+      "value": "Rad bi podal mnenje o razmerju med ceno in kakovostjo.",
+      "other": "Rad bi podal mnenje o nečem drugem."
+    },
+    "topicLabels": {
+      "service": "Storitev",
+      "quality": "Kakovost izdelka ali hrane",
+      "speed": "Hitrost",
+      "cleanliness": "Čistoča",
+      "atmosphere": "Vzdušje",
+      "value": "Vrednost za denar",
+      "other": "Drugo"
+    }
   },
   "nav": {
     "quickStart": "Hitri začetek",
@@ -307,6 +347,7 @@
     }
   },
   "vote": {
+    "moreWaysToRespond": "Dodatne možnosti za odgovor",
     "loading": "Nalaganje ankete...",
     "notFound": "Anketa ni bila najdena.",
     "alreadyVotedTitle": "Glasovali ste že",

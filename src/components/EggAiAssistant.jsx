@@ -2,6 +2,36 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import InlinePollVote from "./InlinePollVote";
 
+const GOAL_PROMPTS = {
+  answers: "askQuestion",
+  feedback: "sharePreference",
+  information: "findInformation",
+  "next-step": "findNextStep",
+  contacts: "stayInTouch",
+  reviews: "shareFeedback"
+};
+const DEFAULT_PROMPTS = ["askQuestion", "findInformation", "sharePreference"];
+
+export function buildGuidedPrompts(goalKeys, feedbackTopics, t) {
+  const promptKeys = goalKeys.length
+    ? goalKeys.map((goal) => GOAL_PROMPTS[goal]).filter(Boolean)
+    : DEFAULT_PROMPTS;
+  const goalPrompts = promptKeys.map((key) => ({
+    id: key,
+    label: t(`guidedPrompts.${key}.label`),
+    prompt: t(`guidedPrompts.${key}.prompt`)
+  }));
+  const topicPrompts = feedbackTopics.map((topic) => ({
+    id: `topic-${topic}`,
+    label: t(`topicLabels.${topic}`, { defaultValue: t("topicLabels.other") }),
+    prompt: t(`topicPrompts.${topic}`, { defaultValue: t("topicPrompts.other") })
+  }));
+
+  return [...goalPrompts, ...topicPrompts]
+    .filter((entry, index, entries) => entry.label && entries.findIndex((candidate) => candidate.label === entry.label) === index)
+    .slice(0, 3);
+}
+
 function createSessionId() {
   const storageKey = "godwit-egg-ai-session";
   try {
@@ -17,17 +47,17 @@ function createSessionId() {
 
 export default function EggAiAssistant({ token, campaignId, branding, preview = false, initiallyExpanded = true }) {
   const { t } = useTranslation("translation", { keyPrefix: "eggAi" });
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(preview);
   const [expanded, setExpanded] = useState(initiallyExpanded);
   const [messages, setMessages] = useState([]);
   const [feedbackTopics, setFeedbackTopics] = useState([]);
+  const [goalKeys, setGoalKeys] = useState([]);
   const [input, setInput] = useState("");
   const [sessionId] = useState(createSessionId);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (preview) return;
     let cancelled = false;
     fetch("/api/egg-ai", {
       method: "POST",
@@ -42,11 +72,12 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
         if (!cancelled) {
           setEnabled(result.enabled === true);
           setFeedbackTopics(Array.isArray(result.feedbackTopics) ? result.feedbackTopics : []);
+          setGoalKeys(Array.isArray(result.goalKeys) ? result.goalKeys : []);
         }
       })
       .catch((loadError) => console.error("Unable to load Egg AI settings:", loadError));
     return () => { cancelled = true; };
-  }, [token, preview]);
+  }, [token]);
 
   async function sendMessage(messageText) {
     const message = messageText.trim();
@@ -101,13 +132,10 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
     return `#egg-option-${encodeURIComponent(suggestion.id)}`;
   }
 
-  if (preview) return <section className="qr-portal-menu-item">
-    <span className="qr-portal-menu-item-title">{t("title")}</span>
-    <p className="qr-portal-menu-item-body">{t("previewHint", { defaultValue: "Customers can ask Godwit using your business information. Chat is disabled in this preview." })}</p>
-  </section>;
   if (!enabled) return null;
+  const guidedPrompts = buildGuidedPrompts(goalKeys, feedbackTopics, t);
   return (
-    <section className="qr-portal-menu-item border border-violet-700" aria-label="AI business assistant">
+    <section className="qr-portal-menu-item qr-portal-ai-assistant" aria-label="AI business assistant">
       <button
         type="button"
         aria-expanded={expanded}
@@ -119,6 +147,7 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
       </button>
       {expanded && (
         <div className="mt-3 space-y-3">
+          {preview && <p className="qr-portal-ai-preview-note">{t("previewHint")}</p>}
           <p className="text-xs text-slate-400">{t("privacyHint")}</p>
           <div className="space-y-2" aria-live="polite">
             {messages.map((message, index) => (
@@ -153,19 +182,19 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
               </div>
             ))}
           </div>
-          {messages.length === 0 && feedbackTopics.length > 0 && (
+          {messages.length === 0 && guidedPrompts.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-slate-200">{t("feedbackPrompt")}</p>
+              <p className="text-xs font-semibold text-slate-400">{t("guidedPromptLabel")}</p>
               <div className="flex flex-wrap gap-2">
-                {feedbackTopics.map((topic) => (
+                {guidedPrompts.map(({ id, label, prompt }) => (
                   <button
-                    key={topic}
+                    key={id}
                     type="button"
                     disabled={sending}
-                    onClick={() => sendMessage(t(`topicPrompts.${topic}`, { defaultValue: t("topicPrompts.other") }))}
-                    className="rounded-full border border-violet-600 px-3 py-1.5 text-sm text-violet-100 hover:bg-violet-950/60 disabled:opacity-50"
+                    onClick={() => sendMessage(prompt)}
+                    className="qr-portal-ai-prompt"
                   >
-                    {t(`topicLabels.${topic}`, { defaultValue: t("topicLabels.other") })}
+                    {label}
                   </button>
                 ))}
               </div>

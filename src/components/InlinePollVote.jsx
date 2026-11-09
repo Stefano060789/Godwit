@@ -4,11 +4,16 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
 import { isPollClosed } from "../lib/pollMeta";
 
+export function hasOptionalPollExtras(poll) {
+  return Boolean(poll.allow_organizer_messages === true
+    || poll.raffle_enabled === true
+    || (poll.email_benefit_type && poll.email_benefit_type !== "none")
+    || (poll.review_benefit_type && poll.review_benefit_type !== "none"));
+}
+
 // Renders one "poll" QR-campaign item directly inline in the QR menu: the question and its
 // answer options are shown open, right there, so a voter can answer without clicking through to
-// a separate page. This intentionally covers only the simple case (pick an answer, submit) -
-// richer options (language switcher, leaving a private message, opting in by email) still live
-// on the full /vote/:pollId page, reachable via the "More options" link below the answers.
+// a separate page. Optional follow-up features remain available on the full poll when configured.
 export default function InlinePollVote({ item, branding }) {
   const { t } = useTranslation();
   const [poll, setPoll] = useState(null);
@@ -155,9 +160,11 @@ export default function InlinePollVote({ item, branding }) {
       >
         {submitting ? "Submitting…" : "Submit"}
       </button>
-      <Link to={`/vote/${item.poll_id}?campaign=${item.campaign_id}`} className="qr-portal-poll-more">
-        More options →
-      </Link>
+      {hasOptionalPollExtras(poll) && (
+        <Link to={`/vote/${item.poll_id}?campaign=${item.campaign_id}`} className="qr-portal-poll-more">
+          {t("vote.moreWaysToRespond", { defaultValue: "Optional ways to respond" })} →
+        </Link>
+      )}
     </div>
   );
 }

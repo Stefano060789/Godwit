@@ -154,6 +154,41 @@ textarea {
   margin-top: 20px;
 }
 
+.qr-portal-menu-item.qr-portal-ai-assistant {
+  border-color: #7c3aed;
+  background: linear-gradient(145deg, #f5f3ff 0%, #ffffff 76%);
+}
+
+.qr-portal-ai-preview-note {
+  margin: 0 !important;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #ede9fe;
+  color: #5b21b6;
+  font-size: 0.8rem;
+}
+
+.qr-portal-ai-prompt {
+  min-height: 36px;
+  padding: 6px 11px;
+  border: 1px solid #c4b5fd;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #5b21b6;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.qr-portal-ai-prompt:hover {
+  background: #ede9fe;
+}
+
+.qr-portal-ai-prompt:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .qr-portal-menu-item {
   display: block;
   width: 100%;
@@ -680,6 +715,26 @@ textarea {
 
 [data-theme="dark"] .qr-portal-menu-item-title {
   color: var(--ink);
+}
+
+[data-theme="dark"] .qr-portal-menu-item.qr-portal-ai-assistant {
+  border-color: #8b5cf6;
+  background: linear-gradient(145deg, #241d39 0%, var(--surface) 76%);
+}
+
+[data-theme="dark"] .qr-portal-ai-preview-note {
+  background: #35264f;
+  color: #ddd6fe;
+}
+
+[data-theme="dark"] .qr-portal-ai-prompt {
+  border-color: #8b5cf6;
+  background: #211b32;
+  color: #ddd6fe;
+}
+
+[data-theme="dark"] .qr-portal-ai-prompt:hover {
+  background: #35264f;
 }
 
 /* Shell ivory, sea greens, and restrained rose washes echo Botticelli's Venus. */

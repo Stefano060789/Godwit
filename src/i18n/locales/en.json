@@ -18,9 +18,9 @@
   },
   "eggAi": {
     "welcome": "Welcome. How can I help?",
-    "previewHint": "Customers can ask Godwit using your business information. Chat is disabled in this preview.",
+    "previewHint": "Live preview: try the same assistant visitors will use. Test messages count toward this Egg's AI allowance.",
     "title": "Ask the business assistant",
-    "description": "Tell me what interests you. I’ll share useful business information and point you to a relevant poll when it helps.",
+    "description": "Ask a question or choose a quick start. Your information and polls stay available below.",
     "privacyHint": "You're chatting with an AI powered by Claude. Your messages and the business information are processed to create answers. Avoid sharing sensitive personal information.",
     "you": "You",
     "assistant": "Assistant",
@@ -31,6 +31,15 @@
     "usageLimit": "The AI allowance for this Egg has been reached for now. You can still contact the business or use the other options on this page.",
     "assistantError": "The assistant couldn't respond. Please try again or contact the business.",
     "feedbackPrompt": "What would you like to focus on?",
+    "guidedPromptLabel": "Or choose a quick start",
+    "guidedPrompts": {
+      "askQuestion": { "label": "Ask about this place", "prompt": "What should I know before I visit?" },
+      "sharePreference": { "label": "Share a preference", "prompt": "I'd like to share what matters most to me." },
+      "findInformation": { "label": "Find useful information", "prompt": "Show me the most useful information for my visit." },
+      "findNextStep": { "label": "Find a next step", "prompt": "What can I do or book here?" },
+      "stayInTouch": { "label": "Stay in touch", "prompt": "How can I choose to hear from this business?" },
+      "shareFeedback": { "label": "Share honest feedback", "prompt": "How can I share honest feedback about my visit?" }
+    },
     "topicPrompts": {
       "service": "I'd like to give feedback about the service.",
       "quality": "I'd like to give feedback about the product or food quality.",
@@ -261,6 +270,7 @@
     "yourVote": "Your vote",
     "chooseMultiple": "Choose one or more answers",
     "chooseOne": "Choose one answer",
+    "moreWaysToRespond": "Optional ways to respond",
     "language": "Language",
     "originalOnly": "Original only",
     "translating": "Translating poll content...",

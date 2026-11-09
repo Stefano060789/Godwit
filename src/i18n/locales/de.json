@@ -1,8 +1,48 @@
 {
   "eggAi": {
     "welcome": "Willkommen. Wie kann ich helfen?",
-    "previewHint": "Kunden können Godwit Fragen zu Ihren Unternehmensinformationen stellen. Der Chat ist in dieser Vorschau deaktiviert.",
-    "pollUnavailable": "Ich kann in diesem Chat gerade keine neue Umfrage hinzufügen. Du kannst aber die vorhandenen Umfragen nutzen."
+    "previewHint": "Interaktive Vorschau: Testen Sie den Assistenten, den Besucher nutzen. Testnachrichten zählen zum KI-Kontingent dieses Eggs.",
+    "title": "Fragen Sie den Assistenten",
+    "description": "Stellen Sie eine Frage oder wählen Sie einen Einstieg. Informationen und Umfragen bleiben unten verfügbar.",
+    "privacyHint": "Der KI-Assistent verarbeitet Nachrichten und Unternehmensinformationen. Teilen Sie keine sensiblen persönlichen Daten.",
+    "you": "Sie",
+    "assistant": "Assistent",
+    "questionLabel": "Eine Frage stellen",
+    "questionPlaceholder": "Was möchten Sie wissen?",
+    "thinking": "Ich denke nach…",
+    "ask": "Fragen",
+    "assistantError": "Der Assistent konnte nicht antworten. Versuchen Sie es erneut oder kontaktieren Sie das Unternehmen.",
+    "usageLimit": "Das KI-Kontingent für dieses Egg ist aufgebraucht. Sie können weiterhin die Informationen und Umfragen unten nutzen.",
+    "guidedPromptLabel": "Oder wählen Sie einen Einstieg",
+    "guidedPrompts": {
+      "askQuestion": { "label": "Fragen zu diesem Ort", "prompt": "Was sollte ich vor meinem Besuch wissen?" },
+      "sharePreference": { "label": "Vorliebe mitteilen", "prompt": "Ich möchte mitteilen, was mir wichtig ist." },
+      "findInformation": { "label": "Nützliche Informationen finden", "prompt": "Zeigen Sie mir die wichtigsten Informationen für meinen Besuch." },
+      "findNextStep": { "label": "Nächsten Schritt finden", "prompt": "Was kann ich hier tun oder buchen?" },
+      "stayInTouch": { "label": "In Kontakt bleiben", "prompt": "Wie kann ich selbst entscheiden, ob ich Neuigkeiten erhalte?" },
+      "shareFeedback": { "label": "Ehrliches Feedback geben", "prompt": "Wie kann ich ehrliches Feedback zu meinem Besuch geben?" }
+    },
+    "suggestedOptions": "Hier können Sie weitermachen:",
+    "pollUnavailable": "Ich kann in diesem Chat gerade keine neue Umfrage hinzufügen. Sie können aber die vorhandenen Umfragen nutzen.",
+    "optionTypes": { "poll": "Feedback geben", "info": "Informationen ansehen", "task": "Aktion öffnen" },
+    "topicPrompts": {
+      "service": "Ich möchte Feedback zum Service geben.",
+      "quality": "Ich möchte Feedback zur Produkt- oder Essensqualität geben.",
+      "speed": "Ich möchte Feedback zur Geschwindigkeit des Services geben.",
+      "cleanliness": "Ich möchte Feedback zur Sauberkeit geben.",
+      "atmosphere": "Ich möchte Feedback zur Atmosphäre geben.",
+      "value": "Ich möchte Feedback zum Preis-Leistungs-Verhältnis geben.",
+      "other": "Ich möchte Feedback zu etwas anderem geben."
+    },
+    "topicLabels": {
+      "service": "Service",
+      "quality": "Produkt- oder Essensqualität",
+      "speed": "Geschwindigkeit",
+      "cleanliness": "Sauberkeit",
+      "atmosphere": "Atmosphäre",
+      "value": "Preis-Leistung",
+      "other": "Etwas anderes"
+    }
   },
   "nav": {
     "quickStart": "Erste Schritte",
@@ -195,6 +235,7 @@
     "yourVote": "Ihre Stimme",
     "chooseMultiple": "Wählen Sie eine oder mehrere Antworten",
     "chooseOne": "Wählen Sie eine Antwort",
+    "moreWaysToRespond": "Optionale weitere Antwortmöglichkeiten",
     "language": "Sprache",
     "originalOnly": "Nur Original",
     "translating": "Umfrageinhalt wird übersetzt...",

@@ -1,8 +1,48 @@
 {
   "eggAi": {
     "welcome": "Benvenuto. Come posso aiutarti?",
-    "previewHint": "I clienti possono fare domande a Godwit usando le informazioni dell'attività. La chat è disattivata in questa anteprima.",
-    "pollUnavailable": "Al momento non posso aggiungere un sondaggio in questa chat, ma puoi usare quelli già disponibili."
+    "previewHint": "Anteprima interattiva: prova l'assistente che useranno i visitatori. I messaggi di prova usano il limite AI di questo Egg.",
+    "title": "Chiedi all'assistente",
+    "description": "Fai una domanda o scegli un suggerimento. Informazioni e sondaggi restano disponibili qui sotto.",
+    "privacyHint": "L'assistente AI elabora i messaggi e le informazioni dell'attività. Evita di condividere dati personali sensibili.",
+    "you": "Tu",
+    "assistant": "Assistente",
+    "questionLabel": "Fai una domanda",
+    "questionPlaceholder": "Cosa vorresti sapere?",
+    "thinking": "Sto pensando…",
+    "ask": "Chiedi",
+    "assistantError": "L'assistente non ha potuto rispondere. Riprova o contatta l'attività.",
+    "usageLimit": "Il limite AI per questo Egg è stato raggiunto. Puoi comunque usare le informazioni e i sondaggi qui sotto.",
+    "guidedPromptLabel": "Oppure scegli da dove iniziare",
+    "guidedPrompts": {
+      "askQuestion": { "label": "Chiedi informazioni sul luogo", "prompt": "Cosa dovrei sapere prima di venire?" },
+      "sharePreference": { "label": "Condividi una preferenza", "prompt": "Vorrei condividere ciò che conta di più per me." },
+      "findInformation": { "label": "Trova informazioni utili", "prompt": "Mostrami le informazioni più utili per la mia visita." },
+      "findNextStep": { "label": "Scopri il prossimo passo", "prompt": "Cosa posso fare o prenotare qui?" },
+      "stayInTouch": { "label": "Resta in contatto", "prompt": "Come posso scegliere di ricevere aggiornamenti da questa attività?" },
+      "shareFeedback": { "label": "Condividi un feedback sincero", "prompt": "Come posso condividere un feedback sincero sulla mia visita?" }
+    },
+    "suggestedOptions": "Puoi continuare qui:",
+    "pollUnavailable": "Al momento non posso aggiungere un sondaggio in questa chat, ma puoi usare quelli già disponibili.",
+    "optionTypes": { "poll": "Lascia un feedback", "info": "Vedi informazioni", "task": "Apri attività" },
+    "topicPrompts": {
+      "service": "Vorrei lasciare un feedback sul servizio.",
+      "quality": "Vorrei lasciare un feedback sulla qualità del prodotto o del cibo.",
+      "speed": "Vorrei lasciare un feedback sulla velocità del servizio.",
+      "cleanliness": "Vorrei lasciare un feedback sulla pulizia.",
+      "atmosphere": "Vorrei lasciare un feedback sull'atmosfera.",
+      "value": "Vorrei lasciare un feedback sul rapporto qualità-prezzo.",
+      "other": "Vorrei lasciare un feedback su un altro aspetto."
+    },
+    "topicLabels": {
+      "service": "Servizio",
+      "quality": "Qualità del prodotto o del cibo",
+      "speed": "Velocità",
+      "cleanliness": "Pulizia",
+      "atmosphere": "Atmosfera",
+      "value": "Rapporto qualità-prezzo",
+      "other": "Altro"
+    }
   },
   "nav": {
     "quickStart": "Per iniziare",
@@ -195,6 +235,7 @@
     "yourVote": "Il tuo voto",
     "chooseMultiple": "Scegli una o più risposte",
     "chooseOne": "Scegli una risposta",
+    "moreWaysToRespond": "Altri modi facoltativi per rispondere",
     "language": "Lingua",
     "originalOnly": "Solo originale",
     "translating": "Traduzione del sondaggio in corso...",

@@ -356,7 +356,16 @@ describe("Egg AI API", () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
-      if (href.includes("/rest/v1/qr_campaigns?token=")) return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Cafe", is_active: true, ai_enabled: true }]);
+      if (href.includes("/rest/v1/qr_campaigns?token=")) return jsonResponse([{
+        id: 42,
+        workspace_id: "workspace-1",
+        name: "Cafe",
+        is_active: true,
+        ai_enabled: true,
+        goal_key: "feedback",
+        goal_keys: ["feedback", "information", "not-a-supported-goal"],
+        ai_feedback_topics: ["service", "quality"]
+      }]);
       if (href.includes("/rest/v1/egg_ai_sources?campaign_id=")) return jsonResponse([]);
       if (href.includes("/rest/v1/workspace_ai_sources?workspace_id=eq.workspace-1")) return jsonResponse([{ id: 1, title: "Notes", content: "Open daily.", source_type: "notes" }]);
       if (href.includes("/rest/v1/rpc/get_public_qr_campaign_items") || href.includes("/rest/v1/rpc/get_public_woodpecker_portal") || href.includes("/rest/v1/rpc/get_public_qr_campaign")) return jsonResponse([]);
@@ -370,6 +379,8 @@ describe("Egg AI API", () => {
     const config = makeResponse();
     await handler(makeRequest({ action: "config", token: "egg-token" }), config);
     expect(config.body.enabled).toBe(true);
+    expect(config.body.goalKeys).toEqual(["feedback", "information"]);
+    expect(config.body.feedbackTopics).toEqual(["service", "quality"]);
     const chat = makeResponse();
     await handler(makeChatRequest(), chat);
     expect(chat.statusCode).toBe(200);
