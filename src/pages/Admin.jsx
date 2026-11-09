@@ -12,6 +12,7 @@ import BusinessProfile from "../components/BusinessProfile";
 import BusinessData from "../components/BusinessData";
 import EggNfcSetup from "../components/EggNfcSetup";
 import { createGoalEggSetup } from "../lib/goalEggSetup";
+import { getEggAccessAnalyticsErrorMessage } from "../lib/eggAccessAnalytics";
 import { isRestrictedTopic } from "../lib/restrictedContent";
 import { normalizeEggEmailBenefit } from "../lib/eggBenefits";
 import "../components/EggDashboard.css";
@@ -290,8 +291,11 @@ export default function Admin() {
           setActionTasksError("");
         }
         if (eggAccessResult.error) {
-          console.error("Egg access analytics are unavailable. Apply the Eggs NFC attribution migration.", eggAccessResult.error);
-          setEggAccessTrackingError(t("admin.engagement.campaigns.migrationRequired"));
+          console.error("Egg access analytics are unavailable.", eggAccessResult.error);
+          setEggAccessTrackingError(getEggAccessAnalyticsErrorMessage(
+            eggAccessResult.error,
+            (key) => t(key)
+          ));
         } else {
           setEggAccessTrackingError("");
           setEggAccessCounts(Object.fromEntries((eggAccessResult.data || []).map((row) => [
