@@ -155,33 +155,155 @@ textarea {
 }
 
 .qr-portal-menu-item.qr-portal-ai-assistant {
-  border-color: #7c3aed;
-  background: linear-gradient(145deg, #f5f3ff 0%, #ffffff 76%);
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-top: 3px solid var(--rose);
+  background:
+    radial-gradient(ellipse at 100% 0%, var(--rose-soft), transparent 58%),
+    linear-gradient(135deg, var(--surface) 0%, var(--input-surface) 100%);
+  color: var(--ink);
+  box-shadow: 0 12px 30px rgba(52, 49, 44, 0.1);
+}
+
+.qr-portal-ai-heading {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.qr-portal-ai-kicker {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--rose);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.qr-portal-ai-heading .qr-portal-menu-item-title {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.18rem;
+}
+
+.qr-portal-ai-heading .qr-portal-menu-item-body {
+  margin-top: 4px !important;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.qr-portal-ai-content {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.qr-portal-ai-privacy,
+.qr-portal-ai-prompts > p,
+.qr-portal-ai-suggestions > p,
+.qr-portal-ai-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .qr-portal-ai-preview-note {
-  margin: 0 !important;
+  margin: 0;
   padding: 8px 10px;
-  border-radius: 6px;
-  background: #ede9fe;
-  color: #5b21b6;
+  border-left: 3px solid var(--gold-deep);
+  border-radius: 3px;
+  background: var(--surface-soft);
+  color: var(--ink);
   font-size: 0.8rem;
 }
 
+.qr-portal-ai-messages,
+.qr-portal-ai-suggestions {
+  display: grid;
+  gap: 8px;
+}
+
+.qr-portal-ai-message {
+  max-width: 90%;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.qr-portal-ai-message strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--teal);
+  font-size: 0.72rem;
+}
+
+.qr-portal-ai-message.is-user {
+  justify-self: end;
+  border-color: var(--rose-soft);
+  background: var(--rose-soft);
+}
+
+.qr-portal-ai-message.is-assistant {
+  justify-self: start;
+  background: var(--surface);
+}
+
+.qr-portal-ai-suggestions > p,
+.qr-portal-ai-prompts > p {
+  margin-bottom: 7px;
+  font-weight: 700;
+}
+
+.qr-portal-ai-suggestion {
+  display: block;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--teal);
+  font-size: 0.86rem;
+  text-decoration: none;
+}
+
+.qr-portal-ai-suggestion:hover {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.qr-portal-ai-prompts > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
 .qr-portal-ai-prompt {
-  min-height: 36px;
-  padding: 6px 11px;
-  border: 1px solid #c4b5fd;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--teal);
   border-radius: 999px;
-  background: #ffffff;
-  color: #5b21b6;
+  background: var(--teal-soft);
+  color: var(--teal);
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .qr-portal-ai-prompt:hover {
-  background: #ede9fe;
+  border-color: var(--rose);
+  background: var(--rose-soft);
 }
 
 .qr-portal-ai-prompt:disabled {
@@ -717,24 +839,77 @@ textarea {
   color: var(--ink);
 }
 
+.qr-portal-ai-form {
+  display: grid;
+  gap: 8px;
+}
+
+.qr-portal-ai-form > div {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.qr-portal-ai-input {
+  width: 100%;
+  min-height: 42px;
+  max-height: 120px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid var(--control-line);
+  border-radius: 9px;
+  background: var(--input-surface);
+  color: var(--ink) !important;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.qr-portal-ai-input::placeholder {
+  color: var(--muted);
+  opacity: 0.85;
+}
+
+.qr-portal-ai-input:focus-visible,
+.qr-portal-ai-submit:focus-visible,
+.qr-portal-ai-prompt:focus-visible,
+.qr-portal-ai-heading:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.qr-portal-ai-submit {
+  min-height: 38px;
+  padding: 8px 17px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--action-primary);
+  color: var(--action-on-dark);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.qr-portal-ai-submit:hover:not(:disabled) {
+  background: var(--action-primary-hover);
+}
+
+.qr-portal-ai-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.qr-portal-ai-error {
+  margin: 0;
+  color: var(--rose);
+  font-size: 0.86rem;
+}
+
 [data-theme="dark"] .qr-portal-menu-item.qr-portal-ai-assistant {
-  border-color: #8b5cf6;
-  background: linear-gradient(145deg, #241d39 0%, var(--surface) 76%);
-}
-
-[data-theme="dark"] .qr-portal-ai-preview-note {
-  background: #35264f;
-  color: #ddd6fe;
-}
-
-[data-theme="dark"] .qr-portal-ai-prompt {
-  border-color: #8b5cf6;
-  background: #211b32;
-  color: #ddd6fe;
-}
-
-[data-theme="dark"] .qr-portal-ai-prompt:hover {
-  background: #35264f;
+  border-color: var(--gold);
+  border-top-color: var(--rose);
+  background:
+    radial-gradient(ellipse at 100% 0%, var(--rose-soft), transparent 58%),
+    linear-gradient(135deg, var(--surface) 0%, var(--input-surface) 100%);
 }
 
 /* Shell ivory, sea greens, and restrained rose washes echo Botticelli's Venus. */

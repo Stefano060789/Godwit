@@ -1,10 +1,11 @@
 {
   "eggAi": {
     "welcome": "Dobrodošli. Kako vam lahko pomagam?",
+    "eyebrow": "Godwit ti z veseljem pomaga",
     "previewHint": "Interaktivni predogled: preizkusi pomočnika, ki ga bodo uporabljali obiskovalci. Poskusna sporočila štejejo v AI-kvoto tega Egga.",
-    "title": "Vprašaj pomočnika",
-    "description": "Zastavi vprašanje ali izberi začetek. Informacije in ankete ostanejo na voljo spodaj.",
-    "privacyHint": "Pomočnik z umetno inteligenco obdeluje sporočila in podatke o podjetju. Ne deli občutljivih osebnih podatkov.",
+    "title": "Kako ti lahko pomagamo?",
+    "description": "Zastavi vprašanje ali izberi predlog.",
+    "privacyHint": "Tvoje sporočilo nam pomaga pri odgovoru. Ne deli občutljivih osebnih podatkov.",
     "you": "Ti",
     "assistant": "Pomočnik",
     "questionLabel": "Zastavi vprašanje",

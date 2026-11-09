@@ -1,10 +1,11 @@
 {
   "eggAi": {
     "welcome": "Benvenuto. Come posso aiutarti?",
+    "eyebrow": "Un piccolo aiuto da Godwit",
     "previewHint": "Anteprima interattiva: prova l'assistente che useranno i visitatori. I messaggi di prova usano il limite AI di questo Egg.",
-    "title": "Chiedi all'assistente",
-    "description": "Fai una domanda o scegli un suggerimento. Informazioni e sondaggi restano disponibili qui sotto.",
-    "privacyHint": "L'assistente AI elabora i messaggi e le informazioni dell'attività. Evita di condividere dati personali sensibili.",
+    "title": "Ti serve una mano?",
+    "description": "Fai una domanda o scegli un suggerimento.",
+    "privacyHint": "Il tuo messaggio ci aiuta a rispondere. Non condividere dati personali sensibili.",
     "you": "Tu",
     "assistant": "Assistente",
     "questionLabel": "Fai una domanda",

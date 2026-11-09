@@ -29,7 +29,7 @@ export function buildGuidedPrompts(goalKeys, feedbackTopics, t) {
 
   return [...goalPrompts, ...topicPrompts]
     .filter((entry, index, entries) => entry.label && entries.findIndex((candidate) => candidate.label === entry.label) === index)
-    .slice(0, 3);
+    .slice(0, 2);
 }
 
 function createSessionId() {
@@ -140,20 +140,21 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
         type="button"
         aria-expanded={expanded}
         onClick={() => setExpanded((value) => !value)}
-        className="w-full text-left"
+        className="qr-portal-ai-heading"
       >
-          <span className="qr-portal-menu-item-title">{t("title")}</span>
-          <span className="qr-portal-menu-item-body">{t("description")}</span>
+        <span className="qr-portal-ai-kicker">{t("eyebrow")}</span>
+        <span className="qr-portal-menu-item-title">{t("title")}</span>
+        <span className="qr-portal-menu-item-body">{t("description")}</span>
       </button>
       {expanded && (
-        <div className="mt-3 space-y-3">
+        <div className="qr-portal-ai-content">
           {preview && <p className="qr-portal-ai-preview-note">{t("previewHint")}</p>}
-          <p className="text-xs text-slate-400">{t("privacyHint")}</p>
-          <div className="space-y-2" aria-live="polite">
+          <p className="qr-portal-ai-privacy">{t("privacyHint")}</p>
+          <div className="qr-portal-ai-messages" aria-live="polite">
             {messages.map((message, index) => (
               <div key={`${message.role}-${index}`}>
-                <p className={`rounded p-2 text-sm ${message.role === "user" ? "ml-6 bg-slate-800" : "mr-6 bg-violet-950/50"}`}>
-                  <strong className="mr-1">{message.role === "user" ? t("you") : t("assistant")}:</strong>
+                <p className={`qr-portal-ai-message ${message.role === "user" ? "is-user" : "is-assistant"}`}>
+                  <strong>{message.role === "user" ? t("you") : t("assistant")}</strong>
                   {message.content}
                 </p>
                 {message.poll && (
@@ -164,15 +165,15 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
                     />
                   </div>
                 )}
-                {message.pollUnavailable && <p className="mt-2 text-xs text-slate-400">{t("pollUnavailable")}</p>}
+                {message.pollUnavailable && <p className="qr-portal-ai-status">{t("pollUnavailable")}</p>}
                 {message.suggestions?.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    <p className="text-xs font-semibold text-slate-400">{t("suggestedOptions")}</p>
+                  <div className="qr-portal-ai-suggestions">
+                    <p>{t("suggestedOptions")}</p>
                     {message.suggestions.map((suggestion) => (
                       <a
                         key={`${suggestion.type}-${suggestion.id}`}
                         href={getSuggestionHref(suggestion)}
-                        className="block rounded border border-teal-700 px-3 py-2 text-sm text-teal-200 hover:bg-teal-950/40"
+                        className="qr-portal-ai-suggestion"
                       >
                         {t(`optionTypes.${suggestion.type}`)}: {suggestion.title} →
                       </a>
@@ -183,9 +184,9 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
             ))}
           </div>
           {messages.length === 0 && guidedPrompts.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-slate-400">{t("guidedPromptLabel")}</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="qr-portal-ai-prompts">
+              <p>{t("guidedPromptLabel")}</p>
+              <div>
                 {guidedPrompts.map(({ id, label, prompt }) => (
                   <button
                     key={id}
@@ -200,25 +201,24 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
               </div>
             </div>
           )}
-          <form onSubmit={handleFormSubmit} className="space-y-2">
+          <form onSubmit={handleFormSubmit} className="qr-portal-ai-form">
             <label className="sr-only" htmlFor="egg-ai-question">{t("questionLabel")}</label>
             <textarea
               id="egg-ai-question"
-              rows={2}
+              rows={1}
               maxLength={600}
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder={t("questionPlaceholder")}
-              className="w-full rounded border border-slate-600 bg-slate-950 p-2 text-sm text-white"
+              className="qr-portal-ai-input"
             />
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-slate-500">{input.length}/600</span>
-              <button type="submit" disabled={sending || !input.trim()} className="rounded bg-violet-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+            <div>
+              <button type="submit" disabled={sending || !input.trim()} className="qr-portal-ai-submit">
                 {sending ? t("thinking") : t("ask")}
               </button>
             </div>
           </form>
-          {error && <p role="alert" className="text-sm text-amber-300">{error}</p>}
+          {error && <p role="alert" className="qr-portal-ai-error">{error}</p>}
         </div>
       )}
     </section>

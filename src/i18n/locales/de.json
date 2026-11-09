@@ -1,10 +1,11 @@
 {
   "eggAi": {
     "welcome": "Willkommen. Wie kann ich helfen?",
+    "eyebrow": "Ein wenig Hilfe von Godwit",
     "previewHint": "Interaktive Vorschau: Testen Sie den Assistenten, den Besucher nutzen. Testnachrichten zählen zum KI-Kontingent dieses Eggs.",
-    "title": "Fragen Sie den Assistenten",
-    "description": "Stellen Sie eine Frage oder wählen Sie einen Einstieg. Informationen und Umfragen bleiben unten verfügbar.",
-    "privacyHint": "Der KI-Assistent verarbeitet Nachrichten und Unternehmensinformationen. Teilen Sie keine sensiblen persönlichen Daten.",
+    "title": "Wie können wir helfen?",
+    "description": "Stellen Sie eine Frage oder wählen Sie einen Vorschlag.",
+    "privacyHint": "Ihre Nachricht hilft uns bei der Antwort. Bitte teilen Sie keine sensiblen persönlichen Daten.",
     "you": "Sie",
     "assistant": "Assistent",
     "questionLabel": "Eine Frage stellen",
