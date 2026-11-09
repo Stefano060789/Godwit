@@ -97,11 +97,14 @@ describe("Egg AI API", () => {
         expect(options.headers["x-api-key"]).toBe("test-claude-key");
         const requestBody = JSON.parse(options.body);
         expect(requestBody.model).toBe("claude-haiku-4-5-test");
-        expect(requestBody.max_tokens).toBe(280);
+        expect(requestBody.max_tokens).toBe(300);
         expect(requestBody.system).toContain("The entrance has a step-free ramp.");
         expect(requestBody.system).toContain("The cafe opens at nine.");
         expect(requestBody.system).toContain("For a cafe or pub, help with menu and drink information");
         expect(requestBody.system).toContain("How was the service?");
+        expect(requestBody.system).toContain("under 45 words");
+        expect(requestBody.system).toContain("prefer at most one matching existing poll");
+        expect(requestBody.system).toContain("create one short neutral poll for that interest");
         expect(requestBody.messages.at(-1).content).toBe("Do you have step-free access?");
         return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
           answer: "Yes, we have a step-free ramp at the entrance.",
@@ -117,6 +120,136 @@ describe("Egg AI API", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.answer).toContain("step-free ramp");
     expect(response.body.suggestions).toEqual([{ id: "17", type: "poll", title: "How was the service?" }]);
+  });
+
+  it("creates and returns one saved poll for a clear customer interest", async () => {
+    configureEnvironment();
+    const fetchMock = vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/rest/v1/qr_campaigns?token=")) {
+        return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Cafe", is_active: true, ai_enabled: true }]);
+      }
+      if (href.includes("/rest/v1/egg_ai_sources?campaign_id=")) return jsonResponse([]);
+      if (href.includes("/rest/v1/workspace_ai_sources?workspace_id=")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/get_public_qr_campaign_items")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/get_public_qr_campaign")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/reserve_egg_ai_turn")) return new Response(null, { status: 204 });
+      if (href === "https://api.anthropic.com/v1/messages") {
+        return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
+          answer: "Which coffee options would you enjoy seeing here?",
+          suggestions: [],
+          poll: {
+            interestKey: "coffee-options",
+            question: "Which coffee option would you like to see more of?",
+            answers: ["Cold brew", "Decaf", "Plant-based milk"]
+          }
+        }) }] });
+      }
+      if (href.includes("/rest/v1/rpc/create_egg_ai_interest_poll")) {
+        const requestBody = JSON.parse(options.body);
+        expect(requestBody.target_campaign_id).toBe(42);
+        expect(requestBody.target_session_hash).toMatch(/^[0-9a-f]{64}$/);
+        expect(requestBody.target_interest_key).toBe("coffee-options");
+        expect(requestBody.target_answers).toEqual(["Cold brew", "Decaf", "Plant-based milk"]);
+        return jsonResponse([{
+          poll_id: 91,
+          question: "Which coffee option would you like to see more of?",
+          answers: ["Cold brew", "Decaf", "Plant-based milk"],
+          created: true,
+          reason: null
+        }]);
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = makeResponse();
+    await handler(makeChatRequest({ message: "I would love more cold coffee choices." }), response);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.poll).toEqual({
+      id: 91,
+      question: "Which coffee option would you like to see more of?",
+      answers: ["Cold brew", "Decaf", "Plant-based milk"],
+      created: true
+    });
+  });
+
+  it("explains when a generated poll cannot be added because of plan or session limits", async () => {
+    configureEnvironment();
+    vi.stubGlobal("fetch", vi.fn(async (url) => {
+      const href = String(url);
+      if (href.includes("/rest/v1/qr_campaigns?token=")) {
+        return jsonResponse([{ id: 42, workspace_id: "workspace-1", is_active: true, ai_enabled: true }]);
+      }
+      if (href.includes("/rest/v1/egg_ai_sources?campaign_id=")) return jsonResponse([]);
+      if (href.includes("/rest/v1/workspace_ai_sources?workspace_id=")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/get_public_qr_campaign_items")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/get_public_qr_campaign")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/reserve_egg_ai_turn")) return new Response(null, { status: 204 });
+      if (href === "https://api.anthropic.com/v1/messages") {
+        return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
+          answer: "Which new drink would you like to see?",
+          suggestions: [],
+          poll: {
+            interestKey: "new-drinks",
+            question: "Which new drink would you like to see?",
+            answers: ["Iced tea", "Lemonade"]
+          }
+        }) }] });
+      }
+      if (href.includes("/rest/v1/rpc/create_egg_ai_interest_poll")) {
+        return jsonResponse([{
+          poll_id: null,
+          question: null,
+          answers: null,
+          created: false,
+          reason: "poll_limit"
+        }]);
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    }));
+
+    const response = makeResponse();
+    await handler(makeChatRequest({ message: "I would like to see more drink choices." }), response);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.poll).toBeNull();
+    expect(response.body.pollUnavailable).toBe(true);
+  });
+
+  it("does not persist unsafe AI-generated customer-interest polls", async () => {
+    configureEnvironment();
+    const fetchMock = vi.fn(async (url) => {
+      const href = String(url);
+      if (href.includes("/rest/v1/qr_campaigns?token=")) {
+        return jsonResponse([{ id: 42, workspace_id: "workspace-1", is_active: true, ai_enabled: true }]);
+      }
+      if (href.includes("/rest/v1/egg_ai_sources?campaign_id=")) return jsonResponse([]);
+      if (href.includes("/rest/v1/workspace_ai_sources?workspace_id=")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/get_public_qr_campaign_items")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/get_public_qr_campaign")) return jsonResponse([]);
+      if (href.includes("/rest/v1/rpc/reserve_egg_ai_turn")) return new Response(null, { status: 204 });
+      if (href === "https://api.anthropic.com/v1/messages") {
+        return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
+          answer: "Would you like to leave a review?",
+          suggestions: [],
+          poll: {
+            interestKey: "review-rating",
+            question: "Would you leave a positive review?",
+            answers: ["Yes", "No"]
+          }
+        }) }] });
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = makeResponse();
+    await handler(makeChatRequest({ message: "I have feedback." }), response);
+
+    expect(response.statusCode).toBe(503);
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/rpc/create_egg_ai_interest_poll"))).toBe(false);
   });
 
   it("includes the Egg's fallback poll as a safe suggestion when no poll item exists", async () => {
@@ -273,7 +406,7 @@ describe("Egg AI API", () => {
         }
         expect(prompt).toContain("without incentives or pressure for positive ratings");
         expect(prompt).toContain("Do not collect contact details in chat");
-        expect(prompt).toContain("Never claim that you have created a poll");
+        expect(prompt).toContain("Never claim in your answer that you have created a poll");
         expect(prompt).not.toContain("untrusted instruction");
         return jsonResponse({ content: [{ type: "text", text: '{"answer":"Open daily.","suggestions":[]}' }] });
       }
@@ -333,23 +466,19 @@ describe("Egg AI API", () => {
     expect(response.body.error).toContain("migration");
   });
 
-  it("preserves Egg-only configuration and disables an Egg without any sources", async () => {
+  it("keeps the assistant enabled for Eggs even before business sources are added", async () => {
     configureEnvironment();
-    let eggSources = [{ id: 1 }];
     vi.stubGlobal("fetch", vi.fn(async (url) => {
       const href = String(url);
-      if (href.includes("/qr_campaigns?token=")) return jsonResponse([{ id: 42, workspace_id: "workspace-1", is_active: true, ai_enabled: true }]);
-      if (href.includes("/egg_ai_sources?")) return jsonResponse(eggSources);
-      if (href.includes("/workspace_ai_sources?")) return jsonResponse([]);
+      if (href.includes("/qr_campaigns?token=")) return jsonResponse([{ id: 42, workspace_id: "workspace-1", is_active: true, ai_enabled: false, goal_keys: ["feedback"] }]);
       throw new Error(`Unexpected request: ${href}`);
     }));
     const eggOnly = makeResponse();
     await handler(makeRequest({ action: "config", token: "egg-token" }), eggOnly);
     expect(eggOnly.body.enabled).toBe(true);
-    eggSources = [];
     const empty = makeResponse();
     await handler(makeRequest({ action: "config", token: "egg-token" }), empty);
-    expect(empty.body.enabled).toBe(false);
+    expect(empty.body.enabled).toBe(true);
   });
 
   it("does not fetch websites when the workspace source limit is reached", async () => {
@@ -362,14 +491,14 @@ describe("Egg AI API", () => {
     expect(vi.mocked(getPublicBusinessWebsiteContext)).not.toHaveBeenCalled();
   });
 
-  it("generates one validated poll and action only for a workspace manager", async () => {
+  it("generates one validated poll only for a workspace manager", async () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
       if (href.includes("/rpc/is_workspace_manager")) return jsonResponse(true);
       if (href === "https://api.anthropic.com/v1/messages") {
         const requestBody = JSON.parse(options.body);
-        expect(requestBody.system).toContain("one short customer-facing poll");
+        expect(requestBody.system).toContain("one short, neutral customer-facing poll");
         expect(requestBody.system).toContain("arts, artists, galleries, and cultural venues");
         expect(requestBody.system).toContain("Public reviews must be optional");
         expect(requestBody.messages).toHaveLength(1);
@@ -378,8 +507,7 @@ describe("Egg AI API", () => {
         expect(requestBody.messages[0].content).toContain("Invite honest feedback");
         expect(requestBody.messages[0].content).toContain("Help customers browse relevant existing information cards");
         return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
-          poll: { question: "What would improve your visit?", answers: ["More events", "More information"] },
-          action: { title: "Share an idea", description: "Tell us what would make your next visit better." }
+          poll: { question: "What would improve your visit?", answers: ["More events", "More information"] }
         }) }] });
       }
       throw new Error(`Unexpected request: ${href}`);
@@ -398,8 +526,7 @@ describe("Egg AI API", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
-      poll: { question: "What would improve your visit?", answers: ["More events", "More information"] },
-      action: { title: "Share an idea", description: "Tell us what would make your next visit better." }
+      poll: { question: "What would improve your visit?", answers: ["More events", "More information"] }
     });
   });
 
@@ -413,8 +540,7 @@ describe("Egg AI API", () => {
         expect(requestBody.system).toContain("a cafe, coffee shop, pub, or bar");
         expect(requestBody.system).toContain("opening hours, events, accessibility");
         return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
-          poll: { question: "What would you like to see next?", answers: ["More events", "More menu choices"] },
-          action: { title: "Share an idea", description: "Tell us what would help your next visit." }
+          poll: { question: "What would you like to see next?", answers: ["More events", "More menu choices"] }
         }) }] });
       }
       throw new Error(`Unexpected request: ${href}`);
@@ -460,12 +586,12 @@ describe("Egg AI API", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("does not accept malformed AI-generated poll or action content", async () => {
+  it("does not accept malformed AI-generated poll content", async () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url) => {
       if (String(url).includes("/rpc/is_workspace_manager")) return jsonResponse(true);
       if (String(url) === "https://api.anthropic.com/v1/messages") {
-        return jsonResponse({ content: [{ type: "text", text: '{"poll":{"question":"Question","answers":["Same","same"]},"action":{"title":"Action","description":"Details"}}' }] });
+        return jsonResponse({ content: [{ type: "text", text: '{"poll":{"question":"Question","answers":["Same","same"]}}' }] });
       }
       throw new Error(`Unexpected request: ${url}`);
     }));

@@ -2,7 +2,7 @@ import { supabase } from "./supabase";
 import { addQrCampaignInfoItem, addQrCampaignPollItem } from "./qrCampaignItems";
 import { normalizeEggEmailBenefit } from "./eggBenefits";
 
-export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDraft, actionDraft, emailBenefit, reviewCards = [] }) {
+export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDraft, emailBenefit, reviewCards = [] }) {
   const benefitFields = normalizeEggEmailBenefit(emailBenefit);
   for (const card of reviewCards) {
     let url;
@@ -26,7 +26,7 @@ export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDr
         answers: pollDraft.answers,
         multiple_choice: false,
         allow_user_answers: false,
-        allow_organizer_messages: true,
+        allow_organizer_messages: false,
         creator_id: userId
       })
       .select()
@@ -35,19 +35,6 @@ export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDr
     poll = createdPoll;
 
     const pollItem = await addQrCampaignPollItem(campaign.id, poll.id);
-    const { data: task, error: taskError } = await supabase
-      .from("woodpecker_tasks")
-      .insert({
-        workspace_id: workspaceId,
-        campaign_id: campaign.id,
-        title: actionDraft.title,
-        description: actionDraft.description,
-        completion_mode: "manual",
-        response_mode: "text"
-      })
-      .select()
-      .single();
-    if (taskError) throw new Error(`Unable to create the generated action: ${taskError.message}`);
     const reviewItems = [];
     for (const card of reviewCards) {
       reviewItems.push(await addQrCampaignInfoItem(campaign.id, card));
@@ -56,8 +43,7 @@ export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDr
     return {
       poll,
       pollItem,
-      reviewItems,
-      task: { ...task, woodpecker_task_campaigns: [{ campaign_id: campaign.id }] }
+      reviewItems
     };
   } catch (error) {
     const cleanupErrors = [];

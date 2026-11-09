@@ -1,7 +1,8 @@
 {
   "eggAi": {
     "welcome": "Willkommen. Wie kann ich helfen?",
-    "previewHint": "Kunden können Godwit Fragen zu Ihren Unternehmensinformationen stellen. Der Chat ist in dieser Vorschau deaktiviert."
+    "previewHint": "Kunden können Godwit Fragen zu Ihren Unternehmensinformationen stellen. Der Chat ist in dieser Vorschau deaktiviert.",
+    "pollUnavailable": "Ich kann in diesem Chat gerade keine neue Umfrage hinzufügen. Du kannst aber die vorhandenen Umfragen nutzen."
   },
   "nav": {
     "quickStart": "Erste Schritte",
@@ -335,7 +336,7 @@
         "community-space": "Für Gemeinschafts- und öffentliche Einrichtungen: Angebote, Programme, Öffnungszeiten, Barrierefreiheit und Mitmachmöglichkeiten teilen."
       },
       "businessRequired": "Legen Sie vor dem Erstellen eines Eggs Ihre Unternehmensart fest.",
-      "generationFailed": "Die Umfrage und Aktion für dieses Egg konnten nicht erstellt werden. Bitte versuchen Sie es erneut.",
+      "generationFailed": "Die Umfrage für dieses Egg konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
       "generationInvalid": "Die erstellte Umfrage muss überprüft werden. Bitte versuchen Sie erneut, das Egg zu erstellen.",
       "placementTitle": "Name und Standort",
       "nameExample": "Galerie-Empfang",

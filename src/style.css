@@ -424,13 +424,13 @@ textarea {
   align-items: center;
   justify-content: space-between;
   flex-wrap: nowrap;
-  gap: 12px;
+  gap: 16px;
 }
 
 .site-nav-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex: 0 0 auto;
   white-space: nowrap;
 }
@@ -2615,11 +2615,11 @@ textarea {
 
   .site-nav-bar {
     min-height: 56px;
-    gap: 8px;
+    gap: 10px;
   }
 
   .site-nav-actions {
-    gap: 6px;
+    gap: 8px;
   }
 
   .site-nav-brand {
@@ -2670,13 +2670,13 @@ textarea {
   }
 
   .site-nav-bar {
-    gap: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
+    gap: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .site-nav-actions {
-    gap: 4px;
+    gap: 3px;
   }
 
   .site-nav-brand {
@@ -2691,7 +2691,7 @@ textarea {
 
   .site-nav-dashboard {
     min-height: 32px;
-    max-width: 60px;
+    max-width: 56px;
     overflow: hidden;
     padding: 0 5px;
     font-size: 0.72rem;
@@ -2700,7 +2700,7 @@ textarea {
 
   .site-nav-billing {
     min-height: 32px;
-    max-width: 52px;
+    max-width: 48px;
     overflow: hidden;
     padding: 0 2px;
     font-size: 0.72rem;
@@ -2714,7 +2714,7 @@ textarea {
   }
 
   .site-nav-lang {
-    max-width: 56px;
+    max-width: 50px;
     min-height: 32px;
     padding: 0 4px;
     font-size: 0.72rem;

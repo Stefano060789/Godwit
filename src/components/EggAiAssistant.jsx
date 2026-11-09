@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import InlinePollVote from "./InlinePollVote";
 
 function createSessionId() {
   const storageKey = "godwit-egg-ai-session";
@@ -14,7 +15,7 @@ function createSessionId() {
   }
 }
 
-export default function EggAiAssistant({ token, preview = false, initiallyExpanded = false }) {
+export default function EggAiAssistant({ token, campaignId, branding, preview = false, initiallyExpanded = true }) {
   const { t } = useTranslation("translation", { keyPrefix: "eggAi" });
   const [enabled, setEnabled] = useState(false);
   const [expanded, setExpanded] = useState(initiallyExpanded);
@@ -69,10 +70,19 @@ export default function EggAiAssistant({ token, preview = false, initiallyExpand
       if (!response.ok) {
         throw new Error(response.status === 429 ? t("usageLimit") : t("assistantError"));
       }
+      const poll = result.poll && Number.isSafeInteger(Number(result.poll.id)) && Array.isArray(result.poll.answers)
+        ? { id: Number(result.poll.id), campaignId, answers: result.poll.answers }
+        : null;
       setMessages((current) => [
         ...current,
         { role: "user", content: message },
-        { role: "assistant", content: result.answer, suggestions: result.suggestions || [] }
+        {
+          role: "assistant",
+          content: result.answer,
+          suggestions: result.suggestions || [],
+          poll: poll && current.some((entry) => entry.poll?.id === poll.id) ? null : poll,
+          pollUnavailable: result.pollUnavailable === true
+        }
       ]);
     } catch (sendError) {
       setInput(message);
@@ -88,9 +98,6 @@ export default function EggAiAssistant({ token, preview = false, initiallyExpand
   }
 
   function getSuggestionHref(suggestion) {
-    if (suggestion.type === "task") {
-      return `/qr/${encodeURIComponent(token)}/tasks#egg-task-${encodeURIComponent(suggestion.id)}`;
-    }
     return `#egg-option-${encodeURIComponent(suggestion.id)}`;
   }
 
@@ -120,6 +127,15 @@ export default function EggAiAssistant({ token, preview = false, initiallyExpand
                   <strong className="mr-1">{message.role === "user" ? t("you") : t("assistant")}:</strong>
                   {message.content}
                 </p>
+                {message.poll && (
+                  <div className="mt-2">
+                    <InlinePollVote
+                      item={{ poll_id: message.poll.id, campaign_id: message.poll.campaignId }}
+                      branding={branding}
+                    />
+                  </div>
+                )}
+                {message.pollUnavailable && <p className="mt-2 text-xs text-slate-400">{t("pollUnavailable")}</p>}
                 {message.suggestions?.length > 0 && (
                   <div className="mt-2 space-y-1">
                     <p className="text-xs font-semibold text-slate-400">{t("suggestedOptions")}</p>

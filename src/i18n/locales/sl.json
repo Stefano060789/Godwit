@@ -1,7 +1,8 @@
 {
   "eggAi": {
     "welcome": "Dobrodošli. Kako vam lahko pomagam?",
-    "previewHint": "Stranke lahko Godwitu postavljajo vprašanja na podlagi informacij podjetja. Klepet je v tem predogledu onemogočen."
+    "previewHint": "Stranke lahko Godwitu postavljajo vprašanja na podlagi informacij podjetja. Klepet je v tem predogledu onemogočen.",
+    "pollUnavailable": "V tem klepetu trenutno ne morem dodati nove ankete, lahko pa uporabiš že razpoložljive možnosti."
   },
   "nav": {
     "quickStart": "Hitri začetek",
@@ -193,7 +194,7 @@
         "community-space": "Za skupnostne in javne prostore: delite storitve, programe, odpiralni čas, dostopnost in možnosti sodelovanja."
       },
       "businessRequired": "Pred ustvarjanjem Egga določite vrsto podjetja.",
-      "generationFailed": "Ankete in dejanja za ta Egg ni bilo mogoče ustvariti. Poskusite znova.",
+      "generationFailed": "Ankete za ta Egg ni bilo mogoče ustvariti. Poskusite znova.",
       "generationInvalid": "Ustvarjeno anketo je treba pregledati. Poskusite znova ustvariti Egg.",
       "placementTitle": "Ime in lokacija",
       "nameExample": "Dobrodošli v galeriji",

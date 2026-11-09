@@ -133,7 +133,6 @@ export default function NavBar() {
           <Link to="/login" onClick={closeMenu}>{t("nav.signIn")}</Link>
         </>}
         {displayUser && <>
-          <Link to="/essentials" onClick={closeMenu}>{t("nav.quickStart")}</Link>
           {installPrompt && <button type="button" onClick={installApp}>{t("nav.install")}</button>}
           <Link to="/feedback" onClick={closeMenu}>{t("nav.shareFeedback")}</Link>
           <Link to="/account" onClick={closeMenu}>{t("nav.account")}</Link>

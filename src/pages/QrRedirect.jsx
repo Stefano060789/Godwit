@@ -5,7 +5,6 @@ import { getPollBranding } from "../lib/pollBranding";
 import { reassignManagedCampaignPoll, resolveManagedQrToken } from "../lib/qrManage";
 import DonationCard from "../components/DonationCard";
 import InlinePollVote from "../components/InlinePollVote";
-import OrganizerMessageCard from "../components/OrganizerMessageCard";
 import EggAiAssistant from "../components/EggAiAssistant";
 import { accessibilityTagIcon, accessibilityTagLabel } from "../lib/accessibilityTags";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
@@ -59,9 +58,6 @@ export default function QrRedirect() {
       const visibleItems = DONATION_FEATURE_ENABLED
         ? items
         : (items || []).filter((item) => item.item_type !== "donation");
-      const { data: woodpeckerTasks, error: woodpeckerError } = await supabase
-        .rpc("get_public_woodpecker_portal", { target_token: token });
-      const hasWoodpeckerTasks = !woodpeckerError && Array.isArray(woodpeckerTasks) && woodpeckerTasks.length > 0;
       let eggAiEnabled = false;
       try {
         const aiConfigResponse = await fetch("/api/egg-ai", {
@@ -83,14 +79,7 @@ export default function QrRedirect() {
         // question with answer options ready to tap, instead of an extra "Share feedback"
         // click. Only collapse when there's truly one thing to show; a poll alongside other
         // items still needs the menu so those other items remain visible.
-        let singlePollHasMessage = false;
-        if (visibleItems.length === 1 && visibleItems[0].item_type === "poll") {
-          const { data: singlePoll } = await supabase
-            .rpc("get_public_poll", { target_poll_id: visibleItems[0].poll_id })
-            .single();
-          singlePollHasMessage = singlePoll?.allow_organizer_messages === true;
-        }
-        if (visibleItems.length === 1 && visibleItems[0].item_type === "poll" && !singlePollHasMessage && !eggAiEnabled) {
+        if (visibleItems.length === 1 && visibleItems[0].item_type === "poll" && !eggAiEnabled) {
           navigate(`/vote/${visibleItems[0].poll_id}?campaign=${visibleItems[0].campaign_id}`, { replace: true });
           return;
         }
@@ -108,17 +97,9 @@ export default function QrRedirect() {
           portalMessage: visibleItems[0].portal_message,
           items: visibleItems,
           branding,
-          hasWoodpeckerTasks,
           aiEnabled: eggAiEnabled && !isPreview,
           aiPreview: eggAiEnabled && isPreview
         });
-        return;
-      }
-
-      if (hasWoodpeckerTasks && !eggAiEnabled) {
-        const taskCampaignId = woodpeckerTasks[0]?.campaign_id;
-        await recordEggAccess(taskCampaignId);
-        navigate(`/qr/${token}/tasks`, { replace: true });
         return;
       }
 
@@ -154,7 +135,6 @@ export default function QrRedirect() {
               poll_question: campaignPoll?.question
             }],
             branding,
-            hasWoodpeckerTasks,
             aiEnabled: !isPreview,
             aiPreview: isPreview
           });
@@ -170,7 +150,6 @@ export default function QrRedirect() {
           portalMessage: null,
           items: [],
           branding: getPollBranding(null),
-          hasWoodpeckerTasks,
           aiEnabled: !isPreview,
           aiPreview: isPreview
         });
@@ -244,7 +223,7 @@ export default function QrRedirect() {
   }
 
   if (menu) {
-    const { portalTitle, portalMessage, items, branding, hasWoodpeckerTasks, aiEnabled } = menu;
+    const { portalTitle, portalMessage, items, branding, aiEnabled } = menu;
     return (
       <main className="qr-portal" style={{ backgroundColor: branding.accentColor }}>
         <section className="qr-portal-card qr-portal-menu">
@@ -253,6 +232,14 @@ export default function QrRedirect() {
           <h1>{portalTitle || (items.length === 0 && (aiEnabled || menu.aiPreview) ? t("eggAi.welcome", { defaultValue: "Welcome. How can I help?" }) : "Welcome! Choose an option below.")}</h1>
           {portalMessage && <p>{portalMessage}</p>}
           <div className="qr-portal-menu-list">
+            {(aiEnabled || menu.aiPreview) && (
+              <EggAiAssistant
+                token={token}
+                campaignId={menu.campaignId}
+                branding={branding}
+                preview={menu.aiPreview}
+              />
+            )}
             {items.map((item) => {
               if (item.item_type === "poll") {
                 return (
@@ -320,33 +307,6 @@ export default function QrRedirect() {
                 </div>
               );
             })}
-            {hasWoodpeckerTasks && (
-              <Link
-                to={`/qr/${token}/tasks`}
-                className="qr-portal-menu-item qr-portal-menu-info"
-              >
-                <span className="qr-portal-menu-item-title">Woodpecker tasks</span>
-                <p className="qr-portal-menu-item-body">See open tasks, share an update, or mark a task complete.</p>
-                <span
-                  className="qr-portal-menu-item-cta"
-                  style={{ backgroundColor: branding.primaryColor }}
-                >
-                  Open tasks
-                </span>
-              </Link>
-            )}
-            {(() => {
-              const messagePoll = items.find((item) => item.item_type === "poll");
-              return messagePoll ? (
-                <OrganizerMessageCard
-                  key="organizer-message"
-                  pollId={messagePoll.poll_id}
-                  campaignId={messagePoll.campaign_id}
-                  branding={branding}
-                />
-              ) : null;
-            })()}
-            {(aiEnabled || menu.aiPreview) && <EggAiAssistant token={token} preview={menu.aiPreview} initiallyExpanded={menu.items.length === 0} />}
           </div>
         </section>
       </main>

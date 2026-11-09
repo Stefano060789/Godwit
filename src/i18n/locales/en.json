@@ -20,7 +20,7 @@
     "welcome": "Welcome. How can I help?",
     "previewHint": "Customers can ask Godwit using your business information. Chat is disabled in this preview.",
     "title": "Ask the business assistant",
-    "description": "AI answers using information provided by the business. For personal help, contact the business directly.",
+    "description": "Tell me what interests you. I’ll share useful business information and point you to a relevant poll when it helps.",
     "privacyHint": "You're chatting with an AI powered by Claude. Your messages and the business information are processed to create answers. Avoid sharing sensitive personal information.",
     "you": "You",
     "assistant": "Assistant",
@@ -41,6 +41,7 @@
       "other": "I'd like to give feedback about something else."
     },
     "suggestedOptions": "You can continue here:",
+    "pollUnavailable": "I can’t add a new poll in this chat right now, but you can still use the existing poll options.",
     "optionTypes": {
       "poll": "Give feedback",
       "info": "View information",
@@ -434,7 +435,7 @@
         "community-space": "For community and public spaces: share services, programs, opening times, accessibility, and ways to take part."
       },
       "businessRequired": "Set your business type before creating an Egg.",
-      "generationFailed": "Unable to generate this Egg's poll and action. Please try again.",
+      "generationFailed": "Unable to generate this Egg's poll. Please try again.",
       "generationInvalid": "The generated poll needs review. Please try creating the Egg again.",
       "placementTitle": "Name & location",
       "nameExample": "Gallery welcome",

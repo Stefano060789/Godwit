@@ -11,7 +11,6 @@ import EggResults from "../components/EggResults";
 import BusinessProfile from "../components/BusinessProfile";
 import BusinessData from "../components/BusinessData";
 import EggNfcSetup from "../components/EggNfcSetup";
-import { listBusinessSources } from "../lib/businessData";
 import { createGoalEggSetup } from "../lib/goalEggSetup";
 import { isRestrictedTopic } from "../lib/restrictedContent";
 import { normalizeEggEmailBenefit } from "../lib/eggBenefits";
@@ -1571,7 +1570,7 @@ export default function Admin() {
     });
     const generated = await generationResponse.json().catch(() => ({}));
     if (!generationResponse.ok) {
-      throw new Error(generated.error || t("admin.goal.generationFailed", { defaultValue: "Unable to generate this Egg's poll and action. Please try again." }));
+      throw new Error(generated.error || t("admin.goal.generationFailed", { defaultValue: "Unable to generate this Egg's poll. Please try again." }));
     }
     if (
       !generated
@@ -1579,20 +1578,17 @@ export default function Admin() {
       || typeof generated.poll?.question !== "string"
       || !Array.isArray(generated.poll.answers)
       || generated.poll.answers.some((answer) => typeof answer !== "string")
-      || typeof generated.action?.title !== "string"
-      || typeof generated.action?.description !== "string"
       || isRestrictedTopic(generated.poll.question)
       || generated.poll.answers.some((answer) => isRestrictedTopic(answer))
     ) {
       throw new Error(t("admin.goal.generationInvalid", { defaultValue: "The generated poll needs review. Please try creating the Egg again." }));
     }
 
-    const sources = await listBusinessSources(workspaceUserId);
     const campaign = await createQrCampaign({
       ...fields,
       businessType: workspaceProfile.businessType,
       workspaceId: workspaceUserId,
-      aiEnabled: sources.length > 0
+      aiEnabled: true
     });
     let setup;
     try {
@@ -1601,7 +1597,6 @@ export default function Admin() {
         workspaceId: workspaceUserId,
         userId: user.id,
         pollDraft: generated.poll,
-        actionDraft: generated.action,
         emailBenefit: fields.emailBenefit,
         reviewCards: fields.goalKeys.includes("reviews")
           ? (workspaceProfile.reviewPlatforms || []).map((platform) => ({
@@ -1621,7 +1616,6 @@ export default function Admin() {
     setQrCampaigns((current) => [campaign, ...current]);
     setPolls((current) => [setup.poll, ...current]);
     setQrCampaignItems((current) => [setup.pollItem, ...setup.reviewItems, ...current]);
-    setActionTasks((current) => [setup.task, ...current]);
     setAnalytics((current) => ({ ...current, total: current.total + 1, active: current.active + 1 }));
     goToEgg(campaign.id);
   }

@@ -1,7 +1,8 @@
 {
   "eggAi": {
     "welcome": "Benvenuto. Come posso aiutarti?",
-    "previewHint": "I clienti possono fare domande a Godwit usando le informazioni dell'attività. La chat è disattivata in questa anteprima."
+    "previewHint": "I clienti possono fare domande a Godwit usando le informazioni dell'attività. La chat è disattivata in questa anteprima.",
+    "pollUnavailable": "Al momento non posso aggiungere un sondaggio in questa chat, ma puoi usare quelli già disponibili."
   },
   "nav": {
     "quickStart": "Per iniziare",
@@ -335,7 +336,7 @@
         "community-space": "Per spazi pubblici e comunitari: condividi servizi, programmi, orari, accessibilità e modalità di partecipazione."
       },
       "businessRequired": "Imposta il tipo di attività prima di creare un Egg.",
-      "generationFailed": "Impossibile generare il sondaggio e l'azione per questo Egg. Riprova.",
+      "generationFailed": "Impossibile generare il sondaggio per questo Egg. Riprova.",
       "generationInvalid": "Il sondaggio generato deve essere verificato. Prova a creare di nuovo l'Egg.",
       "placementTitle": "Nome e posizione",
       "nameExample": "Benvenuto in galleria",
