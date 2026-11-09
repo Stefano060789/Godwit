@@ -423,6 +423,8 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 12px;
 }
 
 .site-nav-actions {
@@ -430,6 +432,7 @@ textarea {
   align-items: center;
   gap: 12px;
   flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .site-nav-brand {
@@ -531,6 +534,21 @@ textarea {
   color: #ffffff;
   font-size: 1.05rem;
   cursor: pointer;
+}
+
+.site-nav-billing {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 4px;
+  color: var(--gold-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-nav-billing:hover {
+  color: var(--gold);
 }
 
 .app-page {
@@ -2597,11 +2615,11 @@ textarea {
 
   .site-nav-bar {
     min-height: 56px;
-    gap: 10px;
+    gap: 8px;
   }
 
   .site-nav-actions {
-    gap: 8px;
+    gap: 6px;
   }
 
   .site-nav-brand {
@@ -2636,29 +2654,70 @@ textarea {
     padding: 0 10px;
     font-size: 0.82rem;
   }
+
+  .site-nav-billing {
+    font-size: 0.82rem;
+  }
 }
 
-/* Below ~480px (a normal phone in portrait), the "Quick start" pill plus Dashboard pill plus
-   language dropdown plus menu button no longer fit next to the brand logo - the flex layout
-   would otherwise crush the logo down to zero width to make room. Drop the pill here and rely
-   on the equivalent link already mirrored into the hamburger menu instead. */
 @media (max-width: 480px) {
-  .site-nav-quickstart,
   .site-nav-start {
     display: none;
   }
 
-  .site-nav-links-quickstart,
   .site-nav-links-start {
     display: block;
   }
 
   .site-nav-bar {
-    flex-wrap: wrap;
+    gap: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .site-nav-actions {
+    gap: 4px;
+  }
+
+  .site-nav-brand {
+    gap: 4px;
+    font-size: 0.78rem;
+  }
+
+  .site-nav-brand-mark {
+    width: 20px;
+    height: 20px;
+  }
+
+  .site-nav-dashboard {
+    min-height: 32px;
+    max-width: 60px;
+    overflow: hidden;
+    padding: 0 5px;
+    font-size: 0.72rem;
+    text-overflow: ellipsis;
+  }
+
+  .site-nav-billing {
+    min-height: 32px;
+    max-width: 52px;
+    overflow: hidden;
+    padding: 0 2px;
+    font-size: 0.72rem;
+    text-overflow: ellipsis;
+  }
+
+  .site-nav-theme,
+  .site-nav-toggle {
+    width: 30px;
+    height: 32px;
   }
 
   .site-nav-lang {
-    max-width: 96px;
+    max-width: 56px;
+    min-height: 32px;
+    padding: 0 4px;
+    font-size: 0.72rem;
   }
 }
 

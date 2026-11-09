@@ -88,7 +88,6 @@ export default function NavBar() {
           <span>Godwit</span>
         </Link>
         <div className="site-nav-actions">
-          {displayUser && <Link to="/essentials" onClick={closeMenu} className="site-nav-primary site-nav-quickstart">{t("nav.quickStart")}</Link>}
           {displayUser && (
             <Link
               to="/admin"
@@ -110,6 +109,7 @@ export default function NavBar() {
           >
             {theme === "dark" ? "☀" : "◐"}
           </button>
+          {displayUser && <Link to="/admin/billing" onClick={closeMenu} className="site-nav-billing">{t("nav.billing")}</Link>}
           <button
             type="button"
             className="site-nav-toggle"
@@ -133,8 +133,8 @@ export default function NavBar() {
           <Link to="/login" onClick={closeMenu}>{t("nav.signIn")}</Link>
         </>}
         {displayUser && <>
+          <Link to="/essentials" onClick={closeMenu}>{t("nav.quickStart")}</Link>
           {installPrompt && <button type="button" onClick={installApp}>{t("nav.install")}</button>}
-          <Link to="/admin/billing" onClick={closeMenu}>{t("nav.billing")}</Link>
           <Link to="/feedback" onClick={closeMenu}>{t("nav.shareFeedback")}</Link>
           <Link to="/account" onClick={closeMenu}>{t("nav.account")}</Link>
           {isCreator && <Link to="/creator" onClick={closeMenu}>Creator overview</Link>}

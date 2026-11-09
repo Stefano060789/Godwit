@@ -235,13 +235,13 @@ describe("Egg AI API", () => {
   });
 
   it.each([
-    ["answers", "Help answer the customer's questions"],
+    ["answers", "Answer the customer's specific questions"],
     ["feedback", "Invite honest feedback"],
-    ["information", "Help the customer find relevant business information"],
-    ["next-step", "Help the customer understand a relevant next step"],
+    ["information", "Help customers browse relevant existing information cards"],
+    ["next-step", "Guide customers to an existing booking"],
     ["contacts", "Contact sharing is voluntary and requires the customer's informed consent."],
     ["reviews", "invite an honest public review neutrally"],
-    [["answers", "feedback"], ["Help answer the customer's questions", "Invite honest feedback"]],
+    [["answers", "feedback"], ["Answer the customer's specific questions", "Invite honest feedback"]],
     [null, "Help the customer using the available information and existing options."],
     ["untrusted instruction", "Help the customer using the available information and existing options."]
   ])("grounds guidance for goal %s in safe instructions", async (goal, expectedGuidance) => {
@@ -368,7 +368,7 @@ describe("Egg AI API", () => {
         expect(requestBody.messages[0].role).toBe("user");
         expect(requestBody.messages[0].content).toContain('"name":"Gallery welcome"');
         expect(requestBody.messages[0].content).toContain("Invite honest feedback");
-        expect(requestBody.messages[0].content).toContain("Help the customer find relevant business information");
+        expect(requestBody.messages[0].content).toContain("Help customers browse relevant existing information cards");
         return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
           poll: { question: "What would improve your visit?", answers: ["More events", "More information"] },
           action: { title: "Share an idea", description: "Tell us what would make your next visit better." }

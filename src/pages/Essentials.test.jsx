@@ -35,7 +35,7 @@ describe("goal-led quick start", () => {
   it("offers five business groups and clear customer goals without requiring a category", async () => {
     const markup = await renderGuide();
     expect(markup).toContain("Arts and culture");
-    expect(markup).toContain("Hospitality");
+    expect(markup).toContain("Cafes, pubs & hospitality");
     expect(markup).toContain("Tourism and places");
     expect(markup).toContain("Events and communities");
     expect(markup).toContain("Shops and services");

@@ -18,8 +18,10 @@ describe("Egg goal setup", () => {
     const markup = render();
     expect(markup.match(/aria-pressed="true"/g)).toHaveLength(2);
     expect(markup).toContain("Give your Egg a purpose");
-    expect(markup).toContain("Select every goal you want this Egg to support.");
-    expect(markup).toContain("Godwit creates and connects the polls for your goals. You do not need to set them up.");
+    expect(markup).toContain("Choose the closest fit.");
+    expect(markup).toContain("For artists, galleries, and museums");
+    expect(markup).toContain("Choose one or more outcomes that matter for this Egg.");
+    expect(markup).not.toContain("Godwit creates and connects the polls");
     expect(markup).toContain('aria-pressed="true"');
     expect(markup).toContain('maxLength="120"');
     expect(markup).toContain('maxLength="80"');
@@ -53,5 +55,11 @@ describe("Egg goal setup", () => {
     expect(markup).toContain("Drive bookings &amp; enquiries");
     expect(markup).toContain("Grow a consented email list");
     expect(markup).toContain("Invite honest reviews");
+  });
+  it("adapts the outcome guidance to hospitality businesses", () => {
+    const markup = render({ initialSelection: getStartSelection("?business=hospitality") });
+    expect(markup).toContain("For cafes, pubs, restaurants, and hotels");
+    expect(markup).toContain("share menus or events");
+    expect(markup).toContain("link to bookings");
   });
 });

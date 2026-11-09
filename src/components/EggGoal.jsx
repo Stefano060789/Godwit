@@ -49,21 +49,23 @@ export default function EggGoal({ initialSelection, canManage, entitlements, onC
     <header className="hub-page-heading"><p className="goal-eyebrow">{t("admin.hub.goal", { defaultValue: "Goal" })}</p>
       <h2 id="egg-goal-title">{t("admin.goal.title", { defaultValue: "Give your Egg a purpose" })}</h2>
       <p>{t("admin.goal.intro", { defaultValue: "Choose a target and where people will find it." })}</p>
-      <p className="goal-multi-hint">{t("admin.goal.creationDetails", { defaultValue: "Godwit creates and connects the polls for your goals. You do not need to set them up." })}</p>
     </header>
     <form onSubmit={submit} className="egg-goal-form">
       <fieldset disabled={!canManage || busy}>
         <legend><span className="hub-step">01</span>{t("quickStart.businessTitle")}</legend>
+        <p className="goal-multi-hint">{t("admin.goal.businessHint")}</p>
         <div className="goal-business-grid">
           {PERSONAS.map((entry) => <button type="button" key={entry.audienceKey} className="goal-choice" aria-pressed={business === entry.audienceKey} onClick={() => setBusiness(entry.audienceKey)}>
             <span className="goal-choice-title">{t(`landing.useCases.${entry.audienceKey}Title`)}</span>
+            <span className="goal-choice-detail">{t(`quickStart.businesses.${entry.audienceKey}`, { defaultValue: entry.pitch })}</span>
             <span className="goal-choice-check" aria-hidden="true">{business === entry.audienceKey ? "\u2713" : "+"}</span>
           </button>)}
         </div>
       </fieldset>
       <fieldset disabled={!canManage || busy}>
         <legend><span className="hub-step">02</span>{t("quickStart.goalTitle")}</legend>
-        <p className="goal-multi-hint">{t("admin.goal.multipleGoalsHint", { defaultValue: "Choose all that matter. One Egg can support several goals." })}</p>
+        <p className="goal-multi-hint">{t(`admin.goal.businessGuidance.${business}`, { defaultValue: t("admin.goal.businessGuidance.default") })}</p>
+        <p className="goal-multi-hint">{t("admin.goal.multipleGoalsHint", { defaultValue: "Choose one or more outcomes that matter for this Egg." })}</p>
         <div className="goal-options-grid">
           {START_GOALS.map((entry) => <button type="button" key={entry.key} className="goal-choice" aria-pressed={goalKeys.includes(entry.key)} onClick={() => toggleGoal(entry.key)}>
             <span className="goal-choice-title">{t(`quickStart.goals.${entry.key}.title`)}</span>
