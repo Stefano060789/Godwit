@@ -28,7 +28,7 @@
     "loopResults": "Nützliche Ergebnisse",
     "businessTitle": "In welchem Bereich arbeiten Sie?",
     "optional": "Optional",
-    "goalTitle": "Was möchten Sie erreichen?",
+    "goalTitle": "Welches Ergebnis soll Godwit unterstützen?",
     "chooseHint": "Wählen Sie ein Ziel, um Ihre nächsten Schritte zu sehen.",
     "planEyebrow": "Ihr Einstiegsplan",
     "shareStep": "Fügen Sie Ihre Inhalte einem Egg hinzu, testen Sie es und teilen Sie den QR-Code oder NFC-Link.",
@@ -42,39 +42,39 @@
     "existingEggHint": "Öffnen Sie bei einem vorhandenen Egg unten den KI-Assistenten oder die Verwaltung der Inhalte.",
     "businesses": {
       "arts": "Kunstschaffende, Galerien, Museen",
-      "hospitality": "Hotels, Restaurants, Cafés",
+      "hospitality": "Cafés, Pubs, Restaurants, Hotels",
       "places": "Reiseziele, Stadtteams, Sehenswürdigkeiten",
       "events": "Veranstaltungen, Vereine, Gemeinschaften",
       "shops": "Einzelhandel, Studios, lokale Dienstleistungen"
     },
     "goals": {
       "answers": {
-        "title": "Fragen beantworten",
-        "example": "Helfen Sie Menschen, benötigte Informationen zu finden.",
+        "title": "Kundenfragen beantworten",
+        "example": "Beantworten Sie Fragen zu Öffnungszeiten, Zugang, Speisekarten oder Angeboten mit Ihren Geschäftsinformationen.",
         "setup": "Erstellen Sie ein Egg, öffnen Sie seinen KI-Assistenten, ergänzen Sie Ihre Website oder FAQs und aktivieren Sie Godwit.",
         "result": "Testen Sie vor dem Teilen eine Kundenfrage. Godwit antwortet anhand Ihrer Quellen und schlägt passende Inhalte vor."
       },
       "feedback": {
-        "title": "Nützliches Feedback erhalten",
-        "example": "Erfahren Sie, was Kunden über ihren Besuch denken.",
+        "title": "Privates Feedback sammeln",
+        "example": "Erfahren Sie, was Gäste oder Kunden über ihr Erlebnis denken.",
         "setup": "Öffnen oder erstellen Sie ein Egg und ergänzen Sie eine kurze Feedback-Umfrage.",
         "result": "Öffnen Sie die Umfrageergebnisse, um Antworten und Verbesserungsmöglichkeiten zu sehen."
       },
       "information": {
-        "title": "Informationen teilen",
-        "example": "Erzählen Sie eine Geschichte oder erklären Sie ein Produkt.",
+        "title": "Speisekarten, Geschichten & Details zeigen",
+        "example": "Stellen Sie Speisekarten, Veranstaltungsinfos, Geschichten oder praktische Details bereit.",
         "setup": "Erstellen Sie ein Egg und ergänzen Sie eine Informationskarte mit Text, Bild und hilfreichen Links.",
         "result": "Kunden finden Ihre Inhalte ohne Konto. Aktualisieren Sie sie, wenn sich Details ändern."
       },
       "next-step": {
-        "title": "Anfragen ermöglichen",
-        "example": "Erleichtern Sie Fragen zu Kunstwerken, Produkten oder Buchungen.",
+        "title": "Buchungen & Anfragen fördern",
+        "example": "Verlinken Sie auf Reservierungen, Termine, Produkte oder Kontaktmöglichkeiten.",
         "setup": "Ergänzen Sie eine Informationskarte auf einem Egg um Ihren Kontakt- oder Buchungslink.",
         "result": "Anfragen erreichen Sie über Ihre verlinkte E-Mail oder Buchungsseite, nicht über einen neuen Godwit-Posteingang."
       },
       "contacts": {
-        "title": "E-Mail-Liste aufbauen",
-        "example": "Laden Sie Menschen zu Neuigkeiten und Angeboten ein.",
+        "title": "E-Mail-Liste mit Einwilligung aufbauen",
+        "example": "Laden Sie Kunden ein, Neuigkeiten oder Angebote zu abonnieren.",
         "setup": "Öffnen oder erstellen Sie ein Egg, ergänzen Sie eine Umfrage und richten Sie unter Nach der Abstimmung eine klare E-Mail-Einwilligung ein.",
         "result": "Exportieren Sie Kontakte mit Einwilligung unter Kundenbindung. Menschen können auch ohne E-Mail-Adresse abstimmen."
       },
@@ -87,30 +87,30 @@
     }
   },
   "landing": {
-    "eyebrow": "Ein KI-Assistent für Unternehmen vor Ort",
-    "title": "Helfen Sie jedem Kunden, den nächsten Schritt zu finden.",
-    "lede": "Geben Sie Godwit Ihre Unternehmensinformationen und ein Ziel. Kunden erreichen den Assistenten über ein Egg per QR-Code oder NFC.",
+    "eyebrow": "Ein zielorientierter KI-Agent für Kundenkontakte",
+    "title": "Machen Sie jeden Kundenkontakt hilfreicher.",
+    "lede": "Geben Sie Godwit ein Ziel und verlässliche Unternehmensinformationen. Die KI hilft, Fragen zu beantworten, Feedback zu sammeln und Kunden über ein Egg per QR-Code oder NFC zu sinnvollen nächsten Schritten zu führen. Sie behalten die Kontrolle; die Ergebnisse hängen von Ihren Kunden ab.",
     "workspaceDashboard": "Dashboard",
     "createWorkspace": "Mit Godwit starten",
     "workspaceLogin": "Bei Godwit anmelden",
-    "note": "Für Kunstschaffende, Galerien, Museen, Hotels, Reiseziele, Veranstaltungen, Geschäfte und lokale Dienstleistungen.",
+    "note": "Für Cafés, Pubs, Restaurants, Hotels, Kunstschaffende, Galerien, Museen, Reiseziele, Veranstaltungen, Geschäfte und lokale Dienstleistungen.",
     "eggFeatures": {
       "eyebrow": "Das Godwit Egg",
       "title": "Godwit über ein Egg erreichen.",
-      "lede": "Godwit ist Ihr KI-Assistent. Ein Egg ist der wiederverwendbare Zugang für Kunden. Aktualisieren Sie es ohne neuen QR-Code oder NFC-Tag.",
+      "lede": "Godwit ist Ihr zielorientierter KI-Agent. Ein Egg ist der wiederverwendbare Zugang für Kunden. Aktualisieren Sie es ohne neuen QR-Code oder NFC-Tag.",
       "accessibilityLabel": "Zugänge zum Egg",
       "sameExperience": "Ein gemeinsames Erlebnis",
       "accessTitle": "Einfacher Zugang für Kunden",
       "accessDetail": "QR-Code, NFC-Tag oder beides: Jeder Zugang öffnet dasselbe aktuelle Egg.",
-      "assistantTitle": "KI-Antworten auf Basis Ihres Unternehmens",
-      "assistantDetail": "Ergänzen Sie Ihre Website oder FAQs, damit der Assistent Fragen beantwortet und Kunden zum nächsten Schritt führt.",
+      "assistantTitle": "Zielorientierte KI auf Basis Ihres Unternehmens",
+      "assistantDetail": "Ergänzen Sie Ihre Website oder FAQs, damit Godwit Fragen beantwortet und Kunden zu den von Ihnen gewählten Zielen und Aktionen führt.",
       "guidanceTitle": "Von der Frage zum nächsten Schritt",
       "guidanceDetail": "Führen Sie Kunden zur passenden Umfrage, Informationskarte oder offenen Aufgabe.",
       "control": "Sie wählen Informationen, Themen und ob KI aktiviert ist. Nutzungslimits halten den Umfang kontrollierbar.",
       "cta": "Erstes Egg erstellen"
     },
     "howItWorksEyebrow": "Drei einfache Schritte",
-    "howItWorksTitle": "Ziel wählen. Godwit teilen. Aus jedem Kontakt lernen.",
+    "howItWorksTitle": "Ziel festlegen. Godwit führt durch jeden Kundenkontakt.",
     "steps": {
       "step1Title": "Wählen Sie Ihr Ziel",
       "step1Detail": "Sammeln Sie Feedback, beantworten Sie Fragen, teilen Sie Informationen oder laden Sie zu einer privaten Anfrage ein.",
@@ -138,8 +138,8 @@
     "useCases": {
       "artsTitle": "Kunst und Kultur",
       "artsDetail": "Kunstschaffende, Galerien und Museen teilen Geschichten, beantworten Fragen und laden zu Feedback oder Anfragen ein.",
-      "hospitalityTitle": "Gastgewerbe",
-      "hospitalityDetail": "Hotels, Restaurants und Cafés beantworten häufige Fragen und erfahren mehr über das Gästeerlebnis.",
+      "hospitalityTitle": "Cafés, Pubs & Gastgewerbe",
+      "hospitalityDetail": "Cafés, Pubs, Restaurants und Hotels können Speisekarten und Veranstaltungen teilen, Fragen beantworten, Buchungen verlinken und privates Feedback sammeln.",
       "placesTitle": "Tourismus und Orte",
       "placesDetail": "Reiseziele und Stadtteams teilen lokales Wissen und zeigen Besuchern, was sie als Nächstes entdecken können.",
       "eventsTitle": "Veranstaltungen und Gemeinschaften",

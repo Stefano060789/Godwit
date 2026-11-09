@@ -15,21 +15,21 @@
     "getStarted": "立即开始"
   },
   "landing": {
-    "eyebrow": "为线下商家服务的 AI 助手",
-    "title": "帮助每位客户找到下一步。",
-    "lede": "向 Godwit 提供业务信息和目标。客户通过 Egg 使用二维码或 NFC 连接助手。",
+    "eyebrow": "以目标为导向的客户互动 AI 智能体",
+    "title": "让每一次客户互动都更有帮助。",
+    "lede": "为 Godwit 设定目标并提供可靠的业务信息。它的 AI 可帮助回答问题、收集反馈，并通过二维码或 NFC Egg 引导客户采取有用的下一步。您始终掌握控制权；实际结果取决于客户。",
     "workspaceDashboard": "控制台",
     "createWorkspace": "开始使用 Godwit",
     "workspaceLogin": "登录 Godwit",
-    "note": "适用于艺术家、画廊、博物馆、酒店、旅游目的地、活动、商店和本地服务。",
+    "note": "适用于咖啡馆、酒吧、餐厅、酒店、艺术家、画廊、博物馆、旅游目的地、活动、商店和本地服务。",
     "eggFeatures": {
       "title": "Godwit 是助手，Egg 是客户访问它的方式。",
-      "lede": "把 Egg 放在客户需要帮助的地方，通过二维码或 NFC 分享，并可随时更新内容，无需更换代码或标签。",
-      "assistantTitle": "基于业务信息的 AI 答案",
-      "assistantDetail": "添加网站或常见问题，让助手回答客户问题并引导他们采取有用的下一步。"
+      "lede": "Godwit 是以目标为导向的 AI 智能体。Egg 是客户可重复使用的访问入口。将它放在客户需要帮助的地方，并随时更新，无需更换二维码或 NFC 标签。",
+      "assistantTitle": "基于业务信息、服务于目标的 AI",
+      "assistantDetail": "添加网站或常见问题，让 Godwit 回答客户问题，并引导他们完成您选择的目标和操作。"
     },
     "howItWorksEyebrow": "三个简单步骤",
-    "howItWorksTitle": "选择目标。分享 Godwit。从每次互动中学习。",
+    "howItWorksTitle": "设定目标，让 Godwit 引导每一次客户互动。",
     "steps": {
       "step1Title": "选择想要实现的目标",
       "step1Detail": "收集反馈、回答访客问题、分享信息，或邀请客户进行私下咨询。",
@@ -53,12 +53,12 @@
     },
     "useCasesEyebrow": "一个助手，适用于多种场景",
     "useCasesTitle": "为人们常去的场所而设计。",
-    "useCasesLede": "选择适合业务的目标。Godwit 帮助客户获取答案、分享反馈或采取下一步行动。",
+    "useCasesLede": "设定客户互动目标。Godwit 根据您的信息引导互动，而目标和操作由您选择并掌控。",
     "useCases": {
       "artsTitle": "艺术与文化",
       "artsDetail": "艺术家、画廊和博物馆可以分享故事、回答问题，并邀请访客反馈或咨询。",
-      "hospitalityTitle": "酒店与餐饮",
-      "hospitalityDetail": "酒店、餐厅和咖啡馆可以回答常见问题并了解客人的体验。",
+      "hospitalityTitle": "咖啡馆、酒吧与餐饮",
+      "hospitalityDetail": "咖啡馆、酒吧、餐厅和酒店可以展示菜单与活动、回答问题、链接预订并收集私下反馈。",
       "placesTitle": "旅游与目的地",
       "placesDetail": "旅游目的地和城市团队可以分享本地信息，帮助访客发现下一步活动。",
       "eventsTitle": "活动与社区",

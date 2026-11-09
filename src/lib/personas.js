@@ -27,12 +27,12 @@ export const PERSONAS = [
     key: "hospitality",
     audienceKey: "hospitality",
     icon: "\u2615",
-    label: "Hospitality",
-    pitch: "Help guests find useful information and share feedback about their visit.",
+    label: "Cafes, pubs and hospitality",
+    pitch: "Help guests explore menus and event details, find booking information, and share feedback.",
     steps: [
       {
-        title: "Answer common guest questions",
-        detail: "Add your website or FAQs, such as opening hours, amenities, or services.",
+        title: "Share menus and answer guest questions",
+        detail: "Add your website or FAQs for opening hours, menus, events, amenities, or services.",
         tab: "engagement"
       },
       {
@@ -41,8 +41,8 @@ export const PERSONAS = [
         tab: "engagement"
       },
       {
-        title: "Place an Egg where guests need help",
-        detail: "Share the same experience with a QR code, an NFC tag, or both.",
+        title: "Place an Egg where guests make decisions",
+        detail: "Add it to a menu, counter, entrance, or event display and share it by QR code, NFC tag, or both.",
         tab: "engagement"
       }
     ]

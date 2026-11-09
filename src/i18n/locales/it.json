@@ -28,7 +28,7 @@
     "loopResults": "Risultati utili",
     "businessTitle": "Di cosa ti occupi?",
     "optional": "Facoltativo",
-    "goalTitle": "Cosa vorresti ottenere?",
+    "goalTitle": "Quale risultato vuoi che Godwit supporti?",
     "chooseHint": "Scegli un obiettivo per vedere i prossimi passi.",
     "planEyebrow": "Il tuo piano iniziale",
     "shareStep": "Aggiungi i contenuti a un Egg, provalo e condividi il codice QR o il link NFC.",
@@ -42,39 +42,39 @@
     "existingEggHint": "Per un Egg esistente, apri qui sotto l'assistente AI o la gestione dei contenuti.",
     "businesses": {
       "arts": "Artisti, gallerie, musei",
-      "hospitality": "Hotel, ristoranti, caffè",
+      "hospitality": "Caffè, pub, ristoranti, hotel",
       "places": "Destinazioni, team cittadini, attrazioni",
       "events": "Eventi, associazioni, comunità",
       "shops": "Negozi, studi, servizi locali"
     },
     "goals": {
       "answers": {
-        "title": "Rispondere alle domande",
-        "example": "Aiuta le persone a trovare le informazioni che cercano.",
+        "title": "Rispondere alle domande dei clienti",
+        "example": "Usa le informazioni affidabili della tua attività per rispondere su orari, accessibilità, menu o servizi.",
         "setup": "Crea un Egg, apri il suo assistente AI, aggiungi il sito o le FAQ e attiva Godwit.",
         "result": "Prova una domanda prima di condividere. Godwit risponde dalle tue fonti e suggerisce contenuti pertinenti."
       },
       "feedback": {
-        "title": "Raccogliere feedback utile",
-        "example": "Scopri cosa pensano i clienti della loro visita.",
+        "title": "Raccogliere feedback privato",
+        "example": "Scopri cosa pensano gli ospiti o i clienti della loro esperienza.",
         "setup": "Apri o crea un Egg, poi aggiungi un breve sondaggio alla sua esperienza.",
         "result": "Apri i risultati del sondaggio per vedere le risposte e individuare cosa migliorare."
       },
       "information": {
-        "title": "Condividere informazioni",
-        "example": "Racconta una storia, spiega un prodotto o condividi dettagli pratici.",
+        "title": "Mostrare menu, storie e dettagli",
+        "example": "Offri menu, programmi di eventi, storie o informazioni pratiche da consultare.",
         "setup": "Crea un Egg e aggiungi una scheda informativa con testo, immagine e link utili.",
         "result": "I clienti trovano i contenuti senza account. Aggiornali quando cambiano i dettagli."
       },
       "next-step": {
-        "title": "Ricevere richieste",
-        "example": "Facilita le domande su opere, prodotti o prenotazioni.",
+        "title": "Favorire prenotazioni e richieste",
+        "example": "Indirizza i clienti a prenotazioni, appuntamenti, prodotti o pagine di contatto.",
         "setup": "Aggiungi un link di contatto o prenotazione a una scheda informativa dell'Egg.",
         "result": "Le richieste arrivano tramite l'email o la pagina collegata, non in una nuova casella Godwit."
       },
       "contacts": {
-        "title": "Creare una lista email",
-        "example": "Invita le persone a ricevere novità e offerte.",
+        "title": "Creare una lista email con consenso",
+        "example": "Invita i clienti a iscriversi per ricevere novità o offerte future.",
         "setup": "Apri o crea un Egg, aggiungi un sondaggio e configura un consenso email chiaro in Dopo il voto.",
         "result": "Esporta i contatti con consenso da Connessione clienti. Le persone possono votare senza condividere l'email."
       },
@@ -87,30 +87,30 @@
     }
   },
   "landing": {
-    "eyebrow": "Un assistente AI per le attività sul territorio",
-    "title": "Aiuta ogni cliente a trovare il prossimo passo.",
-    "lede": "Fornisci a Godwit le informazioni della tua attività e un obiettivo. I clienti raggiungono l'assistente tramite un Egg, con QR o NFC.",
+    "eyebrow": "Un agente AI orientato agli obiettivi per il coinvolgimento dei clienti",
+    "title": "Rendi più utile ogni interazione con i clienti.",
+    "lede": "Dai a Godwit un obiettivo e informazioni affidabili sulla tua attività. L'AI aiuta a rispondere alle domande, raccogliere feedback e guidare i clienti verso passi utili tramite un Egg con QR o NFC. Il controllo resta a te; i risultati dipendono dai clienti.",
     "workspaceDashboard": "Dashboard",
     "createWorkspace": "Inizia con Godwit",
     "workspaceLogin": "Accedi a Godwit",
-    "note": "Per artisti, gallerie, musei, hotel, destinazioni, eventi, negozi e servizi locali.",
+    "note": "Per caffè, pub, ristoranti, hotel, artisti, gallerie, musei, destinazioni, eventi, negozi e servizi locali.",
     "eggFeatures": {
       "eyebrow": "Scopri l'Egg di Godwit",
       "title": "Incontra Godwit con un Egg.",
-      "lede": "Godwit è il tuo assistente AI. L'Egg è il punto di accesso riutilizzabile per i clienti. Aggiornalo senza sostituire il codice QR o il tag NFC.",
+      "lede": "Godwit è il tuo agente AI orientato agli obiettivi. L'Egg è il punto di accesso riutilizzabile per i clienti. Aggiornalo senza sostituire il codice QR o il tag NFC.",
       "accessibilityLabel": "Modi per aprire l'Egg",
       "sameExperience": "Un'unica esperienza",
       "accessTitle": "Facile da aprire per i clienti",
       "accessDetail": "Codice QR, tag NFC o entrambi: ogni accesso apre lo stesso Egg aggiornato.",
-      "assistantTitle": "Risposte AI basate sulla tua attività",
-      "assistantDetail": "Aggiungi il tuo sito o le FAQ perché l'assistente risponda e guidi i clienti verso un passo utile.",
+      "assistantTitle": "AI orientata agli obiettivi e basata sulla tua attività",
+      "assistantDetail": "Aggiungi il tuo sito o le FAQ perché Godwit risponda alle domande e guidi i clienti verso gli obiettivi e le azioni che scegli.",
       "guidanceTitle": "Dalla domanda al prossimo passo",
       "guidanceDetail": "Guida i clienti al sondaggio, alla scheda informativa o all'attività aperta più adatta.",
       "control": "Scegli informazioni, argomenti e se attivare l'AI. I limiti di utilizzo aiutano a mantenere il controllo.",
       "cta": "Crea il tuo primo Egg"
     },
     "howItWorksEyebrow": "Tre semplici passi",
-    "howItWorksTitle": "Scegli un obiettivo. Condividi Godwit. Impara da ogni interazione.",
+    "howItWorksTitle": "Definisci un obiettivo. Godwit guida ogni interazione con i clienti.",
     "steps": {
       "step1Title": "Scegli cosa vuoi ottenere",
       "step1Detail": "Raccogli feedback, rispondi alle domande, condividi informazioni o invita a una richiesta privata.",
@@ -138,8 +138,8 @@
     "useCases": {
       "artsTitle": "Arte e cultura",
       "artsDetail": "Artisti, gallerie e musei condividono storie, rispondono alle domande e invitano a lasciare feedback o richieste.",
-      "hospitalityTitle": "Ospitalità",
-      "hospitalityDetail": "Hotel, ristoranti e caffè rispondono alle domande frequenti e scoprono com'è stata l'esperienza degli ospiti.",
+      "hospitalityTitle": "Caffè, pub e ospitalità",
+      "hospitalityDetail": "Caffè, pub, ristoranti e hotel possono condividere menu ed eventi, rispondere alle domande, collegare le prenotazioni e raccogliere feedback privati.",
       "placesTitle": "Turismo e luoghi",
       "placesDetail": "Destinazioni e team cittadini condividono informazioni locali e aiutano i visitatori a scoprire cosa fare.",
       "eventsTitle": "Eventi e comunità",

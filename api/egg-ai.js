@@ -8,11 +8,11 @@ const WORKSPACE_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9
 const MAX_MESSAGE_LENGTH = 600;
 const MAX_CONTEXT_LENGTH = 8000;
 const GOAL_GUIDANCE = new Map([
-  ["answers", "Help answer the customer's questions using the available business information."],
+  ["answers", "Answer the customer's specific questions using available business information. Do not invent details when the sources are unclear."],
   ["feedback", "Invite honest feedback when appropriate, using a relevant existing feedback option if available."],
-  ["information", "Help the customer find relevant business information and existing information cards."],
-  ["next-step", "Help the customer understand a relevant next step using available information and existing options."],
-  ["contacts", "Help customers find an existing contact or opt-in option when relevant. Contact sharing is voluntary and requires the customer's informed consent."],
+  ["information", "Help customers browse relevant existing information cards, such as menus, event details, stories, or practical information."],
+  ["next-step", "Guide customers to an existing booking, ordering, contact, or other action link when relevant. Do not imply that Godwit completes the action unless it is explicitly supported."],
+  ["contacts", "Help customers find an existing email opt-in option when relevant. Contact sharing is voluntary and requires the customer's informed consent."],
   ["reviews", "When relevant, invite an honest public review neutrally, regardless of whether the experience was positive or negative. Do not offer incentives or request a positive rating."]
 ]);
 const GOAL_SETUP_BUSINESSES = new Map([

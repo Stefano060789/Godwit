@@ -15,21 +15,21 @@
     "getStarted": "Começar"
   },
   "landing": {
-    "eyebrow": "Um assistente de IA para negócios presenciais",
-    "title": "Ajude cada cliente a encontrar o próximo passo.",
-    "lede": "Compartilhe com o Godwit as informações do seu negócio e um objetivo. Os clientes acessam o assistente por um Egg, com QR ou NFC.",
+    "eyebrow": "Um agente de IA orientado a objetivos para o relacionamento com clientes",
+    "title": "Torne cada interação com seus clientes mais útil.",
+    "lede": "Defina um objetivo e forneça ao Godwit informações confiáveis sobre seu negócio. A IA ajuda a responder perguntas, coletar opiniões e orientar clientes para próximos passos úteis por meio de um Egg com QR ou NFC. Você mantém o controle; os resultados dependem dos clientes.",
     "workspaceDashboard": "Painel",
     "createWorkspace": "Comece com o Godwit",
     "workspaceLogin": "Entrar no Godwit",
-    "note": "Para artistas, galerias, museus, hotéis, destinos, eventos, lojas e serviços locais.",
+    "note": "Para cafés, pubs, restaurantes, hotéis, artistas, galerias, museus, destinos, eventos, lojas e serviços locais.",
     "eggFeatures": {
       "title": "Godwit é o assistente. O Egg é como os clientes chegam até ele.",
-      "lede": "Coloque um Egg onde as pessoas precisam de ajuda. Compartilhe por QR ou NFC e atualize a experiência sem trocar o código ou a etiqueta.",
-      "assistantTitle": "Respostas de IA baseadas no seu negócio",
-      "assistantDetail": "Adicione seu site ou perguntas frequentes para o assistente responder e orientar os clientes para o próximo passo."
+      "lede": "O Godwit é seu agente de IA orientado a objetivos. O Egg é um ponto de acesso reutilizável para seus clientes. Coloque-o onde precisam de ajuda e atualize-o sem trocar o QR ou a etiqueta NFC.",
+      "assistantTitle": "IA orientada a objetivos e baseada no seu negócio",
+      "assistantDetail": "Adicione seu site ou perguntas frequentes para o Godwit responder perguntas e orientar os clientes para os objetivos e ações que você escolher."
     },
     "howItWorksEyebrow": "Três passos simples",
-    "howItWorksTitle": "Escolha um objetivo. Compartilhe o Godwit. Aprenda com cada interação.",
+    "howItWorksTitle": "Defina um objetivo. O Godwit orienta cada interação com seus clientes.",
     "steps": {
       "step1Title": "Escolha o que deseja alcançar",
       "step1Detail": "Colete opiniões, responda a perguntas, compartilhe informações ou convide para uma consulta privada.",
@@ -53,12 +53,12 @@
     },
     "useCasesEyebrow": "Um assistente para muitos tipos de lugares",
     "useCasesTitle": "Feito para os lugares que as pessoas visitam.",
-    "useCasesLede": "Escolha um objetivo que combine com seu trabalho. O Godwit ajuda os clientes com respostas, opiniões e próximos passos.",
+    "useCasesLede": "Defina um objetivo de relacionamento com clientes. O Godwit usa suas informações para orientar as interações, enquanto você escolhe as ações e mantém o controle.",
     "useCases": {
       "artsTitle": "Arte e cultura",
       "artsDetail": "Artistas, galerias e museus compartilham histórias, respondem a perguntas e convidam a opiniões ou consultas.",
-      "hospitalityTitle": "Hotelaria e alimentação",
-      "hospitalityDetail": "Hotéis, restaurantes e cafés respondem a perguntas frequentes e entendem a experiência dos hóspedes.",
+      "hospitalityTitle": "Cafés, pubs e hospitalidade",
+      "hospitalityDetail": "Cafés, pubs, restaurantes e hotéis podem compartilhar cardápios e eventos, responder perguntas, incluir links para reservas e coletar opiniões privadas.",
       "placesTitle": "Turismo e lugares",
       "placesDetail": "Destinos e equipes municipais compartilham informações locais e ajudam visitantes a descobrir o que fazer.",
       "eventsTitle": "Eventos e comunidades",

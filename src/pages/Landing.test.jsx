@@ -80,12 +80,17 @@ describe("public landing donation messaging", () => {
       )
     ).replaceAll("&#x27;", "'");
 
+    expect(markup).toContain(en.landing.eyebrow);
+    expect(markup).toContain(en.landing.title);
+    expect(markup).toContain(en.landing.lede);
     expect(markup).toContain(en.landing.eggFeatures.title);
     expect(markup).toContain(en.landing.eggFeatures.accessDetail);
     expect(markup).toContain(en.landing.eggFeatures.assistantDetail);
     expect(markup).toContain(en.landing.eggFeatures.guidanceDetail);
     expect(markup).toContain(en.landing.useCases.artsDetail);
     expect(markup).toContain(en.landing.useCases.hospitalityDetail);
+    expect(en.landing.useCases.hospitalityTitle).toContain("Cafes, pubs");
+    expect(en.landing.useCases.hospitalityDetail).toContain("Cafes, pubs");
     expect(markup).toContain(en.landing.useCases.placesDetail);
     expect(markup).toContain(en.landing.useCases.eventsDetail);
     expect(markup).toContain(en.landing.useCases.shopsDetail);

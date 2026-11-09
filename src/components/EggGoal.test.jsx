@@ -44,4 +44,14 @@ describe("Egg goal setup", () => {
     expect(markup).toContain('value="discount_code"');
     expect(markup).not.toContain("Open polls");
   });
+  it("presents distinct customer outcomes and explicitly includes cafes and pubs", () => {
+    const markup = render();
+    expect(markup).toContain("Cafes, pubs &amp; hospitality");
+    expect(markup).toContain("Answer customer questions");
+    expect(markup).toContain("Show menus, stories &amp; details");
+    expect(markup).toContain("Collect private feedback");
+    expect(markup).toContain("Drive bookings &amp; enquiries");
+    expect(markup).toContain("Grow a consented email list");
+    expect(markup).toContain("Invite honest reviews");
+  });
 });
