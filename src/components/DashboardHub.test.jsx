@@ -11,7 +11,7 @@ import sl from "../i18n/locales/sl.json";
 const locales = { en, de, it: itLocale, sl };
 describe("Egg dashboard hub", () => {
   it("places inputs left, the Egg in the center, results right and settings below", () => {
-    const t = (key, options) => options.defaultValue;
+    const t = (key, options) => options?.defaultValue || key;
     const markup = renderToStaticMarkup(createElement(DashboardHub, { activeTab: "engagement", onSelect: vi.fn(), t }));
     expect(markup.indexOf("Your Business")).toBeLessThan(markup.indexOf("Business Data"));
     expect(markup).toContain("Business Data");
@@ -20,6 +20,9 @@ describe("Egg dashboard hub", () => {
     expect(markup).toContain('class="dashboard-hub-egg" aria-current="page"');
     expect(markup).toContain("dashboard-hub-results");
     expect(markup).toContain("dashboard-hub-settings");
+    expect(markup).toContain("dashboard-hub-outputs");
+    expect(markup.match(/class="dashboard-hub-connector"/g)).toHaveLength(2);
+    expect(markup.match(/<button /g)).toHaveLength(7);
     expect(markup).toContain(">QR<");
     expect(markup).toContain(">NFC<");
     expect(markup).not.toContain("Workspace");
@@ -34,6 +37,9 @@ describe("Egg dashboard hub", () => {
       for (const key of Object.keys(en.admin[section])) {
         expect(i18n.exists(`admin.${section}.${key}`)).toBe(true);
       }
+    }
+    for (const tab of ["your-business", "business", "goal", "results", "goal-progress"]) {
+      expect(i18n.exists(`admin.hub.descriptions.${tab}`)).toBe(true);
     }
   });
 });

@@ -18,9 +18,9 @@
   },
   "trial": {
     "signupTitle": "Try Godwit free for one month",
-    "signupBody": "New accounts creating their first Godwit workspace receive unlimited Eggs and up to 100 customer Egg sessions over 30 days, whichever comes first. No card is required and you will not be charged automatically. The trial starts when Godwit creates your workspace after you confirm your email, usually on your first dashboard visit. At the limit, new Egg sessions pause. Paid-plan checkout is not yet available.",
+    "signupBody": "New accounts creating their first Godwit workspace receive unlimited Eggs and up to 10 customer Egg sessions over 30 days, whichever comes first. No card is required and you will not be charged automatically. The trial starts when Godwit creates your workspace after you confirm your email, usually on your first dashboard visit. At the limit, new Egg sessions pause. Paid-plan checkout is not yet available.",
     "dashboardActive": "Trial: {{used}} of {{limit}} customer Egg sessions used. Ends {{date}}.",
-    "dashboardPaused": "Your free trial has ended or used all 100 Egg sessions.",
+    "dashboardPaused": "Your free trial has ended or used all 10 Egg sessions.",
     "dashboardPausedDetail": "New customer Egg sessions are paused. Paid plans are not yet available for purchase.",
     "statusUnavailable": "Trial status could not be loaded. Confirm the latest Supabase migration has been applied.",
     "billingLink": "View billing details",
@@ -381,6 +381,54 @@
     "defaultReviewPlatform": "Review platform"
   },
   "billing": {
+    "interactions": {
+      "eyebrow": "Monthly interaction plans",
+      "availability": "Choose a monthly plan or add a one-time pack. Review and confirm every payment securely with Stripe.",
+      "vat": "Prices exclude VAT.",
+      "loading": "Loading workspace billing…",
+      "error": "Billing could not be completed: {{message}}",
+      "usageUnavailable": "Interaction usage could not be loaded.",
+      "noWorkspace": "No existing workspace was found. Open your dashboard to set up a workspace before purchasing.",
+      "ownerOnly": "Only the workspace owner can purchase interactions or manage billing.",
+      "refresh": "Refresh billing",
+      "opening": "Opening billing…",
+      "manage": "Manage billing / cancel subscription",
+      "subscribe": "Continue to checkout",
+      "changePlan": "Change plan in billing portal",
+      "signIn": "Create an account to continue",
+      "login": "Sign in",
+      "returned": "Returned from checkout. Your allowance updates only after payment confirmation. Refresh billing to check its status.",
+      "planChanges": "Monthly subscriptions renew automatically until cancelled in the billing portal. Upgrades are prorated and take effect immediately without resetting used interactions. Downgrades and cancellations take effect at the end of the current billing period.",
+      "countingTitle": "What counts as an interaction?",
+      "countingBody": "The first customer Egg open per browser session across an account’s Eggs counts as one interaction. Repeat opens in that session and staff previews do not count. All plans include unlimited Eggs.",
+      "trialInfo": "The free trial includes 10 interactions for 30 days. It does not automatically start a paid subscription. Choose a monthly plan to continue when the trial expires or runs out.",
+      "topupTitle": "One-time interaction top-up",
+      "topupQuantity": "100 interactions",
+      "topupBody": "One payment of €7 for 100 extra interactions, valid for 30 days after purchase. Not recurring; unused top-up interactions expire. Top-ups are used after the monthly base allowance.",
+      "topupEligibility": "Buying and using top-ups requires an active paid subscription, including when its interaction allowance is exhausted. Not available for the free trial. This link opens billing; purchase requires a separate checkout action.",
+      "buyTopup": "Buy 100 extra interactions",
+      "refunds": "For billing questions or refund requests, contact support. Your statutory consumer rights remain unaffected.",
+      "usageTitle": "Interaction usage",
+      "baseUsage": "Monthly allowance: {{used}} / {{limit}} used",
+      "trialUsage": "Free trial: {{used}} / {{limit}} used",
+      "baseProgress": "Base interaction allowance used",
+      "remaining": "Interactions remaining: {{count}}",
+      "trialEnds": "Trial ends: {{date}}",
+      "periodEnds": "Current billing period ends: {{date}}",
+      "topupRemaining": "Top-up interactions remaining: {{count}}. Next expiry: {{date}}.",
+      "nextPlan": "Next plan: {{plan}}, from {{date}}.",
+      "warning": "Your interaction allowance is nearly used up. Upgrade or add a top-up to keep your Eggs available.",
+      "trialWarning": "Your free trial allowance is nearly used up. Choose a paid monthly plan to keep your Eggs available.",
+      "trialPaused": "Your free trial has ended or its 10 interactions have been used. Choose a paid monthly plan to resume customer access.",
+      "viewPlans": "View / upgrade plans",
+      "topupLink": "Add 100 interactions",
+      "legacy": "This workspace uses a legacy plan. Interaction usage is not available for this plan; review billing before changing it.",
+      "states": {
+        "exhausted": "Your interaction allowance is exhausted. Choose a paid plan or, if eligible, add a top-up to resume customer access.",
+        "expired": "Your interaction access has expired. Review your plan to resume customer access.",
+        "inactive": "No interaction plan is active. Choose a paid plan to enable customer access."
+      }
+    },
     "title": "Plans and billing",
     "subtitle": "Unlimited Eggs with a clear monthly allowance of customer interactions.",
     "pilotNotice": "Godwit is currently a free pilot until {{date}}. No payment method is required, and no paid subscription starts automatically.",
@@ -408,13 +456,21 @@
       "tiers": {
         "small": "Small",
         "standard": "Standard",
-        "scale": "Scale"
+        "scale": "Scale",
+        "regional": "Regional"
+      },
+      "priceDisclaimer": "Proposed monthly price, excluding VAT. Not yet available to buy.",
+      "useCases": {
+        "small": "For street artists, independent creators and small pop-ups: share your story, collect feedback or offer a contact link.",
+        "standard": "For cafes, pubs, shops and local services: answer common questions, collect reviews and invite email opt-ins.",
+        "scale": "For museums, busy venues and recurring events: guide visitors, gather feedback across exhibits and track engagement.",
+        "regional": "For municipalities, tourism networks and multi-site organisations: gather citizen or visitor feedback across locations."
       },
       "interactionsPerMonth": "customer interactions / month",
       "unlimitedEggs": "Unlimited Eggs included",
       "priceToBeConfirmed": "Monthly price to be announced",
       "countingTitle": "How is the free trial counted?",
-      "countingBody": "Trial counting is enforced: one first customer Egg open per browser session across a workspace's Eggs counts toward its 100-interaction allowance. Repeat opens in the same session and staff previews don't count. Paid-package counting and checkout are still proposals.",
+      "countingBody": "Trial counting is enforced: one first customer Egg open per browser session across a workspace's Eggs counts toward its 10-interaction allowance. Repeat opens in the same session and staff previews don't count. Paid-package counting and checkout are still proposals.",
       "topUpsTitle": "Need more interactions?",
       "topUpsBody": "Optional top-up packs are planned. Pack sizes, prices, and the purchase flow have not been set.",
       "statusNote": "Existing plan features and limits remain in effect. Paid-package pricing and counting, top-ups, and Stripe checkout will need a separate implementation before this proposal can be purchased."
@@ -486,6 +542,13 @@
   "admin": {
     "hub": {
       "label": "Your business, connected by Eggs",
+      "descriptions": {
+        "your-business": "Identity and profile",
+        "business": "Knowledge for your Eggs",
+        "goal": "What you want to achieve",
+        "results": "Responses and insights",
+        "goal-progress": "See your impact grow"
+      },
       "yourBusiness": "Your Business",
       "business": "Business Data",
       "goal": "Goal",
@@ -513,8 +576,8 @@
     },
     "settingsIntro": "Manage your customer review links.",
     "goal": {
-      "title": "Give your Egg a purpose",
-      "intro": "Choose customer outcomes for your business and where people will find this Egg.",
+      "title": "Create an Egg with a clear goal",
+      "intro": "You are creating a new Egg: choose its goals, give it a name and location, and optionally add a customer thank-you. After creation, manage its content and QR or NFC access in Eggs.",
       "businessHint": "Choose the closest fit. The examples help you see how an Egg can work across different businesses and places.",
       "multipleGoalsHint": "Choose one or more outcomes that matter for this Egg.",
       "businessGuidance": {

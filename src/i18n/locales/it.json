@@ -62,9 +62,9 @@
   },
   "trial": {
     "signupTitle": "Prova Godwit gratis per un mese",
-    "signupBody": "I nuovi account che creano il primo spazio Godwit ricevono Eggs illimitati e fino a 100 sessioni cliente tramite Egg in 30 giorni, a seconda di quale limite viene raggiunto prima. Non serve una carta e non verrà effettuato alcun addebito automatico. La prova inizia quando Godwit crea il tuo spazio dopo la conferma dell'email, di solito alla prima apertura della dashboard. Al raggiungimento del limite, le nuove sessioni Egg vengono sospese. L'acquisto dei piani a pagamento non è ancora disponibile.",
+    "signupBody": "I nuovi account che creano il primo spazio Godwit ricevono Eggs illimitati e fino a 10 sessioni cliente tramite Egg in 30 giorni, a seconda di quale limite viene raggiunto prima. Non serve una carta e non verrà effettuato alcun addebito automatico. La prova inizia quando Godwit crea il tuo spazio dopo la conferma dell'email, di solito alla prima apertura della dashboard. Al raggiungimento del limite, le nuove sessioni Egg vengono sospese. L'acquisto dei piani a pagamento non è ancora disponibile.",
     "dashboardActive": "Prova gratuita: {{used}} di {{limit}} sessioni Egg utilizzate. Termina il {{date}}.",
-    "dashboardPaused": "La prova gratuita è terminata o sono state utilizzate tutte le 100 sessioni Egg.",
+    "dashboardPaused": "La prova gratuita è terminata o sono state utilizzate tutte le 10 sessioni Egg.",
     "dashboardPausedDetail": "Le nuove sessioni cliente sono sospese. I piani a pagamento non sono ancora acquistabili.",
     "statusUnavailable": "Impossibile caricare lo stato della prova. Verifica che sia stata applicata l'ultima migrazione Supabase.",
     "billingLink": "Visualizza i dettagli di fatturazione",
@@ -331,6 +331,54 @@
     "defaultReviewPlatform": "Piattaforma di recensioni"
   },
   "billing": {
+    "interactions": {
+      "eyebrow": "Piani mensili di interazioni",
+      "availability": "Scegli un piano mensile o aggiungi un pacchetto una tantum. Controlla e conferma ogni pagamento in sicurezza con Stripe.",
+      "vat": "Prezzi IVA esclusa.",
+      "loading": "Caricamento della fatturazione dello spazio di lavoro…",
+      "error": "Impossibile completare l’operazione di fatturazione: {{message}}",
+      "usageUnavailable": "Impossibile caricare l’utilizzo delle interazioni.",
+      "noWorkspace": "Nessuno spazio di lavoro esistente trovato. Apri la dashboard per configurarlo prima dell’acquisto.",
+      "ownerOnly": "Solo il proprietario dello spazio di lavoro può acquistare interazioni o gestire la fatturazione.",
+      "refresh": "Aggiorna fatturazione",
+      "opening": "Apertura fatturazione…",
+      "manage": "Gestisci fatturazione / annulla abbonamento",
+      "subscribe": "Continua al checkout",
+      "changePlan": "Cambia piano nel portale di fatturazione",
+      "signIn": "Crea un account per continuare",
+      "login": "Accedi",
+      "returned": "Ritorno dal checkout. Le interazioni disponibili si aggiornano solo dopo la conferma del pagamento. Aggiorna la fatturazione per verificarne lo stato.",
+      "planChanges": "Gli abbonamenti mensili si rinnovano automaticamente fino all’annullamento nel portale di fatturazione. Gli upgrade sono calcolati pro rata e hanno effetto immediato senza azzerare le interazioni utilizzate. I downgrade e gli annullamenti hanno effetto alla fine del periodo di fatturazione corrente.",
+      "countingTitle": "Cosa conta come interazione?",
+      "countingBody": "La prima apertura di un Egg da parte di un cliente per sessione del browser conta come un’interazione nell’insieme degli Eggs di un account. Le aperture ripetute nella stessa sessione e le anteprime del personale non contano. Tutti i piani includono Eggs illimitati.",
+      "trialInfo": "La prova gratuita include 10 interazioni per 30 giorni. Non avvia automaticamente un abbonamento a pagamento. Scegli un piano mensile per continuare quando la prova scade o le interazioni si esauriscono.",
+      "topupTitle": "Ricarica di interazioni una tantum",
+      "topupQuantity": "100 interazioni",
+      "topupBody": "Un pagamento di 7 € per 100 interazioni extra, valide per 30 giorni dall’acquisto. Non ricorrente; le interazioni extra inutilizzate scadono. Le ricariche si utilizzano dopo la quota mensile di base.",
+      "topupEligibility": "L’acquisto e l’utilizzo delle ricariche richiedono un abbonamento a pagamento attivo, anche quando la sua quota di interazioni è esaurita. Non disponibile con la prova gratuita. Il link apre la fatturazione; l’acquisto richiede un’azione separata al checkout.",
+      "buyTopup": "Acquista 100 interazioni extra",
+      "refunds": "Per domande sulla fatturazione o richieste di rimborso, contatta l’assistenza. I diritti dei consumatori previsti dalla legge restano invariati.",
+      "usageTitle": "Utilizzo delle interazioni",
+      "baseUsage": "Quota mensile: {{used}} / {{limit}} utilizzate",
+      "trialUsage": "Prova gratuita: {{used}} / {{limit}} utilizzate",
+      "baseProgress": "Quota di base delle interazioni utilizzata",
+      "remaining": "Interazioni rimanenti: {{count}}",
+      "trialEnds": "Fine della prova: {{date}}",
+      "periodEnds": "Fine del periodo di fatturazione corrente: {{date}}",
+      "topupRemaining": "Interazioni extra rimanenti: {{count}}. Prossima scadenza: {{date}}.",
+      "nextPlan": "Prossimo piano: {{plan}}, dal {{date}}.",
+      "warning": "Le interazioni disponibili stanno per esaurirsi. Passa a un piano superiore o aggiungi una ricarica per mantenere disponibili i tuoi Eggs.",
+      "trialWarning": "Le interazioni della prova gratuita stanno per esaurirsi. Scegli un piano mensile a pagamento per mantenere disponibili i tuoi Eggs.",
+      "trialPaused": "La prova gratuita è terminata o le sue 10 interazioni sono esaurite. Scegli un piano mensile a pagamento per ripristinare l’accesso dei clienti.",
+      "viewPlans": "Visualizza / aggiorna piani",
+      "topupLink": "Aggiungi 100 interazioni",
+      "legacy": "Questo spazio di lavoro utilizza un piano precedente. L’utilizzo delle interazioni non è disponibile per questo piano; controlla la fatturazione prima di cambiarlo.",
+      "states": {
+        "exhausted": "Le interazioni disponibili sono esaurite. Scegli un piano a pagamento o, se idoneo, aggiungi una ricarica per ripristinare l’accesso dei clienti.",
+        "expired": "L’accesso alle interazioni è scaduto. Controlla il piano per ripristinare l’accesso dei clienti.",
+        "inactive": "Nessun piano di interazioni è attivo. Scegli un piano a pagamento per abilitare l’accesso dei clienti."
+      }
+    },
     "title": "Piani e fatturazione",
     "subtitle": "Egg illimitati con una quota mensile chiara di interazioni con i clienti.",
     "trialBanner": "Sei nuovo? Ogni piano a pagamento include una prova gratuita di 90 giorni, senza addebiti fino alla fine.",
@@ -360,13 +408,21 @@
       "tiers": {
         "small": "Piccolo",
         "standard": "Standard",
-        "scale": "Ampio"
+        "scale": "Ampio",
+        "regional": "Regionale"
+      },
+      "priceDisclaimer": "Prezzo mensile proposto, IVA esclusa. Non ancora acquistabile.",
+      "useCases": {
+        "small": "Per artisti di strada, creativi indipendenti e piccoli pop-up: racconta la tua storia, raccogli feedback o offri un link di contatto.",
+        "standard": "Per bar, pub, negozi e servizi locali: rispondi alle domande, raccogli recensioni e invita a iscriversi via email.",
+        "scale": "Per musei, luoghi molto frequentati ed eventi ricorrenti: guida i visitatori, raccogli feedback sulle esposizioni e misura le interazioni.",
+        "regional": "Per comuni, reti turistiche e organizzazioni con più sedi: raccogli feedback di cittadini e visitatori in luoghi diversi."
       },
       "interactionsPerMonth": "interazioni con i clienti / mese",
       "unlimitedEggs": "Egg illimitati inclusi",
       "priceToBeConfirmed": "Prezzo mensile da definire",
       "countingTitle": "Come si conteggia la prova gratuita?",
-      "countingBody": "Il conteggio della prova è attivo: la prima apertura di un Egg da parte di un cliente per sessione del browser viene conteggiata nel limite di 100 interazioni dello spazio di lavoro, considerando tutti i suoi Egg. Le riaperture nella stessa sessione e le anteprime dello staff non vengono conteggiate. Il conteggio e il checkout dei pacchetti a pagamento sono ancora proposte.",
+      "countingBody": "Il conteggio della prova è attivo: la prima apertura di un Egg da parte di un cliente per sessione del browser viene conteggiata nel limite di 10 interazioni dello spazio di lavoro, considerando tutti i suoi Egg. Le riaperture nella stessa sessione e le anteprime dello staff non vengono conteggiate. Il conteggio e il checkout dei pacchetti a pagamento sono ancora proposte.",
       "topUpsTitle": "Servono più interazioni?",
       "topUpsBody": "Sono previsti pacchetti di ricarica facoltativi. Dimensioni, prezzi e modalità di acquisto non sono ancora definiti.",
       "statusNote": "Le funzionalità e i limiti dei piani attuali restano in vigore. Prezzi e conteggio dei pacchetti a pagamento, ricariche e checkout Stripe richiedono un'implementazione separata prima che questa proposta sia acquistabile."
@@ -405,6 +461,13 @@
   },
   "admin": {
     "hub": {
+      "descriptions": {
+        "your-business": "Identit\u00e0 e profilo",
+        "business": "Informazioni per i tuoi Egg",
+        "goal": "Cosa vuoi raggiungere",
+        "results": "Risposte e spunti",
+        "goal-progress": "Segui il tuo impatto"
+      },
       "label": "La tua attività, collegata dagli Egg",
       "yourBusiness": "La tua attività",
       "business": "Dati attività",
@@ -433,8 +496,8 @@
     },
     "settingsIntro": "Gestisci i link alle recensioni dei clienti.",
     "goal": {
-      "title": "Dai uno scopo al tuo Egg",
-      "intro": "Scegli l'attività o il luogo, i risultati che vuoi offrire ai clienti e dove troveranno questo Egg.",
+      "title": "Crea un Egg con un obiettivo chiaro",
+      "intro": "Stai creando un nuovo Egg: scegli gli obiettivi, assegna un nome e una posizione e aggiungi un ringraziamento facoltativo. Dopo la creazione, gestisci contenuti e accesso QR o NFC nella sezione Eggs.",
       "businessHint": "Scegli la categoria più adatta. Gli esempi mostrano come usare Egg in attività e luoghi diversi.",
       "multipleGoalsHint": "Scegli uno o più risultati importanti per questo Egg.",
       "businessGuidance": {

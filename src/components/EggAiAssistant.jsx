@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import InlinePollVote from "./InlinePollVote";
+import { supabase } from "../lib/supabase";
 
 const GOAL_PROMPTS = {
   answers: "askQuestion",
@@ -86,9 +87,15 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
     setError("");
     setInput("");
     try {
+      const headers = { "Content-Type": "application/json" };
+      if (preview) {
+        const { data, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (data.session?.access_token) headers.Authorization = `Bearer ${data.session.access_token}`;
+      }
       const response = await fetch("/api/egg-ai", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           action: "chat",
           token,

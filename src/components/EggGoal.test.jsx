@@ -18,7 +18,10 @@ describe("Egg goal setup", () => {
   it("uses the saved business profile and restores the selected goal", () => {
     const markup = render();
     expect(markup.match(/aria-pressed="true"/g)).toHaveLength(1);
-    expect(markup).toContain("Give your Egg a purpose");
+    expect(markup).toContain("Create an Egg with a clear goal");
+    expect(markup).toContain("You are creating a new Egg");
+    expect(markup).not.toContain('class="hub-step"');
+    expect(markup).toContain("Name &amp; location");
     expect(markup).toContain("For cafes and pubs");
     expect(markup).toContain("Choose one or more outcomes that matter for this Egg.");
     expect(markup).not.toContain("goal-business-grid");
@@ -32,7 +35,7 @@ describe("Egg goal setup", () => {
     expect(markup).toContain("Public reviews must stay optional and cannot be rewarded.");
     expect(markup).not.toContain("admin.goal.");
   });
-  it("places the specific success detail in step 01 with the goal choices", () => {
+  it("places the specific success detail with the goal choices rather than name and location", () => {
     const markup = render();
     const firstFieldsetStart = markup.indexOf("<fieldset");
     const firstFieldsetEnd = markup.indexOf("</fieldset>", firstFieldsetStart);

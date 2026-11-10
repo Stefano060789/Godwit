@@ -1,5 +1,9 @@
 # Godwit Stripe subscription sandbox
 
+This document covers the **legacy Starter/Growth test-only integration**, not the
+new interaction packages. See [ROI_SETUP.md](ROI_SETUP.md#stripe-checkout) for the
+separately enabled interaction billing implementation and deployment requirements.
+
 This is **test-only integration code**, not a claim that keys, deployment settings,
 webhook endpoints, or signing secrets have been provisioned. Live billing remains
 unsupported. The free-pilot UI is unchanged; sandbox checkout requires a signed-in

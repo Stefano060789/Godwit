@@ -15,6 +15,9 @@ export function HubIcon({ type }) {
         <circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" />
       </> : type === "results" ? <>
         <path d="M4 3v18h17M8 17v-6M13 17V7M18 17v-3" />
+      </> : type === "progress" ? <>
+        <path d="M4 18l5-5 4 2 7-10M14 5h6v6" />
+        <path d="M4 4v17h17" opacity=".4" />
       </> : <>
         <path d="M4 6h16M4 12h16M4 18h16" /><circle cx="8" cy="6" r="2" fill="var(--hub-surface)" /><circle cx="16" cy="12" r="2" fill="var(--hub-surface)" /><circle cx="10" cy="18" r="2" fill="var(--hub-surface)" />
       </>}
@@ -35,22 +38,34 @@ export default function DashboardHub({ activeTab, onSelect, t }) {
   function node(tab, icon) {
     return <button type="button" className={`dashboard-hub-node dashboard-hub-${tab}`}
       aria-current={activeTab === tab ? "page" : undefined} onClick={() => onSelect(tab)}>
-      <HubIcon type={icon} /><span>{labels[tab]}</span>
+      <span className="dashboard-hub-icon"><HubIcon type={icon} /></span>
+      <span className="dashboard-hub-copy"><span>{labels[tab]}</span>
+        {tab !== "settings" && <small>{t(`admin.hub.descriptions.${tab}`)}</small>}
+      </span>
+      <span className="dashboard-hub-chevron" aria-hidden="true">&rsaquo;</span>
     </button>;
   }
   return (
     <nav className="dashboard-hub" aria-label={t("admin.hub.label", { defaultValue: "Your business, connected by Eggs" })}>
-      <svg className="dashboard-hub-lines" viewBox="0 0 1000 310" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M220 35C310 35 310 110 380 110M220 110H380M220 185C310 185 310 110 380 110M620 110H780M780 110V215M500 205V260" />
-      </svg>
-      <div className="dashboard-hub-inputs">{node("your-business", "yourBusiness")}{node("business", "business")}{node("goal", "goal")}</div>
+      <div className="dashboard-hub-inputs">
+        <svg className="dashboard-hub-connector" viewBox="0 0 100 300" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 50H30Q50 50 50 70V130Q50 150 75 150H100M0 150H75M0 250H30Q50 250 50 230V170Q50 150 75 150" />
+          <circle cx="50" cy="150" r="4" />
+        </svg>
+        {node("your-business", "yourBusiness")}{node("business", "business")}{node("goal", "goal")}
+      </div>
       <button type="button" className="dashboard-hub-egg" aria-current={activeTab === "engagement" ? "page" : undefined} onClick={() => onSelect("engagement")}>
         <img src="/godwit-logo.png" alt="" width="88" height="99" />
         <strong>{labels.engagement}</strong>
         <span className="dashboard-hub-access"><span><HubIcon type="qr" />QR</span><span><HubIcon type="nfc" />NFC</span></span>
       </button>
-      {node("results", "results")}
-      {node("goal-progress", "results")}
+      <div className="dashboard-hub-outputs">
+        <svg className="dashboard-hub-connector" viewBox="0 0 100 200" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 100H25Q50 100 50 80V65Q50 50 70 50H100M25 100Q50 100 50 120V135Q50 150 70 150H100" />
+          <circle cx="50" cy="100" r="4" />
+        </svg>
+        {node("results", "results")}{node("goal-progress", "progress")}
+      </div>
       {node("settings", "settings")}
     </nav>
   );

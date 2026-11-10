@@ -46,8 +46,8 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
 
   return <section className="hub-page" aria-labelledby="egg-goal-title">
     <header className="hub-page-heading"><p className="goal-eyebrow">{t("admin.hub.goal", { defaultValue: "Goal" })}</p>
-      <h2 id="egg-goal-title">{t("admin.goal.title", { defaultValue: "Give your Egg a purpose" })}</h2>
-      <p>{t("admin.goal.intro", { defaultValue: "Choose customer outcomes for your business and where people will find this Egg." })}</p>
+      <h2 id="egg-goal-title">{t("admin.goal.title", { defaultValue: "Create an Egg with a clear goal" })}</h2>
+      <p>{t("admin.goal.intro", { defaultValue: "Choose goals, name and location for your new Egg, and optionally add a customer thank-you. Manage its content and access in Eggs after creation." })}</p>
     </header>
     <form onSubmit={submit} className="egg-goal-form">
       {!businessType && <p className="hub-notice">
@@ -55,7 +55,7 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
         <Link to="/admin?tab=your-business">{t("admin.hub.yourBusiness", { defaultValue: "Your Business" })}</Link>
       </p>}
       <fieldset disabled={!canManage || busy || !businessType}>
-        <legend><span className="hub-step">01</span>{t("quickStart.goalTitle")}</legend>
+        <legend>{t("quickStart.goalTitle")}</legend>
         <p className="goal-multi-hint">{t(`admin.goal.businessGuidance.${businessType}`, { defaultValue: t("admin.goal.businessGuidance.default") })}</p>
         <p className="goal-multi-hint">{t("admin.goal.multipleGoalsHint", { defaultValue: "Choose one or more outcomes that matter for this Egg." })}</p>
         <div className="goal-options-grid">
@@ -70,7 +70,7 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
         </label>
       </fieldset>
       <fieldset disabled={!canManage || busy || !businessType}>
-        <legend><span className="hub-step">02</span>{t("admin.goal.placementTitle", { defaultValue: "Name & location" })}</legend>
+        <legend>{t("admin.goal.placementTitle", { defaultValue: "Name & location" })}</legend>
         <div className="hub-form-grid">
           <label>{t("admin.engagement.campaigns.nameLabel")}<input required maxLength={120} value={name} onChange={(event) => setName(event.target.value)} placeholder={t("admin.goal.nameExample", { defaultValue: "Gallery welcome" })} /></label>
           <label>{t("admin.engagement.campaigns.placementLabel")}<input required maxLength={80} value={placement} onChange={(event) => setPlacement(event.target.value)} placeholder={t("admin.goal.locationExample", { defaultValue: "Main entrance" })} /></label>

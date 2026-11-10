@@ -87,11 +87,12 @@ async function loadCampaign(token) {
   };
 }
 
-async function loadEggOptions(token, campaign, trialSessionId) {
+async function loadEggOptions(token, campaign, trialSessionId, managerToken) {
   const { serviceKey } = getSupabaseConfig();
   const [items, campaigns] = await Promise.all([
     supabaseRequest("/rest/v1/rpc/get_public_qr_campaign_items", {
       key: serviceKey,
+      ...(managerToken ? { token: managerToken } : {}),
       method: "POST",
       body: { target_token: token, target_session_id: trialSessionId }
     }),
@@ -443,18 +444,19 @@ async function handleChat(request, token, response) {
   const { serviceKey } = getSupabaseConfig();
   const trialAccessAllowed = await supabaseRequest("/rest/v1/rpc/check_egg_trial_session", {
     key: serviceKey,
+    ...(getBearer(request) ? { token: getBearer(request) } : {}),
     method: "POST",
     body: { target_campaign_token: token, target_session_id: trialSessionId }
   });
   if (trialAccessAllowed !== true) {
-    return response.status(403).json({ error: "This Egg trial has ended. New customer interactions are paused." });
+    return response.status(403).json({ error: "This Egg session is unavailable. New customer interactions may be paused; staff previews require a signed-in manager." });
   }
 
   const [sources, sharedSources] = await Promise.all([
     supabaseRequest(`/rest/v1/egg_ai_sources?campaign_id=eq.${campaign.id}&select=title,content&order=created_at.desc&limit=8`, { key: serviceKey }),
     supabaseRequest(`/rest/v1/workspace_ai_sources?workspace_id=eq.${encodeURIComponent(campaign.workspace_id)}&select=title,content,source_type&order=created_at.desc&limit=8`, { key: serviceKey })
   ]);
-  const eggOptions = await loadEggOptions(token, campaign, trialSessionId);
+  const eggOptions = await loadEggOptions(token, campaign, trialSessionId, getBearer(request));
 
   const sessionHash = createHash("sha256").update(sessionId).digest("hex");
   try {

@@ -12,6 +12,7 @@
 
 import { captureError } from "../lib/errorReporting.js";
 import { DONATION_FEATURE_ENABLED } from "../lib/donationFeature.js";
+import { handleInteractionCheckout } from "../lib/interactionStripe.js";
 import {
   STRIPE_SANDBOX_PLANS as PLANS,
   requireStripeSandbox,
@@ -105,6 +106,9 @@ export default async function handler(request, response) {
   }
 
   const mode = String(request.body?.mode || "subscription");
+  if (["interaction-subscription", "interaction-topup", "interaction-portal"].includes(mode)) {
+    return handleInteractionCheckout(request, response);
+  }
   if (mode === "connect-onboarding") return handleConnectOnboarding(request, response);
   if (mode === "connect-status") return handleConnectStatus(request, response);
   if (mode === "donation") return handleDonationCheckout(request, response);

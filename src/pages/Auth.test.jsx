@@ -40,6 +40,6 @@ describe("workspace entry pages", () => {
     expect(login).toContain("Create a Godwit account");
     expect(login).not.toContain("Sign in to your workspace");
     expect(register).toContain("Try Godwit free for one month");
-    expect(register).toContain("100 customer Egg sessions");
+    expect(register).toContain("10 customer Egg sessions");
   });
 });

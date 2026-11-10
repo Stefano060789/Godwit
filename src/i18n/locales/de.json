@@ -62,9 +62,9 @@
   },
   "trial": {
     "signupTitle": "Testen Sie Godwit einen Monat kostenlos",
-    "signupBody": "Neue Konten, die ihren ersten Godwit-Arbeitsbereich erstellen, erhalten unbegrenzt viele Eggs und bis zu 100 Kundeninteraktionen innerhalb von 30 Tagen – je nachdem, was zuerst eintritt. Sie benötigen keine Karte und es erfolgt keine automatische Abbuchung. Der Test beginnt, sobald Godwit nach Ihrer E-Mail-Bestätigung Ihren Arbeitsbereich erstellt, normalerweise beim ersten Dashboard-Aufruf. Danach werden neue Egg-Sitzungen pausiert. Der Kauf kostenpflichtiger Tarife ist noch nicht verfügbar.",
+    "signupBody": "Neue Konten, die ihren ersten Godwit-Arbeitsbereich erstellen, erhalten unbegrenzt viele Eggs und bis zu 10 Kundeninteraktionen innerhalb von 30 Tagen – je nachdem, was zuerst eintritt. Sie benötigen keine Karte und es erfolgt keine automatische Abbuchung. Der Test beginnt, sobald Godwit nach Ihrer E-Mail-Bestätigung Ihren Arbeitsbereich erstellt, normalerweise beim ersten Dashboard-Aufruf. Danach werden neue Egg-Sitzungen pausiert. Der Kauf kostenpflichtiger Tarife ist noch nicht verfügbar.",
     "dashboardActive": "Testphase: {{used}} von {{limit}} Kundeninteraktionen genutzt. Ende: {{date}}.",
-    "dashboardPaused": "Die kostenlose Testphase ist abgelaufen oder alle 100 Egg-Sitzungen wurden genutzt.",
+    "dashboardPaused": "Die kostenlose Testphase ist abgelaufen oder alle 10 Egg-Sitzungen wurden genutzt.",
     "dashboardPausedDetail": "Neue Kundeninteraktionen sind pausiert. Kostenpflichtige Tarife können noch nicht gekauft werden.",
     "statusUnavailable": "Der Teststatus konnte nicht geladen werden. Prüfen Sie, ob die aktuelle Supabase-Migration angewendet wurde.",
     "billingLink": "Abrechnungsdetails ansehen",
@@ -331,6 +331,54 @@
     "defaultReviewPlatform": "Bewertungsplattform"
   },
   "billing": {
+    "interactions": {
+      "eyebrow": "Monatliche Interaktionstarife",
+      "availability": "Wähle einen Monatstarif oder füge ein einmaliges Zusatzpaket hinzu. Prüfe und bestätige jede Zahlung sicher mit Stripe.",
+      "vat": "Preise zuzüglich MwSt.",
+      "loading": "Workspace-Abrechnung wird geladen…",
+      "error": "Abrechnung konnte nicht abgeschlossen werden: {{message}}",
+      "usageUnavailable": "Der Interaktionsverbrauch konnte nicht geladen werden.",
+      "noWorkspace": "Kein bestehender Workspace gefunden. Öffne dein Dashboard und richte vor dem Kauf einen Workspace ein.",
+      "ownerOnly": "Nur der Workspace-Inhaber kann Interaktionen kaufen oder die Abrechnung verwalten.",
+      "refresh": "Abrechnung aktualisieren",
+      "opening": "Abrechnung wird geöffnet…",
+      "manage": "Abrechnung verwalten / Abo kündigen",
+      "subscribe": "Weiter zum Checkout",
+      "changePlan": "Tarif im Abrechnungsportal ändern",
+      "signIn": "Konto erstellen und fortfahren",
+      "login": "Anmelden",
+      "returned": "Vom Checkout zurückgekehrt. Dein Kontingent wird erst nach Zahlungsbestätigung aktualisiert. Aktualisiere die Abrechnung, um den Status zu prüfen.",
+      "planChanges": "Monatsabos verlängern sich automatisch bis zur Kündigung im Abrechnungsportal. Upgrades werden anteilig berechnet und gelten sofort, ohne verbrauchte Interaktionen zurückzusetzen. Downgrades und Kündigungen werden zum Ende des aktuellen Abrechnungszeitraums wirksam.",
+      "countingTitle": "Was zählt als Interaktion?",
+      "countingBody": "Das erste Öffnen eines Eggs durch einen Kunden pro Browsersitzung zählt über alle Eggs eines Kontos als eine Interaktion. Wiederholte Aufrufe in derselben Sitzung und Mitarbeitervorschauen zählen nicht. Alle Tarife enthalten unbegrenzt viele Eggs.",
+      "trialInfo": "Die kostenlose Testphase umfasst 10 Interaktionen für 30 Tage. Es beginnt nicht automatisch ein kostenpflichtiges Abo. Wähle einen Monatstarif, wenn die Testphase abläuft oder das Kontingent aufgebraucht ist.",
+      "topupTitle": "Einmaliges Interaktions-Zusatzpaket",
+      "topupQuantity": "100 Interaktionen",
+      "topupBody": "Einmalig 7 € für 100 zusätzliche Interaktionen, gültig für 30 Tage nach dem Kauf. Kein Abo; ungenutzte Zusatzinteraktionen verfallen. Zusatzpakete werden nach dem monatlichen Grundkontingent genutzt.",
+      "topupEligibility": "Kauf und Nutzung von Zusatzpaketen erfordern ein aktives bezahltes Abo, auch wenn dessen Interaktionskontingent aufgebraucht ist. Nicht in der kostenlosen Testphase verfügbar. Der Link öffnet die Abrechnung; ein Kauf erfordert einen separaten Checkout.",
+      "buyTopup": "100 zusätzliche Interaktionen kaufen",
+      "refunds": "Bei Abrechnungsfragen oder Erstattungsanfragen wende dich an den Support. Deine gesetzlichen Verbraucherrechte bleiben unberührt.",
+      "usageTitle": "Interaktionsverbrauch",
+      "baseUsage": "Monatskontingent: {{used}} / {{limit}} verbraucht",
+      "trialUsage": "Kostenlose Testphase: {{used}} / {{limit}} verbraucht",
+      "baseProgress": "Verbrauch des Grundkontingents",
+      "remaining": "Verbleibende Interaktionen: {{count}}",
+      "trialEnds": "Testphase endet: {{date}}",
+      "periodEnds": "Aktueller Abrechnungszeitraum endet: {{date}}",
+      "topupRemaining": "Verbleibende Zusatzinteraktionen: {{count}}. Nächster Verfall: {{date}}.",
+      "nextPlan": "Nächster Tarif: {{plan}}, ab {{date}}.",
+      "warning": "Dein Interaktionskontingent ist fast aufgebraucht. Wechsle den Tarif oder kaufe ein Zusatzpaket, damit deine Eggs verfügbar bleiben.",
+      "trialWarning": "Dein Testkontingent ist fast aufgebraucht. Wähle einen bezahlten Monatstarif, damit deine Eggs verfügbar bleiben.",
+      "trialPaused": "Deine kostenlose Testphase ist beendet oder ihre 10 Interaktionen sind verbraucht. Wähle einen bezahlten Monatstarif, um den Kundenzugang fortzusetzen.",
+      "viewPlans": "Tarife ansehen / upgraden",
+      "topupLink": "100 Interaktionen hinzufügen",
+      "legacy": "Dieser Workspace nutzt einen bisherigen Tarif. Dafür ist kein Interaktionsverbrauch verfügbar. Prüfe vor einem Wechsel die Abrechnung.",
+      "states": {
+        "exhausted": "Dein Interaktionskontingent ist aufgebraucht. Wähle einen bezahlten Tarif oder kaufe, sofern berechtigt, ein Zusatzpaket, um den Kundenzugang fortzusetzen.",
+        "expired": "Dein Interaktionszugang ist abgelaufen. Prüfe deinen Tarif, um den Kundenzugang fortzusetzen.",
+        "inactive": "Kein Interaktionstarif ist aktiv. Wähle einen bezahlten Tarif, um den Kundenzugang zu aktivieren."
+      }
+    },
     "title": "Tarife und Abrechnung",
     "subtitle": "Unbegrenzt viele Eggs mit einem klaren monatlichen Kontingent an Kundeninteraktionen.",
     "trialBanner": "Neu hier? Jeder kostenpflichtige Tarif enthält eine 90-tägige kostenlose Testphase – keine Kosten, bis diese endet.",
@@ -360,13 +408,21 @@
       "tiers": {
         "small": "Klein",
         "standard": "Standard",
-        "scale": "Skalierung"
+        "scale": "Skalierung",
+        "regional": "Regional"
+      },
+      "priceDisclaimer": "Vorgeschlagener Monatspreis ohne MwSt. Noch nicht buchbar.",
+      "useCases": {
+        "small": "Für Straßenkünstler, Kreative und kleine Pop-ups: Geschichten teilen, Feedback sammeln oder einen Kontaktlink anbieten.",
+        "standard": "Für Cafés, Pubs, Geschäfte und lokale Dienstleister: Fragen beantworten, Bewertungen sammeln und freiwillige E-Mail-Anmeldungen anbieten.",
+        "scale": "Für Museen, gut besuchte Orte und regelmäßige Veranstaltungen: Besucher führen, Feedback zu Ausstellungen sammeln und Interaktionen verfolgen.",
+        "regional": "Für Gemeinden, Tourismusnetzwerke und Organisationen mit mehreren Standorten: Bürger- oder Besucherfeedback standortübergreifend sammeln."
       },
       "interactionsPerMonth": "Kundeninteraktionen / Monat",
       "unlimitedEggs": "Unbegrenzt viele Eggs inklusive",
       "priceToBeConfirmed": "Monatlicher Preis wird noch festgelegt",
       "countingTitle": "Wie wird die kostenlose Testphase gezählt?",
-      "countingBody": "Die Zählung in der Testphase ist aktiv: Der erste Egg-Aufruf eines Kunden pro Browser-Sitzung wird über alle Eggs eines Arbeitsbereichs hinweg auf das Kontingent von 100 Interaktionen angerechnet. Weitere Aufrufe in derselben Sitzung und Vorschauen durch Mitarbeitende zählen nicht. Zählung und Checkout für kostenpflichtige Pakete sind weiterhin Vorschläge.",
+      "countingBody": "Die Zählung in der Testphase ist aktiv: Der erste Egg-Aufruf eines Kunden pro Browser-Sitzung wird über alle Eggs eines Arbeitsbereichs hinweg auf das Kontingent von 10 Interaktionen angerechnet. Weitere Aufrufe in derselben Sitzung und Vorschauen durch Mitarbeitende zählen nicht. Zählung und Checkout für kostenpflichtige Pakete sind weiterhin Vorschläge.",
       "topUpsTitle": "Mehr Interaktionen benötigt?",
       "topUpsBody": "Optionale Zusatzpakete sind geplant. Paketgrößen, Preise und Kaufablauf stehen noch nicht fest.",
       "statusNote": "Die bestehenden Tarif-Funktionen und Limits gelten weiterhin. Preise und Zählung für kostenpflichtige Pakete, Zusatzpakete und Stripe-Checkout müssen separat umgesetzt werden, bevor dieser Vorschlag buchbar ist."
@@ -405,6 +461,13 @@
   },
   "admin": {
     "hub": {
+      "descriptions": {
+        "your-business": "Identit\u00e4t und Profil",
+        "business": "Wissen f\u00fcr Ihre Eggs",
+        "goal": "Was Sie erreichen wollen",
+        "results": "Antworten und Einblicke",
+        "goal-progress": "Ihre Wirkung im Blick"
+      },
       "label": "Ihr Unternehmen, verbunden durch Eggs",
       "yourBusiness": "Ihr Unternehmen",
       "business": "Unternehmensdaten",
@@ -433,8 +496,8 @@
     },
     "settingsIntro": "Verwalten Sie Ihre Links zu Kundenbewertungen.",
     "goal": {
-      "title": "Geben Sie Ihrem Egg ein Ziel",
-      "intro": "Wählen Sie Unternehmen oder Ort, gewünschte Kundenergebnisse und den Standort dieses Eggs.",
+      "title": "Erstellen Sie ein Egg mit einem klaren Ziel",
+      "intro": "Sie erstellen ein neues Egg: Wählen Sie Ziele, Name und Standort und fügen Sie optional ein Dankeschön hinzu. Anschließend verwalten Sie Inhalte sowie QR- und NFC-Zugang unter Eggs.",
       "businessHint": "Wählen Sie die passendste Kategorie. Die Beispiele zeigen, wie ein Egg in verschiedenen Unternehmen und an unterschiedlichen Orten eingesetzt werden kann.",
       "multipleGoalsHint": "Wählen Sie ein oder mehrere Ergebnisse, die für dieses Egg wichtig sind.",
       "businessGuidance": {

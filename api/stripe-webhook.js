@@ -1,31 +1,12 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
 import { captureError } from "../lib/errorReporting.js";
+import { readRawBody, verifyStripeSignature } from "../lib/stripeWebhookSignature.js";
+import { handleInteractionWebhook } from "../lib/interactionStripeWebhook.js";
 import {
   hasGodwitSandboxMetadata,
   requireStripeSandbox,
   stripeSandboxRequest,
   validateSandboxSubscription
 } from "../lib/stripeSandbox.js";
-
-function verifyStripeSignature(payload, signatureHeader, secret) {
-  const timestamp = signatureHeader?.match(/(?:^|,)t=(\d+)/)?.[1];
-  const signatures = [...(signatureHeader?.matchAll(/(?:^|,)v1=([^,]+)/g) ?? [])].map((match) => match[1]);
-  if (!timestamp || signatures.length === 0) return false;
-  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
-
-  const expected = createHmac("sha256", secret).update(`${timestamp}.${payload}`).digest("hex");
-  return signatures.some((signature) => {
-    const received = Buffer.from(signature, "hex");
-    const calculated = Buffer.from(expected, "hex");
-    return received.length === calculated.length && timingSafeEqual(received, calculated);
-  });
-}
-
-async function readRawBody(request) {
-  const chunks = [];
-  for await (const chunk of request) chunks.push(chunk);
-  return Buffer.concat(chunks).toString("utf8");
-}
 
 async function upsertSubscription(subscription) {
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -95,6 +76,9 @@ export default async function handler(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
     return response.status(405).json({ error: "Method not allowed." });
+  }
+  if (process.env.INTERACTION_BILLING_ENABLED === "1") {
+    return handleInteractionWebhook(request, response);
   }
 
   try {

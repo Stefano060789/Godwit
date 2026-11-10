@@ -72,6 +72,7 @@ describe("Egg AI API", () => {
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
       if (href.includes("/rest/v1/rpc/check_egg_trial_session")) {
+        expect(options.headers.Authorization).toBe("Bearer manager-token");
         expect(JSON.parse(options.body)).toEqual({
           target_campaign_token: "egg-token",
           target_session_id: "38dfeb63-639c-4c17-8882-7a82da0e84cc"
@@ -96,6 +97,7 @@ describe("Egg AI API", () => {
         return jsonResponse([{ title: "Business notes", content: "The cafe opens at nine.", source_type: "notes" }]);
       }
       if (href.includes("/rest/v1/rpc/get_public_qr_campaign_items")) {
+        expect(options.headers.Authorization).toBe("Bearer manager-token");
         expect(JSON.parse(options.body)).toMatchObject({
           target_token: "egg-token",
           target_session_id: "38dfeb63-639c-4c17-8882-7a82da0e84cc"
@@ -127,7 +129,9 @@ describe("Egg AI API", () => {
     }));
 
     const response = makeResponse();
-    await handler(makeChatRequest(), response);
+    const previewRequest = makeChatRequest();
+    previewRequest.headers.authorization = "Bearer manager-token";
+    await handler(previewRequest, response);
 
     expect(response.statusCode).toBe(200);
     expect(response.body.answer).toContain("step-free ramp");
@@ -150,7 +154,7 @@ describe("Egg AI API", () => {
     await handler(makeChatRequest(), response);
 
     expect(response.statusCode).toBe(403);
-    expect(response.body.error).toContain("trial has ended");
+    expect(response.body.error).toContain("Egg session is unavailable");
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes("api.anthropic.com"))).toBe(false);
   });
 

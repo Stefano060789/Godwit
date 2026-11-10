@@ -63,9 +63,9 @@
   },
   "trial": {
     "signupTitle": "Preizkusite Godwit brezplačno en mesec",
-    "signupBody": "Novi računi, ki ustvarijo svoj prvi prostor Godwit, prejmejo neomejeno število Eggov in do 100 uporabniških sej prek Eggov v 30 dneh – kar nastopi prej. Kartica ni potrebna in samodejnih bremenitev ne bo. Preizkus se začne, ko Godwit po potrditvi e-pošte ustvari vaš prostor, običajno ob prvem obisku nadzorne plošče. Nato se nove seje Eggov ustavijo. Plačljivih paketov še ni mogoče kupiti.",
+    "signupBody": "Novi računi, ki ustvarijo svoj prvi prostor Godwit, prejmejo neomejeno število Eggov in do 10 uporabniških sej prek Eggov v 30 dneh – kar nastopi prej. Kartica ni potrebna in samodejnih bremenitev ne bo. Preizkus se začne, ko Godwit po potrditvi e-pošte ustvari vaš prostor, običajno ob prvem obisku nadzorne plošče. Nato se nove seje Eggov ustavijo. Plačljivih paketov še ni mogoče kupiti.",
     "dashboardActive": "Preizkus: uporabljenih {{used}} od {{limit}} uporabniških sej Eggov. Konec: {{date}}.",
-    "dashboardPaused": "Brezplačni preizkus se je končal ali pa je bilo uporabljenih vseh 100 sej Eggov.",
+    "dashboardPaused": "Brezplačni preizkus se je končal ali pa je bilo uporabljenih vseh 10 sej Eggov.",
     "dashboardPausedDetail": "Nove uporabniške seje Eggov so ustavljene. Plačljivi paketi še niso na voljo za nakup.",
     "statusUnavailable": "Stanja preizkusa ni bilo mogoče naložiti. Preverite, ali je bila uporabljena najnovejša Supabase migracija.",
     "billingLink": "Oglejte si podrobnosti obračunavanja",
@@ -102,6 +102,54 @@
     "cta": "Ustvarite račun"
   },
   "billing": {
+    "interactions": {
+      "eyebrow": "Mesečni paketi interakcij",
+      "availability": "Izberi mesečni paket ali dodaj enkratni dodatni paket. Vsako plačilo varno preglej in potrdi s storitvijo Stripe.",
+      "vat": "Cene ne vključujejo DDV.",
+      "loading": "Nalaganje obračunavanja delovnega prostora…",
+      "error": "Postopka obračunavanja ni bilo mogoče dokončati: {{message}}",
+      "usageUnavailable": "Porabe interakcij ni bilo mogoče naložiti.",
+      "noWorkspace": "Obstoječi delovni prostor ni bil najden. Pred nakupom odpri nadzorno ploščo in ga nastavi.",
+      "ownerOnly": "Samo lastnik delovnega prostora lahko kupuje interakcije ali upravlja obračunavanje.",
+      "refresh": "Osveži obračunavanje",
+      "opening": "Odpiranje obračunavanja…",
+      "manage": "Upravljaj obračunavanje / prekliči naročnino",
+      "subscribe": "Nadaljuj na plačilo",
+      "changePlan": "Spremeni paket v obračunskem portalu",
+      "signIn": "Ustvari račun za nadaljevanje",
+      "login": "Prijava",
+      "returned": "Vrnitev s plačila. Razpoložljive interakcije se posodobijo šele po potrditvi plačila. Osveži obračunavanje in preveri stanje.",
+      "planChanges": "Mesečne naročnine se samodejno podaljšujejo do preklica v obračunskem portalu. Nadgradnje se obračunajo sorazmerno in veljajo takoj, brez ponastavitve porabljenih interakcij. Znižanja paketov in preklici začnejo veljati ob koncu trenutnega obračunskega obdobja.",
+      "countingTitle": "Kaj šteje kot interakcija?",
+      "countingBody": "Prvo odprtje Egga s strani stranke v seji brskalnika šteje kot ena interakcija za vse Egge računa. Ponovna odprtja v isti seji in predogledi osebja ne štejejo. Vsi paketi vključujejo neomejeno število Eggov.",
+      "trialInfo": "Brezplačni preizkus vključuje 10 interakcij za 30 dni. Plačljiva naročnina se ne začne samodejno. Za nadaljevanje po poteku preizkusa ali porabi interakcij izberi mesečni paket.",
+      "topupTitle": "Enkratni dodatni paket interakcij",
+      "topupQuantity": "100 interakcij",
+      "topupBody": "Enkratno plačilo 7 € za 100 dodatnih interakcij, veljavnih 30 dni po nakupu. Brez ponavljajočih se plačil; neporabljene dodatne interakcije potečejo. Dodatni paketi se porabljajo po mesečni osnovni kvoti.",
+      "topupEligibility": "Nakup in uporaba dodatnih interakcij zahtevata aktivno plačljivo naročnino, tudi ko je njena kvota interakcij porabljena. Ni na voljo pri brezplačnem preizkusu. Povezava odpre obračunavanje; nakup zahteva ločeno dejanje na strani za plačilo.",
+      "buyTopup": "Kupi 100 dodatnih interakcij",
+      "refunds": "Za vprašanja o obračunavanju ali zahtevke za vračilo se obrni na podporo. Tvoje zakonske pravice potrošnika ostajajo nespremenjene.",
+      "usageTitle": "Poraba interakcij",
+      "baseUsage": "Mesečna kvota: {{used}} / {{limit}} porabljenih",
+      "trialUsage": "Brezplačni preizkus: {{used}} / {{limit}} porabljenih",
+      "baseProgress": "Poraba osnovne kvote interakcij",
+      "remaining": "Preostale interakcije: {{count}}",
+      "trialEnds": "Preizkus se konča: {{date}}",
+      "periodEnds": "Trenutno obračunsko obdobje se konča: {{date}}",
+      "topupRemaining": "Preostale dodatne interakcije: {{count}}. Naslednji potek: {{date}}.",
+      "nextPlan": "Naslednji paket: {{plan}}, od {{date}}.",
+      "warning": "Tvoje interakcije so skoraj porabljene. Nadgradi paket ali dodaj dodatne interakcije, da bodo Eggi ostali dostopni.",
+      "trialWarning": "Interakcije brezplačnega preizkusa so skoraj porabljene. Izberi plačljiv mesečni paket, da bodo Eggi ostali dostopni.",
+      "trialPaused": "Brezplačni preizkus se je končal ali je bilo porabljenih vseh 10 interakcij. Izberi plačljiv mesečni paket za obnovitev dostopa strank.",
+      "viewPlans": "Ogled / nadgradnja paketov",
+      "topupLink": "Dodaj 100 interakcij",
+      "legacy": "Ta delovni prostor uporablja prejšnji paket. Poraba interakcij za ta paket ni na voljo; pred spremembo preveri obračunavanje.",
+      "states": {
+        "exhausted": "Interakcije so porabljene. Izberi plačljiv paket ali, če izpolnjuješ pogoje, dodaj interakcije za obnovitev dostopa strank.",
+        "expired": "Dostop do interakcij je potekel. Preveri paket za obnovitev dostopa strank.",
+        "inactive": "Noben paket interakcij ni aktiven. Izberi plačljiv paket za omogočanje dostopa strank."
+      }
+    },
     "title": "Paketi in obračunavanje",
     "subtitle": "Neomejeno Eggov z jasno mesečno kvoto interakcij s strankami.",
     "currentPlanNotice": "Vaš delovni prostor je trenutno v paketu {{plan}}.",
@@ -113,13 +161,21 @@
       "tiers": {
         "small": "Majhna",
         "standard": "Standardna",
-        "scale": "Razširjena"
+        "scale": "Razširjena",
+        "regional": "Regionalna"
+      },
+      "priceDisclaimer": "Predlagana mesečna cena brez DDV. Nakup še ni na voljo.",
+      "useCases": {
+        "small": "Za ulične umetnike, samostojne ustvarjalce in manjše začasne prodajalne: delite zgodbo, zbirajte odzive ali ponudite kontaktno povezavo.",
+        "standard": "Za kavarne, pube, trgovine in lokalne storitve: odgovarjajte na vprašanja, zbirajte ocene in ponudite prostovoljno e-poštno prijavo.",
+        "scale": "Za muzeje, obiskane lokacije in redne dogodke: usmerjajte obiskovalce, zbirajte odzive na razstave in spremljajte interakcije.",
+        "regional": "Za občine, turistične mreže in organizacije z več lokacijami: zbirajte odzive občanov ali obiskovalcev na različnih lokacijah."
       },
       "interactionsPerMonth": "interakcij s strankami / mesec",
       "unlimitedEggs": "Vključeno neomejeno število Eggov",
       "priceToBeConfirmed": "Mesečna cena bo določena pozneje",
       "countingTitle": "Kako se šteje brezplačno preizkusno obdobje?",
-      "countingBody": "Štetje v preizkusnem obdobju je aktivno: prvo odprtje Egg s strani stranke v posamezni seji brskalnika se šteje v omejitev 100 interakcij za vse Egge v delovnem prostoru. Ponovna odprtja v isti seji in predogledi zaposlenih se ne štejejo. Štetje in plačilo za plačljive pakete sta še vedno predlog.",
+      "countingBody": "Štetje v preizkusnem obdobju je aktivno: prvo odprtje Egg s strani stranke v posamezni seji brskalnika se šteje v omejitev 10 interakcij za vse Egge v delovnem prostoru. Ponovna odprtja v isti seji in predogledi zaposlenih se ne štejejo. Štetje in plačilo za plačljive pakete sta še vedno predlog.",
       "topUpsTitle": "Potrebujete več interakcij?",
       "topUpsBody": "Načrtovani so neobvezni dodatni paketi. Velikosti, cene in način nakupa še niso določeni.",
       "statusNote": "Obstoječe funkcije in omejitve paketov ostajajo v veljavi. Pred nakupom predloga bo treba ločeno urediti cene in štetje plačljivih paketov, dodatne pakete ter plačila prek Stripe."
@@ -267,6 +323,13 @@
   },
   "admin": {
     "hub": {
+      "descriptions": {
+        "your-business": "Identiteta in profil",
+        "business": "Znanje za va\u0161a jajca",
+        "goal": "Kaj \u017eelite dose\u010di",
+        "results": "Odgovori in vpogledi",
+        "goal-progress": "Spremljajte svoj napredek"
+      },
       "label": "Vaše podjetje, povezano z Eggi",
       "yourBusiness": "Vaše podjetje",
       "business": "Podatki podjetja",
@@ -295,8 +358,8 @@
     },
     "settingsIntro": "Upravljajte povezave do ocen strank.",
     "goal": {
-      "title": "Dajte svojemu Eggu namen",
-      "intro": "Izberite podjetje ali kraj, želene rezultate za stranke in lokacijo tega Egg.",
+      "title": "Ustvarite Egg z jasnim ciljem",
+      "intro": "Ustvarjate nov Egg: izberite cilje, ime in lokacijo ter po želji dodajte zahvalo strankam. Po ustvarjanju upravljajte vsebino ter dostop QR ali NFC v razdelku Eggs.",
       "businessHint": "Izberite najprimernejšo kategorijo. Primeri prikazujejo, kako lahko Egg uporabljate v različnih podjetjih in krajih.",
       "multipleGoalsHint": "Izberite enega ali več rezultatov, ki so pomembni za ta Egg.",
       "businessGuidance": {

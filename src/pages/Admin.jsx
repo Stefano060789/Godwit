@@ -6,6 +6,7 @@ import { appendAuditLog, readPollMeta, savePollMeta, isPollClosed } from "../lib
 import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
 import { buildEggUrl } from "../lib/eggs";
 import DashboardHub from "../components/DashboardHub";
+import InteractionUsageNotice from "../components/InteractionUsageNotice";
 import EggGoal from "../components/EggGoal";
 import EggResults from "../components/EggResults";
 import BusinessProfile from "../components/BusinessProfile";
@@ -91,6 +92,7 @@ export default function Admin() {
     trial: null
   });
   const [workspaceUserId, setWorkspaceUserId] = useState(null);
+  const [interactionUsage, setInteractionUsage] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState("viewer");
   const [qrCampaigns, setQrCampaigns] = useState([]);
   const [eggAccessCounts, setEggAccessCounts] = useState({});
@@ -346,6 +348,24 @@ export default function Admin() {
 
     return () => clearInterval(interval);
   }, [navigate]);
+
+  useEffect(() => {
+    if (!workspaceUserId) return;
+    let cancelled = false;
+    async function refreshUsage() {
+      const { data, error } = await supabase.rpc("workspace_interaction_status", { target_workspace_id: workspaceUserId });
+      if (cancelled) return;
+      if (error) {
+        console.error("Unable to load interaction usage", error);
+        setInteractionUsage({ state: "unavailable" });
+        return;
+      }
+      setInteractionUsage(data);
+    }
+    refreshUsage();
+    const timer = setInterval(refreshUsage, 30000);
+    return () => { cancelled = true; clearInterval(timer); };
+  }, [workspaceUserId]);
 
   useEffect(() => {
     if (!workspaceUserId || !["engagement", "results"].includes(activeTab)) return;
@@ -1423,7 +1443,11 @@ export default function Admin() {
 
   if (loading) return <p className="text-center p-6">Loading polls...</p>;
 
-  const entitlements = getEntitlements(workspaceProfile.plan);
+  const entitlements = {
+    ...getEntitlements(workspaceProfile.plan),
+    ...(["small", "standard", "scale", "regional"].includes(interactionUsage?.plan)
+      && ["active", "exhausted"].includes(interactionUsage.state) ? { campaignLimit: Infinity } : {})
+  };
   const permission = getPermissionSet(currentUserRole);
   const canEditPolls = permission.canEditPolls;
   const canDeletePolls = permission.canDeletePolls;
@@ -1577,7 +1601,8 @@ export default function Admin() {
 
   return (
     <div className="workspace-page egg-workspace max-w-5xl mx-auto p-6">
-      {workspaceProfile.trial?.state === "active" && (
+      {interactionUsage && <InteractionUsageNotice usage={interactionUsage} t={t} />}
+      {!interactionUsage && workspaceProfile.trial?.state === "active" && (
         <aside className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           <p>
             <strong>{t("trial.dashboardActive", {
@@ -1589,13 +1614,13 @@ export default function Admin() {
           <Link to="/admin/billing" className="font-semibold underline">{t("trial.billingLink")}</Link>
         </aside>
       )}
-      {["expired", "used_up", "inactive"].includes(workspaceProfile.trial?.state) && (
+      {!interactionUsage && ["expired", "used_up", "inactive"].includes(workspaceProfile.trial?.state) && (
         <aside className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-950" role="status">
           <p><strong>{t("trial.dashboardPaused")}</strong> {t("trial.dashboardPausedDetail")}</p>
           <Link to="/support" className="font-semibold underline">{t("trial.supportLink")}</Link>
         </aside>
       )}
-      {workspaceProfile.trial?.state === "unavailable" && (
+      {!interactionUsage && workspaceProfile.trial?.state === "unavailable" && (
         <aside className="mb-5 rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-950" role="alert">
           {t("trial.statusUnavailable")} {workspaceProfile.trial.error}
         </aside>
