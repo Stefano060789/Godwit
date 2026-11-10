@@ -41,7 +41,7 @@ export default function DashboardHub({ activeTab, onSelect, t }) {
   return (
     <nav className="dashboard-hub" aria-label={t("admin.hub.label", { defaultValue: "Your business, connected by Eggs" })}>
       <svg className="dashboard-hub-lines" viewBox="0 0 1000 310" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M220 35C350 35 350 110 500 110M220 110H500M220 185C350 185 350 110 500 110M500 110H780M780 110V215M500 110V215" />
+        <path d="M220 35C310 35 310 110 380 110M220 110H380M220 185C310 185 310 110 380 110M620 110H780M780 110V215M500 205V260" />
       </svg>
       <div className="dashboard-hub-inputs">{node("your-business", "yourBusiness")}{node("business", "business")}{node("goal", "goal")}</div>
       <button type="button" className="dashboard-hub-egg" aria-current={activeTab === "engagement" ? "page" : undefined} onClick={() => onSelect("engagement")}>

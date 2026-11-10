@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
-import { appendAuditLog, readAuditLog, readPollMeta, savePollMeta, isPollClosed } from "../lib/pollMeta";
+import { appendAuditLog, readPollMeta, savePollMeta, isPollClosed } from "../lib/pollMeta";
 import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
 import { buildEggUrl } from "../lib/eggs";
 import DashboardHub from "../components/DashboardHub";
@@ -31,7 +31,6 @@ import LockedFeature from "../components/LockedFeature";
 import { loadLeadNurtureSettings, saveLeadNurtureSettings } from "../lib/leadNurture";
 import { loadWinbackSettings, saveWinbackSettings } from "../lib/winbackSettings";
 import { loadDonationSettings, saveDonationSettings, startStripeConnectOnboarding, refreshStripeConnectStatus } from "../lib/donationSettings";
-import { loadApiKeys, createApiKey, deleteApiKey } from "../lib/apiKeys";
 import { getEntitlements, planLabel, minPlanLabelFor } from "../lib/entitlements";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 import { PERSONAS, findPersona } from "../lib/personas";
@@ -40,12 +39,8 @@ import Woodpecker from "./Woodpecker";
 import {
   getCurrentUserRole,
   getPermissionSet,
-  inviteWorkspaceMember,
   loadWorkspaceProfile,
-  readWorkspaceMembers,
   readWorkspaceProfile,
-  removeWorkspaceMember,
-  saveWorkspaceMember,
   saveWorkspaceProfile
 } from "../lib/workspaceProfile";
 
@@ -75,7 +70,6 @@ export default function Admin() {
     card?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [activeTab, location.search, loading]);
 
-  const [auditLog, setAuditLog] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [locationFilter, setLocationFilter] = useState("all");
@@ -98,10 +92,6 @@ export default function Admin() {
   });
   const [workspaceUserId, setWorkspaceUserId] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState("viewer");
-  const [teamMembers, setTeamMembers] = useState([]);
-  const [newMemberName, setNewMemberName] = useState("");
-  const [newMemberEmail, setNewMemberEmail] = useState("");
-  const [newMemberRole, setNewMemberRole] = useState("viewer");
   const [qrCampaigns, setQrCampaigns] = useState([]);
   const [eggAccessCounts, setEggAccessCounts] = useState({});
   const [eggAccessTrackingError, setEggAccessTrackingError] = useState("");
@@ -135,7 +125,6 @@ export default function Admin() {
   const [qrWizardTaskDescription, setQrWizardTaskDescription] = useState("");
   const [qrWizardTaskIds, setQrWizardTaskIds] = useState([]);
   const [qrModifier, setQrModifier] = useState(null);
-  const [invitingMember, setInvitingMember] = useState(false);
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemMessage, setRedeemMessage] = useState("");
   const [alertRules, setAlertRules] = useState([]);
@@ -178,8 +167,6 @@ export default function Admin() {
   const [workspaceUpdates, setWorkspaceUpdates] = useState([]);
   const [newUpdateMessage, setNewUpdateMessage] = useState("");
   const [newUpdatePollId, setNewUpdatePollId] = useState("");
-  const [apiKeys, setApiKeys] = useState([]);
-  const [newApiKeyLabel, setNewApiKeyLabel] = useState("");
   const [selectedQrReviewPlatforms, setSelectedQrReviewPlatforms] = useState([]);
 
   useEffect(() => {
@@ -267,7 +254,6 @@ export default function Admin() {
         setWorkspaceProfile(profile);
         const savedPersona = findPersona(localStorage.getItem(`ivote_persona_${profile.id}`));
         setPersonaKey(savedPersona?.key || null);
-        setTeamMembers(await readWorkspaceMembers(profile.id));
         setQrCampaigns(await loadQrCampaigns());
         setQrCampaignItems(await loadQrCampaignItems());
         const [rulesResult, alertsResult, tasksResult, reportsResult, messagesResult, contentReportsResult, actionTasksResult, eggAccessResult] = await Promise.all([
@@ -345,12 +331,6 @@ export default function Admin() {
         const { data: updatesRows } = await supabase.from("workspace_updates").select("*").order("created_at", { ascending: false }).limit(20);
         setWorkspaceUpdates(updatesRows || []);
 
-        try {
-          setApiKeys(await loadApiKeys(supabase, profile.id));
-        } catch (apiKeyError) {
-          console.warn("API key management is unavailable until its database table is installed.", apiKeyError);
-          setApiKeys([]);
-        }
       } catch (error) {
         console.error(error);
         alert(error.message || "Unable to load workspace role data.");
@@ -359,11 +339,9 @@ export default function Admin() {
 
     loadPolls();
     loadWorkspaceProfileState();
-    setAuditLog(readAuditLog());
 
     const interval = setInterval(() => {
       loadPolls();
-      setAuditLog(readAuditLog());
     }, 5000);
 
     return () => clearInterval(interval);
@@ -845,30 +823,6 @@ export default function Admin() {
 
   }
 
-  async function handleCreateApiKey() {
-    try {
-      const { record, plaintextKey } = await createApiKey(supabase, workspaceUserId, newApiKeyLabel);
-      setApiKeys((current) => [record, ...current]);
-      setNewApiKeyLabel("");
-      window.prompt("Copy this API key now. It won't be shown again:", plaintextKey);
-    } catch (error) {
-      console.error(error);
-      alert(error.message || "Unable to create API key.");
-    }
-  }
-
-  async function handleDeleteApiKey(keyId) {
-    const confirmed = window.confirm("Delete this API key? Anything using it will stop working immediately.");
-    if (!confirmed) return;
-    try {
-      await deleteApiKey(supabase, keyId);
-      setApiKeys((current) => current.filter((item) => item.id !== keyId));
-    } catch (error) {
-      console.error(error);
-      alert(error.message || "Unable to delete API key.");
-    }
-  }
-
   async function lookUpScannedQr(rawValue) {
     const token = extractQrToken(rawValue);
     if (!token) {
@@ -1031,65 +985,6 @@ export default function Admin() {
     alert(`Winner picked: ${data.email}`);
   }
 
-  async function addTeamMember() {
-    if (!newMemberName.trim()) {
-      alert("Add a team member name first.");
-      return;
-    }
-
-    const email = newMemberEmail.trim();
-
-    if (email) {
-      setInvitingMember(true);
-      try {
-        const result = await inviteWorkspaceMember(workspaceUserId, {
-          email,
-          name: newMemberName.trim(),
-          role: newMemberRole
-        });
-        setTeamMembers(await readWorkspaceMembers(workspaceUserId));
-        setNewMemberName("");
-        setNewMemberEmail("");
-        setNewMemberRole("viewer");
-        if (result.actionLink) {
-          window.prompt("Invite created. Copy this sign-in link and send it to your teammate:", result.actionLink);
-        } else {
-          alert(`Invited ${email}. They'll receive an email to set up their account.`);
-        }
-      } catch (error) {
-        console.error(error);
-        alert(error.message || "Unable to invite team member.");
-      } finally {
-        setInvitingMember(false);
-      }
-      return;
-    }
-
-    try {
-      const nextMembers = await saveWorkspaceMember(workspaceUserId, {
-        name: newMemberName.trim(),
-        email: newMemberEmail.trim(),
-        role: newMemberRole
-      });
-      setTeamMembers(nextMembers);
-      setNewMemberName("");
-      setNewMemberEmail("");
-      setNewMemberRole("viewer");
-    } catch (error) {
-      console.error(error);
-      alert(error.message || "Unable to add team member.");
-    }
-  }
-
-  async function deleteTeamMember(memberId) {
-    try {
-      setTeamMembers(await removeWorkspaceMember(workspaceUserId, memberId));
-    } catch (error) {
-      console.error(error);
-      alert(error.message || "Unable to remove team member.");
-    }
-  }
-
   async function deletePoll(id) {
     const { error } = await supabase.from("polls").delete().eq("id", id);
     if (error) {
@@ -1099,7 +994,6 @@ export default function Admin() {
     }
 
     appendAuditLog("delete_poll", { poll_id: id });
-    setAuditLog(readAuditLog());
     setPolls((prev) => prev.filter((p) => p.id !== id));
   }
 
@@ -1113,7 +1007,6 @@ export default function Admin() {
     });
 
     appendAuditLog(status === "closed" ? "close_poll" : "reopen_poll", { poll_id: poll.id, question: poll.question });
-    setAuditLog(readAuditLog());
     await loadPolls();
     alert(status === "closed" ? "Poll closed." : "Poll reopened.");
   }
@@ -1153,7 +1046,6 @@ export default function Admin() {
     link.click();
     URL.revokeObjectURL(url);
     appendAuditLog("export_csv", { poll_id: poll.id });
-    setAuditLog(readAuditLog());
   }
 
   async function exportConsentedEmailCsv() {
@@ -1193,7 +1085,6 @@ export default function Admin() {
     link.click();
     URL.revokeObjectURL(url);
     appendAuditLog("export_consented_email_list", { count: latestByEmail.size });
-    setAuditLog(readAuditLog());
   }
 
   function copyShareLink(poll) {
@@ -1532,7 +1423,6 @@ export default function Admin() {
 
   if (loading) return <p className="text-center p-6">Loading polls...</p>;
 
-  const auditEntries = auditLog.slice(0, 5);
   const entitlements = getEntitlements(workspaceProfile.plan);
   const permission = getPermissionSet(currentUserRole);
   const canEditPolls = permission.canEditPolls;
@@ -2555,11 +2445,6 @@ export default function Admin() {
 
 
                   <section className="egg-card-share">
-                    <img
-                      src={getCampaignQrImageUrl(url, 160)}
-                      alt={t("admin.engagement.campaigns.qrAlt", { name: campaign.name })}
-                      className="egg-card-qr"
-                    />
                     <div className="egg-card-share-content">
                       <div>
                         <h4>{t("admin.engagement.campaigns.shareTitle", { defaultValue: "Share your Egg" })}</h4>
@@ -2911,7 +2796,7 @@ export default function Admin() {
       <header className="hub-page-heading">
         <p className="goal-eyebrow">{t("admin.hub.settings", { defaultValue: "Settings" })}</p>
         <h2>{t("admin.hub.settings", { defaultValue: "Settings" })}</h2>
-        <p>{t("admin.settingsIntro", { defaultValue: "Brand, team and account preferences." })}</p>
+        <p>{t("admin.settingsIntro", { defaultValue: "Manage your customer review links." })}</p>
       </header>
       {DONATION_FEATURE_ENABLED && <details id="donation-settings" className="mb-6 border rounded bg-gray-900">
         <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.engagement.donations.title")}</summary>
@@ -3062,222 +2947,6 @@ export default function Admin() {
             {t("admin.settings.workspace.reviewPlatforms.saveButton")}
           </button>
           </>}
-        </div>
-      </details>
-      <details className="mb-6 border rounded bg-gray-900">
-        <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.settings.workspace.title")}</summary>
-        <div className="px-4 pb-4">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-slate-400">{t("admin.settings.workspace.subtitle")}</p>
-          <span className="text-xs uppercase tracking-wide text-gray-300">{t("admin.settings.workspace.roleLabel", { role: workspaceProfile.role })}</span>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-3">
-          <input
-            type="text"
-            value={workspaceProfile.companyName}
-            onChange={(event) => setWorkspaceProfile((current) => ({ ...current, companyName: event.target.value }))}
-            className="border p-2 rounded text-black"
-            placeholder={t("admin.settings.workspace.companyNamePlaceholder")}
-          />
-          <select
-            value={workspaceProfile.role}
-            className="border p-2 rounded text-black"
-            disabled
-          >
-            <option value="owner">{t("admin.settings.workspace.roles.owner")}</option>
-            <option value="editor">{t("admin.settings.workspace.roles.editor")}</option>
-            <option value="viewer">{t("admin.settings.workspace.roles.viewer")}</option>
-          </select>
-          <input
-            type="url"
-            value={workspaceProfile.logoUrl}
-            onChange={(event) => setWorkspaceProfile((current) => ({ ...current, logoUrl: event.target.value }))}
-            className="border p-2 rounded text-black md:col-span-2"
-            placeholder={t("admin.settings.workspace.logoUrlPlaceholder")}
-          />
-          <input
-            type="url"
-            value={workspaceProfile.webhookUrl}
-            onChange={(event) => setWorkspaceProfile((current) => ({ ...current, webhookUrl: event.target.value }))}
-            className="border p-2 rounded text-black md:col-span-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            placeholder={entitlements.webhooks ? t("admin.settings.workspace.webhookUrlPlaceholder") : t("admin.settings.workspace.webhookUrlLocked")}
-            disabled={!entitlements.webhooks}
-          />
-          <label className="block font-semibold md:col-span-2">
-            {t("admin.settings.workspace.autoDeleteLabel")}
-            <input
-              type="number"
-              min="7"
-              max="3650"
-              value={workspaceProfile.voteRetentionDays}
-              onChange={(event) => setWorkspaceProfile((current) => ({ ...current, voteRetentionDays: event.target.value }))}
-              className="mt-1 w-full border p-2 rounded text-black"
-              placeholder={t("admin.settings.workspace.autoDeletePlaceholder")}
-            />
-          </label>
-        </div>
-
-        {!entitlements.webhooks && (
-          <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-amber-300">
-            {t("admin.settings.workspace.webhooksUpgradeNote")} · <Link to="/admin/billing" className="underline">{t("admin.overview.upgrade")}</Link>
-          </p>
-        )}
-
-        <div className="mt-4">
-          <button
-            onClick={saveWorkspaceSettings}
-            disabled={!permission.canManageWorkspace}
-            className={`px-4 py-2 rounded font-semibold ${
-              permission.canManageWorkspace ? "bg-blue-600 text-white" : "bg-gray-600 text-gray-300 cursor-not-allowed"
-            }`}
-          >
-            {t("admin.settings.workspace.saveButton")}
-          </button>
-        </div>
-
-        </div>
-      </details>
-
-      <details className="mb-6 border rounded bg-gray-900">
-        <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.settings.api.title")}</summary>
-        <div className="px-4 pb-4">
-          {entitlements.apiAccess ? (
-          <>
-          <p className="mb-3 text-sm text-slate-400">Generate a key to pull your workspace summary from <code>/api/v1-summary</code> with an <code>Authorization: Bearer &lt;key&gt;</code> header.</p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <input value={newApiKeyLabel} onChange={(event) => setNewApiKeyLabel(event.target.value)} className="flex-1 border p-2 rounded text-black" placeholder={t("admin.settings.api.labelPlaceholder")} />
-            <button onClick={handleCreateApiKey} className="bg-violet-600 text-white px-4 py-2 rounded font-semibold">{t("admin.settings.api.generateKey")}</button>
-          </div>
-          <div className="mt-4 space-y-2 text-sm">
-            {apiKeys.length === 0 ? (
-              <p className="text-gray-400">{t("admin.settings.api.noKeys")}</p>
-            ) : (
-              apiKeys.map((key) => (
-                <div key={key.id} className="flex items-center justify-between border-b border-gray-700 py-1">
-                  <span>{key.label || t("admin.settings.api.untitledKey")} · {t("admin.settings.api.created", { date: new Date(key.created_at).toLocaleDateString() })}{key.last_used_at ? ` · ${t("admin.settings.api.lastUsed", { date: new Date(key.last_used_at).toLocaleDateString() })}` : ""}</span>
-                  <button onClick={() => handleDeleteApiKey(key.id)} className="shrink-0 text-xs text-red-300 underline">{t("admin.engagement.locations.delete")}</button>
-                </div>
-              ))
-            )}
-          </div>
-          </>
-          ) : (
-            <LockedFeature
-              feature="apiAccess"
-              title={t("admin.settings.api.lockedTitle")}
-              description={t("admin.settings.api.lockedDescription")}
-            />
-          )}
-        </div>
-      </details>
-
-      <details className="mb-6 border rounded bg-gray-900">
-        <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.settings.team.title")}</summary>
-        <div className="px-4 pb-4">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-slate-400">{t("admin.settings.team.subtitle")}</p>
-          <span className="text-xs uppercase tracking-wide text-gray-300">{t("admin.settings.team.seatCount", { current: teamMembers.length, limit: entitlements.seatLimit })}</span>
-        </div>
-
-        {teamMembers.length >= entitlements.seatLimit && (
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-amber-300">
-            {t("admin.settings.team.seatLimitReached", { plan: planLabel(workspaceProfile.plan) })} · <Link to="/admin/billing" className="underline">{t("admin.settings.team.upgradeForMoreSeats")}</Link>
-          </p>
-        )}
-
-        <div className="grid md:grid-cols-3 gap-3 mb-4">
-          <input
-            type="text"
-            value={newMemberName}
-            onChange={(event) => setNewMemberName(event.target.value)}
-            className="border p-2 rounded text-black"
-            placeholder={t("admin.settings.team.namePlaceholder")}
-            disabled={teamMembers.length >= entitlements.seatLimit}
-          />
-          <input
-            type="email"
-            value={newMemberEmail}
-            onChange={(event) => setNewMemberEmail(event.target.value)}
-            className="border p-2 rounded text-black"
-            placeholder="member@example.com"
-            disabled={teamMembers.length >= entitlements.seatLimit}
-          />
-          <select
-            value={newMemberRole}
-            onChange={(event) => setNewMemberRole(event.target.value)}
-            className="border p-2 rounded text-black"
-            disabled={teamMembers.length >= entitlements.seatLimit}
-          >
-            <option value="owner">{t("admin.settings.workspace.roles.owner")}</option>
-            <option value="editor">{t("admin.settings.workspace.roles.editor")}</option>
-            <option value="viewer">{t("admin.settings.workspace.roles.viewer")}</option>
-          </select>
-        </div>
-
-        <button
-          onClick={addTeamMember}
-          disabled={!permission.canManageWorkspace || invitingMember || teamMembers.length >= entitlements.seatLimit}
-          className={`px-4 py-2 rounded font-semibold mb-4 ${
-            permission.canManageWorkspace && teamMembers.length < entitlements.seatLimit ? "bg-indigo-600 text-white" : "bg-gray-600 text-gray-300 cursor-not-allowed"
-          }`}
-        >
-          {invitingMember ? t("admin.settings.team.sendingInvite") : newMemberEmail.trim() ? t("admin.settings.team.sendInvite") : t("admin.settings.team.addMember")}
-        </button>
-
-        <div className="space-y-2">
-          {teamMembers.length === 0 ? (
-            <p className="text-gray-400">{t("admin.settings.team.noMembers")}</p>
-          ) : (
-            teamMembers.map((member) => (
-              <div key={member.id} className="flex items-center justify-between border border-gray-700 rounded p-3">
-                <div>
-                  <p className="font-semibold">{member.name}</p>
-                  {member.email && <p className="text-xs text-gray-400">{member.email}</p>}
-                  <p className="text-xs uppercase tracking-wide text-blue-300">{member.role}</p>
-                </div>
-                <button
-                  onClick={() => deleteTeamMember(member.id)}
-                  disabled={!permission.canManageWorkspace}
-                  className={`px-3 py-2 rounded font-semibold ${
-                    permission.canManageWorkspace ? "bg-red-600 text-white" : "bg-gray-700 text-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  {t("admin.engagement.items.remove")}
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-        </div>
-      </details>
-
-      <details className="mb-6 border rounded bg-gray-900">
-        <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.settings.activity.title")}</summary>
-        <div className="px-4 pb-4">
-        {entitlements.auditLog ? (
-        <>
-        <p className="mb-3 text-sm text-slate-400">{t("admin.settings.activity.subtitle")}</p>
-        <div className="space-y-2 text-sm">
-          {auditEntries.length === 0 ? (
-            <p className="text-gray-400">{t("admin.settings.activity.noActivity")}</p>
-          ) : (
-            auditEntries.map((entry) => (
-              <div key={entry.id} className="border-b border-gray-700 pb-2 last:border-b-0 last:pb-0">
-                <p className="font-semibold text-blue-300">{entry.action}</p>
-                <p className="text-gray-400">{new Date(entry.created_at).toLocaleString()}</p>
-              </div>
-            ))
-          )}
-        </div>
-        </>
-        ) : (
-          <LockedFeature
-            feature="auditLog"
-            title={t("admin.settings.activity.lockedTitle")}
-            description={t("admin.settings.activity.lockedDescription")}
-          />
-        )}
         </div>
       </details>
       </>

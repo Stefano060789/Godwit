@@ -53,12 +53,14 @@
 .workspace-page .dashboard-hub-egg {
   grid-column: 2; grid-row: 1; width: 200px; height: 218px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  border: 1px solid var(--hub-gold); border-radius: 49% 49% 43% 43% / 37% 37% 63% 63%;
-  color: var(--hub-ink); background: linear-gradient(150deg, var(--hub-surface), var(--hub-soft));
-  box-shadow: 0 0 0 6px var(--hub-soft), 0 0 0 7px #d5c7a4, 0 16px 34px rgba(37, 62, 61, .15);
-  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  justify-self: center; padding: 0;
+  border: 0; border-radius: .75rem;
+  color: var(--hub-ink); background: transparent;
+  box-shadow: none;
+  transition: transform .2s ease, color .2s ease;
 }
-.workspace-page .dashboard-hub-egg:hover, .workspace-page .dashboard-hub-egg[aria-current="page"] { transform: translateY(-2px); background: linear-gradient(150deg, var(--hub-active), var(--hub-surface)); border-color: var(--hub-accent); box-shadow: 0 0 0 6px var(--hub-soft), 0 0 0 7px var(--hub-accent), 0 20px 38px rgba(37, 62, 61, .18); }
+.workspace-page .dashboard-hub-egg:hover, .workspace-page .dashboard-hub-egg[aria-current="page"] { transform: translateY(-2px); color: var(--hub-accent); background: transparent; box-shadow: none; }
+.dashboard-hub-egg[aria-current="page"] strong { text-decoration: underline; text-underline-offset: .25rem; }
 .dashboard-hub-egg img { width: 88px; height: 99px; clip-path: ellipse(49% 48% at 50% 50%); object-fit: contain; }
 .dashboard-hub-egg strong { font-size: 1.1rem; }
 .dashboard-hub-access { display: flex; gap: .85rem; margin-top: .5rem; color: var(--hub-muted); }
@@ -200,9 +202,8 @@
 .egg-card-stats > div > span { grid-row: span 2; align-self: center; color: var(--hub-accent); font-size: .7rem; font-weight: 800; letter-spacing: .05em; }
 .egg-card-stats strong { color: var(--hub-ink); font-size: 1rem; line-height: 1; }
 .egg-card-stats small { color: var(--hub-muted); font-size: .66rem; }
-.egg-card-share { display: flex; align-items: center; gap: 1rem; padding: .9rem; border: 1px solid #d7e3de; border-radius: .9rem; background: linear-gradient(120deg, #edf4ef, #f8f2e9); }
-.egg-card-qr { display: block; width: 76px; height: 76px; flex: 0 0 auto; padding: .35rem; border: 1px solid #d5c7a4; border-radius: .55rem; background: #fff; }
-.egg-card-share-content { display: grid; min-width: 0; flex: 1; gap: .7rem; }
+.egg-card-share { padding: .7rem .8rem; border: 1px solid #d7e3de; border-radius: .9rem; background: linear-gradient(120deg, #edf4ef, #f8f2e9); }
+.egg-card-share-content { display: grid; min-width: 0; gap: .5rem; }
 .egg-card-share-content h4 { color: var(--hub-ink); font-size: .9rem; font-weight: 800; }
 .egg-card-share-content p { margin-top: .15rem; color: var(--hub-muted); font-size: .75rem; line-height: 1.4; }
 .egg-card-share-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; }
@@ -257,27 +258,26 @@
 [data-theme="dark"] .business-data-message[role="alert"] { color: #ffb2a5; }
 @media (max-width: 640px) {
   .workspace-page.egg-workspace { padding: 1rem; }
-  .dashboard-hub { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto auto auto; gap: .7rem; padding: 1rem; border-radius: 1.25rem; }
-  .dashboard-hub-lines { display: none; }
-  .dashboard-hub-inputs { grid-column: 1 / -1; grid-row: 2; gap: .6rem; }
-  .workspace-page .dashboard-hub-egg { grid-column: 1 / -1; grid-row: 1; width: 150px; height: 166px; justify-self: center; box-shadow: 0 0 0 4px var(--hub-soft), 0 0 0 5px #d5c7a4, 0 12px 24px rgba(37, 62, 61, .12); }
+  .dashboard-hub { grid-template-columns: minmax(0, 1fr) 80px minmax(0, 1fr); grid-template-rows: 208px auto; column-gap: .5rem; row-gap: 1rem; padding: 1rem .75rem; border-radius: 1.25rem; }
+  .dashboard-hub-lines { inset: 1rem 0; height: calc(100% - 2rem); }
+  .dashboard-hub-inputs { grid-column: 1; grid-row: 1; gap: .6rem; min-width: 0; }
+  .workspace-page .dashboard-hub-egg { width: 80px; height: 166px; }
   .dashboard-hub-egg img { width: 66px; height: 74px; }
   .dashboard-hub-egg strong { font-size: .95rem; }
   .dashboard-hub-access { margin-top: .3rem; gap: .4rem; }
-  .workspace-page .dashboard-hub-node { min-height: 50px; padding: .65rem .75rem; font-size: .8rem; }
-  .dashboard-hub-node svg { width: 21px; height: 21px; }
-  .dashboard-hub-results { grid-column: 1; grid-row: 3; }
-  .dashboard-hub-goal-progress { grid-column: 2; grid-row: 3; }
-  .workspace-page .dashboard-hub-settings { grid-column: 1 / -1; grid-row: 4; flex-direction: row; min-height: 42px; padding: .55rem .85rem; }
+  .workspace-page .dashboard-hub-node { flex-direction: column; justify-content: center; gap: .25rem; min-width: 0; min-height: 58px; padding: .4rem .25rem; border-radius: .75rem; font-size: .72rem; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
+  .dashboard-hub-node svg { width: 18px; height: 18px; }
+  .dashboard-hub-results { grid-column: 3; grid-row: 1; }
+  .dashboard-hub-goal-progress { grid-column: 3; grid-row: 2; }
+  .workspace-page .dashboard-hub-settings { grid-column: 2; grid-row: 2; width: 100%; min-height: 58px; padding: .4rem .25rem; font-size: .72rem; }
   .egg-workspace .egg-location-card { padding: .9rem; }
   .egg-card-header { flex-direction: column; }
   .egg-card-manage-actions { justify-content: flex-start; }
   .egg-card-goals { flex-direction: column; gap: .4rem; }
-  .egg-card-share { align-items: flex-start; gap: .7rem; padding: .7rem; }
-  .egg-card-qr { width: 60px; height: 60px; }
+  .egg-card-share { padding: .65rem; }
   .egg-card-share-actions { gap: .4rem; }
   .egg-card-share-actions .egg-action, .egg-card-share-actions .hub-secondary-action { min-height: 36px; padding: .48rem .6rem; font-size: .72rem; }
   .hub-form-grid, .egg-results-grid, .goal-benefits-grid, .business-profile-grid { grid-template-columns: 1fr; }
   .hub-page-heading h2 { font-size: 1.6rem; }
 }
-@media (prefers-reduced-motion: reduce) { .workspace-page .dashboard-hub-node { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .workspace-page .dashboard-hub-node, .workspace-page .dashboard-hub-egg { transition: none; } }
