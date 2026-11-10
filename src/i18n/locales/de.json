@@ -92,37 +92,37 @@
     "goals": {
       "answers": {
         "title": "Kundenfragen beantworten",
-        "example": "Beantworten Sie Fragen zu Öffnungszeiten, Zugang, Speisekarten oder Angeboten mit Ihren Geschäftsinformationen.",
+        "example": "Verfolgen Sie Egg-Aufrufe, während Kunden Antworten aus Ihren Geschäftsinformationen erhalten.",
         "setup": "Erstellen Sie ein Egg, öffnen Sie seinen KI-Assistenten, ergänzen Sie Ihre Website oder FAQs und aktivieren Sie Godwit.",
         "result": "Testen Sie vor dem Teilen eine Kundenfrage. Godwit antwortet anhand Ihrer Quellen und schlägt passende Inhalte vor."
       },
       "feedback": {
-        "title": "Privates Feedback sammeln",
-        "example": "Erfahren Sie, was Gäste oder Kunden über ihr Erlebnis denken.",
+        "title": "Feedbackantworten sammeln",
+        "example": "Verfolgen Sie Umfrageantworten und erfahren Sie, was Kunden über ihr Erlebnis denken.",
         "setup": "Öffnen oder erstellen Sie ein Egg und ergänzen Sie eine kurze Feedback-Umfrage.",
         "result": "Öffnen Sie die Umfrageergebnisse, um Antworten und Verbesserungsmöglichkeiten zu sehen."
       },
       "information": {
         "title": "Speisekarten, Geschichten & Details zeigen",
-        "example": "Stellen Sie Speisekarten, Veranstaltungsinfos, Geschichten oder praktische Details bereit.",
+        "example": "Verfolgen Sie Egg-Aufrufe, während Sie Speisekarten, Veranstaltungen, Geschichten oder praktische Informationen teilen.",
         "setup": "Erstellen Sie ein Egg und ergänzen Sie eine Informationskarte mit Text, Bild und hilfreichen Links.",
         "result": "Kunden finden Ihre Inhalte ohne Konto. Aktualisieren Sie sie, wenn sich Details ändern."
       },
       "next-step": {
-        "title": "Buchungen & Anfragen fördern",
-        "example": "Verlinken Sie auf Reservierungen, Termine, Produkte oder Kontaktmöglichkeiten.",
+        "title": "Kunden zum nächsten Schritt führen",
+        "example": "Verfolgen Sie Egg-Aufrufe und verlinken Sie Buchungs-, Bestell-, Produkt- oder Kontaktoptionen.",
         "setup": "Ergänzen Sie eine Informationskarte auf einem Egg um Ihren Kontakt- oder Buchungslink.",
         "result": "Anfragen erreichen Sie über Ihre verlinkte E-Mail oder Buchungsseite, nicht über einen neuen Godwit-Posteingang."
       },
       "contacts": {
-        "title": "E-Mail-Liste mit Einwilligung aufbauen",
-        "example": "Laden Sie Kunden ein, Neuigkeiten oder Angebote zu abonnieren.",
+        "title": "Kontakte mit Einwilligung erfassen",
+        "example": "Verfolgen Sie E-Mail-Anmeldungen von Kunden, die dem Erhalt von Nachrichten zustimmen.",
         "setup": "Öffnen oder erstellen Sie ein Egg, ergänzen Sie eine Umfrage und richten Sie unter Nach der Abstimmung eine klare E-Mail-Einwilligung ein.",
         "result": "Exportieren Sie Kontakte mit Einwilligung unter Kundenbindung. Menschen können auch ohne E-Mail-Adresse abstimmen."
       },
       "reviews": {
         "title": "Ehrliche Bewertungen einladen",
-        "example": "Lassen Sie Kunden ihre Erfahrung auf Google oder Tripadvisor teilen.",
+        "example": "Verfolgen Sie Egg-Aufrufe und bieten Sie allen dieselben optionalen Bewertungslinks an.",
         "setup": "Ergänzen Sie Bewertungslinks in den Einstellungen und fügen Sie sie bei der Einrichtung eines Egg hinzu.",
         "result": "Bieten Sie allen dieselben Bewertungslinks an. Öffentliche Bewertungen sind freiwillig und nie mit einer Belohnung verbunden."
       }
@@ -292,7 +292,7 @@
   },
   "billing": {
     "title": "Tarife und Abrechnung",
-    "subtitle": "Wählen Sie den Tarif, der zu Ihrem Feedback-Programm passt.",
+    "subtitle": "Unbegrenzt viele Eggs mit einem klaren monatlichen Kontingent an Kundeninteraktionen.",
     "trialBanner": "Neu hier? Jeder kostenpflichtige Tarif enthält eine 90-tägige kostenlose Testphase – keine Kosten, bis diese endet.",
     "currentPlanNotice": "Ihr Arbeitsbereich befindet sich derzeit im Tarif {{plan}}.",
     "trialStarted": "Ihre 90-tägige kostenlose Testphase hat begonnen. Es fallen keine Kosten an, bis diese endet, und Sie können jederzeit vorher kündigen.",
@@ -312,6 +312,25 @@
     "featureHeader": "Funktion",
     "currentTag": "(aktuell)",
     "paymentsNote": "Zahlungen werden sicher über Stripe abgewickelt. Preise und Limits sind Startvorschläge und können in Stripe und auf dieser Seite geändert werden.",
+    "proposed": {
+      "eyebrow": "Preisvorschlag",
+      "notice": "Dies ist ein Vorschlag, kein buchbarer Tarif. Ihr aktuelles Abonnement und die Stripe-Abrechnung bleiben unverändert.",
+      "packagesTitle": "Wählen Sie ein Interaktionskontingent",
+      "suggested": "Empfohlen",
+      "tiers": {
+        "small": "Klein",
+        "standard": "Standard",
+        "scale": "Skalierung"
+      },
+      "interactionsPerMonth": "Kundeninteraktionen / Monat",
+      "unlimitedEggs": "Unbegrenzt viele Eggs inklusive",
+      "priceToBeConfirmed": "Monatlicher Preis wird noch festgelegt",
+      "countingTitle": "Was würde als Interaktion zählen?",
+      "countingBody": "Vorgeschlagene Regel: Der erste Egg-Aufruf eines Kunden pro Sitzung wird gezählt. Vorschauen durch Mitarbeitende und weitere Aktionen innerhalb derselben Sitzung werden ausgeschlossen. Diese Zählweise ist derzeit nicht aktiv.",
+      "topUpsTitle": "Mehr Interaktionen benötigt?",
+      "topUpsBody": "Optionale Zusatzpakete sind geplant. Paketgrößen, Preise und Kaufablauf stehen noch nicht fest.",
+      "statusNote": "Die bestehenden Tarif-Funktionen und Limits gelten weiterhin. Preise, Zählweise, Zusatzpakete und Stripe-Checkout müssen separat umgesetzt werden, bevor dieser Vorschlag buchbar ist."
+    },
     "plans": {
       "free": {
         "name": "Kostenlos",
@@ -352,7 +371,25 @@
       "goal": "Ziel",
       "eggs": "Eggs",
       "results": "Ergebnisse",
+      "goalProgress": "Zielverlauf",
       "settings": "Einstellungen"
+    },
+    "goalProgress": {
+      "title": "Leistung Ihrer Eggs verfolgen",
+      "intro": "Verfolgen Sie Kundeninteraktionen und Ergebnisse der letzten 30 Tage.",
+      "allEggs": "Alle Eggs",
+      "measure": "Kennzahl",
+      "metrics": {
+        "interactions": "Egg-Aufrufe",
+        "responses": "Umfrageantworten",
+        "contacts": "E-Mail-Anmeldungen mit Einwilligung",
+        "messages": "Private Nachrichten"
+      },
+      "period": "Letzte 30 Tage",
+      "chartLabel": "{{count}} {{metric}} in den letzten 30 Tagen",
+      "metricNote": "Egg-Aufrufe umfassen QR- oder NFC-Besuche; Antworten sind Umfrageantworten; Kontakte sind E-Mail-Anmeldungen mit Einwilligung; Nachrichten sind private Kundennachrichten.",
+      "loadError": "Fortschrittsdaten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
+      "emptyEggs": "Erstellen Sie ein Egg, um den Fortschritt zu verfolgen."
     },
     "settingsIntro": "Marke, Team und Kontoeinstellungen.",
     "goal": {
@@ -381,6 +418,8 @@
       "generationFailed": "Die Umfrage für dieses Egg konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
       "generationInvalid": "Die erstellte Umfrage muss überprüft werden. Bitte versuchen Sie erneut, das Egg zu erstellen.",
       "placementTitle": "Name und Standort",
+      "contextLabel": "Konkretes Ziel oder Erfolgskriterium ergänzen (optional)",
+      "contextPlaceholder": "Zum Beispiel: diesen Monat 20 Umfrageantworten oder mehr E-Mail-Anmeldungen mit Einwilligung erreichen.",
       "nameExample": "Galerie-Empfang",
       "locationExample": "Haupteingang",
       "chooseBusiness": "Unternehmensart wählen",
@@ -406,13 +445,17 @@
       "title": "Erzählen Sie Godwit von Ihrem Unternehmen",
       "description": "Wählen Sie die passendste Kategorie, damit Godwit Kunden und zielorientierte Eggs passend unterstützen kann.",
       "choose": "Um welches Unternehmen oder welchen Ort handelt es sich?",
-      "save": "Unternehmensart speichern",
+      "save": "Unternehmensprofil speichern",
+      "otherRequired": "Beschreiben Sie Ihr Unternehmen oder Ihre Organisation.",
+      "otherLabel": "Beschreiben Sie Ihr Unternehmen oder Ihre Organisation",
+      "otherPlaceholder": "Zum Beispiel: ein Fitnessstudio, eine Klinik oder ein lokaler gemeinnütziger Verein.",
       "saving": "Wird gespeichert...",
       "saved": "Unternehmensart gespeichert.",
       "error": "Unternehmensart konnte nicht gespeichert werden.",
       "selectWorkspace": "Wählen Sie zuerst einen Arbeitsbereich.",
       "managerOnly": "Nur Eigentümer oder Bearbeiter können dieses Profil ändern.",
       "types": {
+        "other": { "title": "Anderes Unternehmen oder Organisation", "description": "Beschreiben Sie Ihr Unternehmen, wenn keine Kategorie passt." },
         "cafe-pub": { "title": "Café oder Pub", "description": "Café, Kaffeeladen, Pub, Bar oder lokaler Treffpunkt." },
         "restaurant-food": { "title": "Restaurant oder Gastronomie", "description": "Restaurant, Bäckerei, Food Hall, Imbiss oder anderes Gastronomieunternehmen." },
         "accommodation": { "title": "Hotel oder Unterkunft", "description": "Hotel, Pension, Ferienunterkunft, Campingplatz oder andere Unterkunft." },

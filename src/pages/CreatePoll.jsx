@@ -243,7 +243,6 @@ export default function CreatePoll() {
         {isAuthenticated === false && (
           <div className="rounded border border-sky-700 bg-slate-900 p-5 text-center">
             <h2 className="text-xl font-bold">{t("admin.pollForm.workspaceTitle")}</h2>
-            <p className="mt-2 text-sm text-slate-300">{t("admin.pollForm.workspaceBody")}</p>
             <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
               <Link to="/register" className="rounded bg-sky-500 px-4 py-2 font-semibold text-slate-950">{t("admin.pollForm.createWorkspace")}</Link>
               <Link to="/login" className="rounded border border-slate-500 px-4 py-2 font-semibold text-slate-100">{t("admin.pollForm.signIn")}</Link>

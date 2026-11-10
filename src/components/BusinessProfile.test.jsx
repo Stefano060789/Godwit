@@ -16,12 +16,12 @@ describe("Business profile setup", () => {
       t
     }));
 
-    expect(markup.match(/type="radio"/g)).toHaveLength(9);
+    expect(markup.match(/type="radio"/g)).toHaveLength(10);
     expect(markup).toContain("Cafe or pub");
     expect(markup).toContain("Restaurant or food venue");
     expect(markup).toContain("Community or public space");
     expect(markup).toContain('checked="" value="cafe-pub"');
-    expect(markup).toContain("Save business type");
+    expect(markup).toContain("Save business profile");
   });
 
   it("does not offer saving until a business type is chosen", () => {
@@ -34,5 +34,19 @@ describe("Business profile setup", () => {
     }));
 
     expect(markup).toContain('type="submit" class="goal-primary-action" disabled=""');
+  });
+
+  it("shows a required custom description for an unlisted business", () => {
+    const markup = renderToStaticMarkup(createElement(BusinessProfile, {
+      workspaceId: "workspace-id",
+      businessType: "other",
+      canManage: true,
+      onSaved: () => {},
+      t
+    }));
+
+    expect(markup).toContain("Other business or organisation");
+    expect(markup).toContain("Describe your business or organisation");
+    expect(markup).toContain('required=""');
   });
 });

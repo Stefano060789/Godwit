@@ -8,6 +8,7 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
   const [goalKeys, setGoalKeys] = useState(() => initialSelection.goal ? [initialSelection.goal.key] : []);
   const [name, setName] = useState("");
   const [placement, setPlacement] = useState("");
+  const [goalContext, setGoalContext] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [benefitType, setBenefitType] = useState("none");
@@ -34,7 +35,7 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
       } catch {
         throw new Error(t("admin.goal.benefitInvalid", { defaultValue: "Enter a voucher or discount code, or a valid HTTPS redemption link." }));
       }
-      await onCreate({ name: name.trim(), placementLabel: placement.trim(), businessType, goalKeys, emailBenefit });
+      await onCreate({ name: name.trim(), placementLabel: placement.trim(), businessType, goalKeys, goalContext: goalContext.trim(), emailBenefit });
     } catch (failure) {
       console.error("Unable to create goal-led Egg", failure);
       setError(failure.message);
@@ -67,6 +68,9 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
       </fieldset>
       <fieldset disabled={!canManage || busy || !businessType}>
         <legend><span className="hub-step">02</span>{t("admin.goal.placementTitle", { defaultValue: "Name & location" })}</legend>
+        <label className="goal-context-field">{t("admin.goal.contextLabel", { defaultValue: "What would success look like for this Egg? (optional)" })}
+          <textarea maxLength={500} rows={3} value={goalContext} onChange={(event) => setGoalContext(event.target.value)} placeholder={t("admin.goal.contextPlaceholder", { defaultValue: "Add a specific outcome or detail to guide the AI and help you interpret progress." })} />
+        </label>
         <div className="hub-form-grid">
           <label>{t("admin.engagement.campaigns.nameLabel")}<input required maxLength={120} value={name} onChange={(event) => setName(event.target.value)} placeholder={t("admin.goal.nameExample", { defaultValue: "Gallery welcome" })} /></label>
           <label>{t("admin.engagement.campaigns.placementLabel")}<input required maxLength={80} value={placement} onChange={(event) => setPlacement(event.target.value)} placeholder={t("admin.goal.locationExample", { defaultValue: "Main entrance" })} /></label>

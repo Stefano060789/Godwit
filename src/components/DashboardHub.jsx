@@ -1,4 +1,4 @@
-import egg from "../assets/birds/egg.svg";
+import godwitMark from "../assets/godwit-mark.svg";
 
 export function HubIcon({ type }) {
   return (
@@ -31,6 +31,7 @@ export default function DashboardHub({ activeTab, onSelect, t }) {
     goal: t("admin.hub.goal", { defaultValue: "Goal" }),
     engagement: t("admin.hub.eggs", { defaultValue: "Eggs" }),
     results: t("admin.hub.results", { defaultValue: "Results" }),
+    "goal-progress": t("admin.hub.goalProgress", { defaultValue: "Goal Progress" }),
     settings: t("admin.hub.settings", { defaultValue: "Settings" })
   };
   function node(tab, icon) {
@@ -41,16 +42,18 @@ export default function DashboardHub({ activeTab, onSelect, t }) {
   }
   return (
     <nav className="dashboard-hub" aria-label={t("admin.hub.label", { defaultValue: "Your business, connected by Eggs" })}>
-      <svg className="dashboard-hub-lines" viewBox="0 0 1000 260" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M220 35C350 35 350 110 500 110M220 110H500M220 185C350 185 350 110 500 110M500 110H780M500 110V225" />
+      <svg className="dashboard-hub-lines" viewBox="0 0 1000 310" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M220 35C350 35 350 110 500 110M220 110H500M220 185C350 185 350 110 500 110M500 110H780M780 110V215M500 110V215" />
       </svg>
       <div className="dashboard-hub-inputs">{node("your-business", "yourBusiness")}{node("business", "business")}{node("goal", "goal")}</div>
       <button type="button" className="dashboard-hub-egg" aria-current={activeTab === "engagement" ? "page" : undefined} onClick={() => onSelect("engagement")}>
-        <img src={egg} alt="" width="84" height="84" />
+        <img src={godwitMark} alt="" width="84" height="84" />
+        <span className="dashboard-hub-wordmark">Godwit</span>
         <strong>{labels.engagement}</strong>
         <span className="dashboard-hub-access"><span><HubIcon type="qr" />QR</span><span><HubIcon type="nfc" />NFC</span></span>
       </button>
       {node("results", "results")}
+      {node("goal-progress", "results")}
       {node("settings", "settings")}
     </nav>
   );

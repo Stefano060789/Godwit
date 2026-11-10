@@ -92,37 +92,37 @@
     "goals": {
       "answers": {
         "title": "Rispondere alle domande dei clienti",
-        "example": "Usa le informazioni affidabili della tua attività per rispondere su orari, accessibilità, menu o servizi.",
+        "example": "Monitora le aperture dell'Egg mentre i clienti ricevono risposte dalle informazioni della tua attività.",
         "setup": "Crea un Egg, apri il suo assistente AI, aggiungi il sito o le FAQ e attiva Godwit.",
         "result": "Prova una domanda prima di condividere. Godwit risponde dalle tue fonti e suggerisce contenuti pertinenti."
       },
       "feedback": {
-        "title": "Raccogliere feedback privato",
-        "example": "Scopri cosa pensano gli ospiti o i clienti della loro esperienza.",
+        "title": "Raccogliere risposte ai sondaggi",
+        "example": "Monitora le risposte ai sondaggi e scopri cosa pensano i clienti della loro esperienza.",
         "setup": "Apri o crea un Egg, poi aggiungi un breve sondaggio alla sua esperienza.",
         "result": "Apri i risultati del sondaggio per vedere le risposte e individuare cosa migliorare."
       },
       "information": {
         "title": "Mostrare menu, storie e dettagli",
-        "example": "Offri menu, programmi di eventi, storie o informazioni pratiche da consultare.",
+        "example": "Monitora le aperture dell'Egg mentre condividi menu, eventi, storie o informazioni pratiche.",
         "setup": "Crea un Egg e aggiungi una scheda informativa con testo, immagine e link utili.",
         "result": "I clienti trovano i contenuti senza account. Aggiornali quando cambiano i dettagli."
       },
       "next-step": {
-        "title": "Favorire prenotazioni e richieste",
-        "example": "Indirizza i clienti a prenotazioni, appuntamenti, prodotti o pagine di contatto.",
+        "title": "Guidare i clienti al passo successivo",
+        "example": "Monitora le aperture dell'Egg e collega opzioni di prenotazione, acquisto, prodotti o contatto.",
         "setup": "Aggiungi un link di contatto o prenotazione a una scheda informativa dell'Egg.",
         "result": "Le richieste arrivano tramite l'email o la pagina collegata, non in una nuova casella Godwit."
       },
       "contacts": {
-        "title": "Creare una lista email con consenso",
-        "example": "Invita i clienti a iscriversi per ricevere novità o offerte future.",
+        "title": "Raccogliere contatti consenzienti",
+        "example": "Monitora le iscrizioni email dei clienti che scelgono di ricevere comunicazioni.",
         "setup": "Apri o crea un Egg, aggiungi un sondaggio e configura un consenso email chiaro in Dopo il voto.",
         "result": "Esporta i contatti con consenso da Connessione clienti. Le persone possono votare senza condividere l'email."
       },
       "reviews": {
         "title": "Invitare recensioni sincere",
-        "example": "Lascia che i clienti raccontino l'esperienza su Google o Tripadvisor.",
+        "example": "Monitora le aperture dell'Egg offrendo a tutti gli stessi link facoltativi per le recensioni.",
         "setup": "Aggiungi i link alle recensioni in Impostazioni, poi includili nella configurazione dell'Egg.",
         "result": "Mostra gli stessi link a tutti. Le recensioni pubbliche sono facoltative e mai legate a un premio."
       }
@@ -292,7 +292,7 @@
   },
   "billing": {
     "title": "Piani e fatturazione",
-    "subtitle": "Scegli il piano più adatto al tuo programma di feedback.",
+    "subtitle": "Egg illimitati con una quota mensile chiara di interazioni con i clienti.",
     "trialBanner": "Sei nuovo? Ogni piano a pagamento include una prova gratuita di 90 giorni, senza addebiti fino alla fine.",
     "currentPlanNotice": "Il tuo spazio di lavoro è attualmente sul piano {{plan}}.",
     "trialStarted": "La tua prova gratuita di 90 giorni è iniziata. Non ti verrà addebitato nulla fino alla fine e puoi annullare in qualsiasi momento prima di allora.",
@@ -312,6 +312,25 @@
     "featureHeader": "Funzionalità",
     "currentTag": "(attuale)",
     "paymentsNote": "I pagamenti sono gestiti in modo sicuro da Stripe. Prezzi e limiti sono proposte di lancio e possono essere modificati su Stripe e in questa pagina.",
+    "proposed": {
+      "eyebrow": "Proposta di prezzo",
+      "notice": "Questa è solo una proposta, non un piano acquistabile. L'abbonamento attuale e la fatturazione Stripe non cambiano.",
+      "packagesTitle": "Scegli una quota di interazioni",
+      "suggested": "Consigliato",
+      "tiers": {
+        "small": "Piccolo",
+        "standard": "Standard",
+        "scale": "Ampio"
+      },
+      "interactionsPerMonth": "interazioni con i clienti / mese",
+      "unlimitedEggs": "Egg illimitati inclusi",
+      "priceToBeConfirmed": "Prezzo mensile da definire",
+      "countingTitle": "Cosa conterebbe come interazione?",
+      "countingBody": "Regola proposta: conteggiare la prima apertura di un Egg da parte di un cliente per sessione. Escludere le anteprime del personale e le azioni ripetute nella stessa sessione. Questo conteggio non è attualmente applicato.",
+      "topUpsTitle": "Servono più interazioni?",
+      "topUpsBody": "Sono previsti pacchetti di ricarica facoltativi. Dimensioni, prezzi e modalità di acquisto non sono ancora definiti.",
+      "statusNote": "Le funzionalità e i limiti dei piani attuali restano in vigore. Prezzi, conteggio delle interazioni, ricariche e checkout Stripe richiedono un'implementazione separata prima che questa proposta sia acquistabile."
+    },
     "plans": {
       "free": {
         "name": "Gratis",
@@ -352,7 +371,25 @@
       "goal": "Obiettivo",
       "eggs": "Egg",
       "results": "Risultati",
+      "goalProgress": "Progressi dell'obiettivo",
       "settings": "Impostazioni"
+    },
+    "goalProgress": {
+      "title": "Monitora i risultati dei tuoi Egg",
+      "intro": "Segui le interazioni dei clienti e i risultati degli ultimi 30 giorni.",
+      "allEggs": "Tutti gli Egg",
+      "measure": "Metrica",
+      "metrics": {
+        "interactions": "Aperture degli Egg",
+        "responses": "Risposte ai sondaggi",
+        "contacts": "Iscrizioni email con consenso",
+        "messages": "Messaggi privati"
+      },
+      "period": "Ultimi 30 giorni",
+      "chartLabel": "{{count}} {{metric}} negli ultimi 30 giorni",
+      "metricNote": "Le aperture includono visite tramite QR o NFC; le risposte sono ai sondaggi; i contatti hanno acconsentito a ricevere email; i messaggi sono privati.",
+      "loadError": "Impossibile caricare i dati di progresso. Riprova più tardi.",
+      "emptyEggs": "Crea un Egg per iniziare a monitorare i progressi."
     },
     "settingsIntro": "Marchio, team e preferenze dell'account.",
     "goal": {
@@ -381,6 +418,8 @@
       "generationFailed": "Impossibile generare il sondaggio per questo Egg. Riprova.",
       "generationInvalid": "Il sondaggio generato deve essere verificato. Prova a creare di nuovo l'Egg.",
       "placementTitle": "Nome e posizione",
+      "contextLabel": "Aggiungi un obiettivo concreto o un criterio di successo (facoltativo)",
+      "contextPlaceholder": "Ad esempio: raccogliere 20 risposte al sondaggio questo mese o aumentare le iscrizioni email con consenso.",
       "nameExample": "Benvenuto in galleria",
       "locationExample": "Ingresso principale",
       "chooseBusiness": "Scegli il tipo di attività",
@@ -406,13 +445,17 @@
       "title": "Parlaci della tua attività",
       "description": "Scegli la categoria più adatta, così Godwit potrà guidare i clienti e personalizzare gli Egg per i tuoi obiettivi.",
       "choose": "Che tipo di attività o luogo è?",
-      "save": "Salva il tipo di attività",
+      "save": "Salva il profilo attività",
+      "otherRequired": "Descrivi la tua attività o organizzazione.",
+      "otherLabel": "Descrivi la tua attività o organizzazione",
+      "otherPlaceholder": "Ad esempio: una palestra, una clinica o un'organizzazione non profit locale.",
       "saving": "Salvataggio...",
       "saved": "Tipo di attività salvato.",
       "error": "Impossibile salvare il tipo di attività.",
       "selectWorkspace": "Seleziona prima uno spazio di lavoro.",
       "managerOnly": "Solo il proprietario o un editor può aggiornare questo profilo.",
       "types": {
+        "other": { "title": "Altra attività o organizzazione", "description": "Descrivila se nessuna delle categorie precedenti è adatta." },
         "cafe-pub": { "title": "Caffè o pub", "description": "Caffetteria, bar, pub o luogo di ritrovo di quartiere." },
         "restaurant-food": { "title": "Ristorante o locale", "description": "Ristorante, panificio, food hall, takeaway o altra attività di ristorazione." },
         "accommodation": { "title": "Hotel o alloggio", "description": "Hotel, pensione, casa vacanze, campeggio o altra struttura ricettiva." },

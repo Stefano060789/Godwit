@@ -122,37 +122,37 @@
     "goals": {
       "answers": {
         "title": "Answer customer questions",
-        "example": "Use your trusted business information to answer questions about hours, access, menus, or services.",
+        "example": "Track Egg visits while customers get answers from your business information.",
         "setup": "Create an Egg, open its AI assistant, add your website or FAQs, then enable Godwit.",
         "result": "Test a customer question before sharing. Godwit answers from your sources and suggests relevant content."
       },
       "feedback": {
-        "title": "Collect private feedback",
-        "example": "Learn what guests or customers think about their experience.",
+        "title": "Collect feedback responses",
+        "example": "Track poll responses over time and see what customers think about their experience.",
         "setup": "Open or create an Egg, then add a short feedback poll to its experience.",
         "result": "Open your poll's results to see answers and spot what could improve."
       },
       "information": {
         "title": "Show menus, stories & details",
-        "example": "Offer browsable menus, event listings, exhibit stories, or practical details.",
+        "example": "Track Egg visits as you share menus, event listings, stories, or practical details.",
         "setup": "Create an Egg and add an information card with your text, image, and useful links.",
         "result": "Customers find your content without an account. Update it whenever details change."
       },
       "next-step": {
-        "title": "Drive bookings & enquiries",
-        "example": "Link customers to a reservation, appointment, product, or contact page.",
+        "title": "Guide customers to a next step",
+        "example": "Track Egg visits while linking customers to booking, ordering, product, or contact options.",
         "setup": "Add a contact or booking link to an information card on an Egg.",
         "result": "Enquiries reach you through your linked email or booking page, not a new Godwit inbox."
       },
       "contacts": {
-        "title": "Grow a consented email list",
-        "example": "Invite customers to opt in to future news or offers.",
+        "title": "Collect opted-in contacts",
+        "example": "Track consented email sign-ups from customers who choose to hear from you.",
         "setup": "Open or create an Egg, add a poll, and configure a clear email opt-in under After voting.",
         "result": "Export consented contacts from Customer connection. People can vote without sharing their email."
       },
       "reviews": {
         "title": "Invite honest reviews",
-        "example": "Let customers share their experience on Google or Tripadvisor.",
+        "example": "Track Egg visits while offering the same optional review links to every customer.",
         "setup": "Add your review-site links in Settings, then include them when setting up an Egg.",
         "result": "Offer the same review links to everyone. Public reviews are optional and never tied to a reward."
       }
@@ -330,7 +330,7 @@
   },
   "billing": {
     "title": "Plans and billing",
-    "subtitle": "Choose the plan that matches your feedback program.",
+    "subtitle": "Unlimited Eggs with a clear monthly allowance of customer interactions.",
     "pilotNotice": "Godwit is currently a free pilot until {{date}}. No payment method is required, and no paid subscription starts automatically.",
     "currentPlanNotice": "Your workspace is currently on the {{plan}} plan.",
     "trialStarted": "Your 90-day free trial has started. You won't be charged until it ends, and you can cancel anytime before then.",
@@ -348,6 +348,25 @@
     "featureHeader": "Feature",
     "currentTag": "(current)",
     "paymentsNote": "Payments are securely handled by Stripe. Prices and limits are launch proposals and can be changed in Stripe and this page.",
+    "proposed": {
+      "eyebrow": "Pricing proposal",
+      "notice": "This is a proposal only, not a purchasable plan. Your current subscription and Stripe billing are unchanged.",
+      "packagesTitle": "Choose an interaction allowance",
+      "suggested": "Suggested",
+      "tiers": {
+        "small": "Small",
+        "standard": "Standard",
+        "scale": "Scale"
+      },
+      "interactionsPerMonth": "customer interactions / month",
+      "unlimitedEggs": "Unlimited Eggs included",
+      "priceToBeConfirmed": "Monthly price to be announced",
+      "countingTitle": "What would count as an interaction?",
+      "countingBody": "Proposed rule: count one customer's first Egg open in a session. Exclude staff previews and repeat actions within that session. This counting rule is not currently enforced.",
+      "topUpsTitle": "Need more interactions?",
+      "topUpsBody": "Optional top-up packs are planned. Pack sizes, prices, and the purchase flow have not been set.",
+      "statusNote": "Existing plan features and limits remain in effect. Pricing, interaction counting, top-ups, and Stripe checkout will need a separate implementation before this proposal can be purchased."
+    },
     "plans": {
       "free": { "name": "Free", "description": "Start with one active Egg, three active polls, and the essential feedback loop." },
       "starter": { "name": "Starter", "description": "Add email-sharing benefits, public review invitations, exports, reports, and professional feedback tools." },
@@ -420,7 +439,25 @@
       "goal": "Goal",
       "eggs": "Eggs",
       "results": "Results",
+      "goalProgress": "Goal Progress",
       "settings": "Settings"
+    },
+    "goalProgress": {
+      "title": "See how your Eggs are performing",
+      "intro": "Follow customer interactions and outcomes over the last 30 days.",
+      "allEggs": "All Eggs",
+      "measure": "Measure",
+      "metrics": {
+        "interactions": "Egg opens",
+        "responses": "Poll responses",
+        "contacts": "Consented email sign-ups",
+        "messages": "Private messages"
+      },
+      "period": "Last 30 days",
+      "chartLabel": "{{count}} {{metric}} over the last 30 days",
+      "metricNote": "Egg opens include QR or NFC visits; responses are poll responses; contacts are consented email sign-ups; messages are private customer messages.",
+      "loadError": "Progress data could not be loaded. Please try again later.",
+      "emptyEggs": "Create an Egg to start tracking progress."
     },
     "settingsIntro": "Brand, team and account preferences.",
     "goal": {
@@ -449,6 +486,8 @@
       "generationFailed": "Unable to generate this Egg's poll. Please try again.",
       "generationInvalid": "The generated poll needs review. Please try creating the Egg again.",
       "placementTitle": "Name & location",
+      "contextLabel": "Add a specific goal or success detail (optional)",
+      "contextPlaceholder": "For example: collect 20 poll responses this month or increase opted-in contacts.",
       "nameExample": "Gallery welcome",
       "locationExample": "Main entrance",
       "chooseBusiness": "Choose a business type",
@@ -474,13 +513,20 @@
       "title": "Tell Godwit about your business",
       "description": "Choose the closest fit so Godwit can tailor customer guidance and goal-based Eggs to your business.",
       "choose": "What kind of business or place is this?",
-      "save": "Save business type",
+      "save": "Save business profile",
+      "otherRequired": "Describe your business or organisation.",
+      "otherLabel": "Describe your business or organisation",
+      "otherPlaceholder": "For example: a fitness studio, clinic, or local nonprofit.",
       "saving": "Saving...",
       "saved": "Business type saved.",
       "error": "Could not save your business type.",
       "selectWorkspace": "Select a workspace first.",
       "managerOnly": "A workspace owner or editor can update this profile.",
       "types": {
+        "other": {
+          "title": "Other business or organisation",
+          "description": "Describe it if none of the categories above fit."
+        },
         "cafe-pub": {
           "title": "Cafe or pub",
           "description": "Cafe, coffee shop, pub, bar, or neighborhood gathering place."
@@ -587,7 +633,6 @@
       "editTitle": "Edit poll",
       "assignedQr": "This poll will be added to the Egg you scanned.",
       "workspaceTitle": "Create a workspace first",
-      "workspaceBody": "A workspace is your venue or business account. Once you create one and sign in, you can create polls and Eggs, then manage customer feedback here.",
       "createWorkspace": "Create a workspace",
       "signIn": "Sign in",
       "checkingAccess": "Checking your workspace access...",

@@ -55,9 +55,9 @@ describe("Egg goal setup", () => {
     const markup = render();
     expect(markup).toContain("Answer customer questions");
     expect(markup).toContain("Show menus, stories &amp; details");
-    expect(markup).toContain("Collect private feedback");
-    expect(markup).toContain("Drive bookings &amp; enquiries");
-    expect(markup).toContain("Grow a consented email list");
+    expect(markup).toContain("Collect feedback responses");
+    expect(markup).toContain("Guide customers to a next step");
+    expect(markup).toContain("Collect opted-in contacts");
     expect(markup).toContain("Invite honest reviews");
   });
   it("adapts the outcome guidance to the saved business type", () => {

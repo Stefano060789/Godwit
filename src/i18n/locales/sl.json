@@ -61,6 +61,30 @@
     "dashboard": "Nadzorna plošča",
     "getStarted": "Začni"
   },
+  "billing": {
+    "title": "Paketi in obračunavanje",
+    "subtitle": "Neomejeno Eggov z jasno mesečno kvoto interakcij s strankami.",
+    "currentPlanNotice": "Vaš delovni prostor je trenutno v paketu {{plan}}.",
+    "proposed": {
+      "eyebrow": "Predlog cen",
+      "notice": "To je samo predlog in še ni na voljo za nakup. Vaša trenutna naročnina in obračunavanje prek Stripe ostajata nespremenjena.",
+      "packagesTitle": "Izberite kvoto interakcij",
+      "suggested": "Priporočeno",
+      "tiers": {
+        "small": "Majhna",
+        "standard": "Standardna",
+        "scale": "Razširjena"
+      },
+      "interactionsPerMonth": "interakcij s strankami / mesec",
+      "unlimitedEggs": "Vključeno neomejeno število Eggov",
+      "priceToBeConfirmed": "Mesečna cena bo določena pozneje",
+      "countingTitle": "Kaj bi štelo kot interakcija?",
+      "countingBody": "Predlagano pravilo: šteje se prvo odprtje Egg s strani stranke v posamezni seji. Predogledi zaposlenih in ponovljena dejanja v isti seji se izključijo. To štetje se trenutno ne uporablja.",
+      "topUpsTitle": "Potrebujete več interakcij?",
+      "topUpsBody": "Načrtovani so neobvezni dodatni paketi. Velikosti, cene in način nakupa še niso določeni.",
+      "statusNote": "Obstoječe funkcije in omejitve paketov ostajajo v veljavi. Pred nakupom tega predloga bo treba ločeno urediti cene, štetje interakcij, dodatne pakete in Stripe."
+    }
+  },
   "quickStart": {
     "eyebrow": "Vaš začetek z Godwitom",
     "title": "En cilj. Koristna izkušnja.",
@@ -93,37 +117,37 @@
     "goals": {
       "answers": {
         "title": "Odgovarjanje na vprašanja strank",
-        "example": "Z zanesljivimi informacijami odgovorite na vprašanja o urniku, dostopnosti, meniju ali storitvah.",
+        "example": "Spremljajte odprtja Eggov, ko stranke iščejo odgovore v informacijah o vašem podjetju.",
         "setup": "Ustvarite Egg, odprite pomočnika umetne inteligence, dodajte spletno stran ali pogosta vprašanja in omogočite Godwit.",
         "result": "Pred deljenjem preizkusite vprašanje. Godwit odgovarja iz vaših virov in predlaga ustrezno vsebino."
       },
       "feedback": {
-        "title": "Zbiranje zasebnih mnenj",
-        "example": "Ugotovite, kaj gostje ali stranke menijo o svoji izkušnji.",
+        "title": "Zbiranje odgovorov na ankete",
+        "example": "Spremljajte odgovore na ankete in mnenja strank o njihovi izkušnji.",
         "setup": "Odprite ali ustvarite Egg in njegovi vsebini dodajte kratko anketo.",
         "result": "Odprite rezultate ankete, preglejte odgovore in poiščite možnosti za izboljšave."
       },
       "information": {
         "title": "Predstavitev menijev, zgodb in podrobnosti",
-        "example": "Ponudite menije, seznam dogodkov, zgodbe ali praktične informacije za ogled.",
+        "example": "Spremljajte odprtja Eggov, ko delite menije, dogodke, zgodbe ali praktične informacije.",
         "setup": "Ustvarite Egg in dodajte informacijsko kartico z besedilom, sliko in uporabnimi povezavami.",
         "result": "Stranke vsebino najdejo brez računa. Posodobite jo, ko se podatki spremenijo."
       },
       "next-step": {
-        "title": "Spodbujanje rezervacij in povpraševanj",
-        "example": "Stranke usmerite do rezervacije, termina, izdelka ali kontaktne strani.",
+        "title": "Usmerjanje strank k naslednjemu koraku",
+        "example": "Spremljajte odprtja Eggov ter povežite možnosti rezervacije, naročila, izdelka ali stika.",
         "setup": "Informacijski kartici v Egg dodajte povezavo za stik ali rezervacijo.",
         "result": "Povpraševanja prejmete prek povezane e-pošte ali strani za rezervacije, ne v novem nabiralniku Godwit."
       },
       "contacts": {
-        "title": "Ustvarjanje e-poštnega seznama s soglasjem",
-        "example": "Stranke povabite, da se prijavijo na novice ali prihodnje ponudbe.",
+        "title": "Zbiranje stikov s privolitvijo",
+        "example": "Spremljajte prijave strank na e-pošto, če se odločijo za prejemanje sporočil.",
         "setup": "Odprite ali ustvarite Egg, dodajte anketo in v razdelku Po glasovanju nastavite jasno soglasje za e-pošto.",
         "result": "Izvozite kontakte s soglasjem iz razdelka Povezava s strankami. Ljudje lahko glasujejo brez delitve e-pošte."
       },
       "reviews": {
         "title": "Povabilo k iskrenim ocenam",
-        "example": "Strankam omogočite deljenje izkušenj na Googlu ali Tripadvisorju.",
+        "example": "Spremljajte odprtja Eggov in vsem ponudite enake neobvezne povezave do ocen.",
         "setup": "V nastavitvah dodajte povezave do ocen in jih vključite pri nastavitvi Egg.",
         "result": "Vsem ponudite iste povezave. Javne ocene so neobvezne in nikoli povezane z nagrado."
       }
@@ -209,7 +233,25 @@
       "goal": "Cilj",
       "eggs": "Egg",
       "results": "Rezultati",
+      "goalProgress": "Napredek cilja",
       "settings": "Nastavitve"
+    },
+    "goalProgress": {
+      "title": "Spremljajte uspešnost svojih Eggov",
+      "intro": "Spremljajte interakcije s strankami in rezultate v zadnjih 30 dneh.",
+      "allEggs": "Vsi Eggi",
+      "measure": "Meritev",
+      "metrics": {
+        "interactions": "Odprti Eggi",
+        "responses": "Odgovori na ankete",
+        "contacts": "Prijave na e-pošto s privolitvijo",
+        "messages": "Zasebna sporočila"
+      },
+      "period": "Zadnjih 30 dni",
+      "chartLabel": "{{count}}: {{metric}} v zadnjih 30 dneh",
+      "metricNote": "Odprtje vključuje obisk prek QR ali NFC; odgovori so odgovori na ankete; stiki so prijave na e-pošto s privolitvijo; sporočila so zasebna sporočila strank.",
+      "loadError": "Podatkov o napredku ni bilo mogoče naložiti. Poskusite znova pozneje.",
+      "emptyEggs": "Ustvarite Egg za spremljanje napredka."
     },
     "settingsIntro": "Znamka, ekipa in nastavitve računa.",
     "goal": {
@@ -238,6 +280,8 @@
       "generationFailed": "Ankete za ta Egg ni bilo mogoče ustvariti. Poskusite znova.",
       "generationInvalid": "Ustvarjeno anketo je treba pregledati. Poskusite znova ustvariti Egg.",
       "placementTitle": "Ime in lokacija",
+      "contextLabel": "Dodajte konkreten cilj ali merilo uspeha (izbirno)",
+      "contextPlaceholder": "Na primer: ta mesec zbrati 20 odgovorov na anketo ali povečati število prijav na e-pošto s privolitvijo.",
       "nameExample": "Dobrodošli v galeriji",
       "locationExample": "Glavni vhod",
       "chooseBusiness": "Izberite vrsto podjetja",
@@ -263,13 +307,17 @@
       "title": "Povejte Godwitu več o svojem podjetju",
       "description": "Izberite najprimernejšo kategorijo, da bo Godwit prilagodil pomoč strankam in Egge vašemu podjetju.",
       "choose": "Za kakšno podjetje ali kraj gre?",
-      "save": "Shrani vrsto podjetja",
+      "save": "Shrani profil podjetja",
+      "otherRequired": "Opišite svoje podjetje ali organizacijo.",
+      "otherLabel": "Opišite svoje podjetje ali organizacijo",
+      "otherPlaceholder": "Na primer: fitnes studio, klinika ali lokalna neprofitna organizacija.",
       "saving": "Shranjevanje...",
       "saved": "Vrsta podjetja je shranjena.",
       "error": "Vrste podjetja ni bilo mogoče shraniti.",
       "selectWorkspace": "Najprej izberite delovni prostor.",
       "managerOnly": "Profil lahko posodobita lastnik ali urednik delovnega prostora.",
       "types": {
+        "other": { "title": "Drugo podjetje ali organizacija", "description": "Opišite jo, če nobena od zgornjih kategorij ne ustreza." },
         "cafe-pub": { "title": "Kavarna ali pub", "description": "Kavarna, čajnica, pub, bar ali lokalno zbirališče." },
         "restaurant-food": { "title": "Restavracija ali gostinski lokal", "description": "Restavracija, pekarna, tržnica s hrano, okrepčevalnica ali druga gostinska dejavnost." },
         "accommodation": { "title": "Hotel ali nastanitev", "description": "Hotel, gostišče, počitniška nastanitev, kamp ali druga nastanitev." },

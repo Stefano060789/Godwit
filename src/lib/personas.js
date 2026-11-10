@@ -184,6 +184,13 @@ export const BUSINESS_TYPES = [
     description: "Community center, library, public space, nonprofit, or civic service.",
     aiContext: "a community organization or public space",
     aiGuidance: "For a community organization or public space, help with supplied public services, programs, opening times, accessibility, and ways to participate. Use only the information provided by the organization."
+  },
+  {
+    key: "other",
+    label: "Other business or organisation",
+    description: "Describe your business or organisation if none of the categories fit.",
+    aiContext: "another kind of business or organization",
+    aiGuidance: "Use the supplied description to understand the organization. Rely only on the business information provided and do not invent facts, policies, prices, or availability."
   }
 ];
 

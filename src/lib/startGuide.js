@@ -17,7 +17,7 @@ export function getCampaignGoalKeys(campaign) {
   return [...new Set(keys.filter((key) => validKeys.has(key)))];
 }
 
-const ADMIN_TABS = ["your-business", "business", "goal", "results", "polls", "woodpecker", "connection", "engagement", "feedback", "settings"];
+const ADMIN_TABS = ["your-business", "business", "goal", "results", "goal-progress", "polls", "woodpecker", "connection", "engagement", "feedback", "settings"];
 
 export function getAdminTab(search) {
   const tab = new URLSearchParams(search).get("tab");

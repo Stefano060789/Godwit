@@ -2,25 +2,32 @@ import { useEffect, useState } from "react";
 import { BUSINESS_TYPES } from "../lib/personas";
 import { saveWorkspaceBusinessType } from "../lib/workspaceProfile";
 
-export default function BusinessProfile({ workspaceId, businessType, canManage, onSaved, t }) {
+export default function BusinessProfile({ workspaceId, businessType, businessDescription = "", canManage, onSaved, t }) {
   const [selectedType, setSelectedType] = useState(businessType || "");
+  const [customDescription, setCustomDescription] = useState(businessDescription);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     setSelectedType(businessType || "");
-  }, [businessType, workspaceId]);
+    setCustomDescription(businessDescription || "");
+  }, [businessType, businessDescription, workspaceId]);
 
   useEffect(() => setMessage(""), [workspaceId]);
 
   async function submit(event) {
     event.preventDefault();
     if (!workspaceId || !canManage || saving || !selectedType) return;
+    if (selectedType === "other" && !customDescription.trim()) {
+      setIsError(true);
+      setMessage(t("admin.businessProfile.otherRequired", { defaultValue: "Describe your business or organization." }));
+      return;
+    }
     setSaving(true);
     setMessage("");
     try {
-      const profile = await saveWorkspaceBusinessType(workspaceId, selectedType);
+      const profile = await saveWorkspaceBusinessType(workspaceId, selectedType, selectedType === "other" ? customDescription : "");
       onSaved(profile);
       setIsError(false);
       setMessage(t("admin.businessProfile.saved", { defaultValue: "Business type saved." }));
@@ -62,11 +69,25 @@ export default function BusinessProfile({ workspaceId, businessType, canManage, 
                   </span>
                 </label>)}
               </div>
+              {selectedType === "other" && <label className="business-profile-custom">
+                {t("admin.businessProfile.otherLabel", { defaultValue: "Describe your business or organisation" })}
+                <textarea
+                  required
+                  maxLength={500}
+                  rows={3}
+                  value={customDescription}
+                  onChange={(event) => {
+                    setCustomDescription(event.target.value);
+                    setMessage("");
+                  }}
+                  placeholder={t("admin.businessProfile.otherPlaceholder", { defaultValue: "For example: a fitness studio, clinic, or local nonprofit." })}
+                />
+              </label>}
             </fieldset>
-            <button type="submit" className="goal-primary-action" disabled={saving || !selectedType || selectedType === businessType}>
+            <button type="submit" className="goal-primary-action" disabled={saving || !selectedType || (selectedType === businessType && (selectedType !== "other" || customDescription === businessDescription))}>
               {saving
                 ? t("admin.businessProfile.saving", { defaultValue: "Saving..." })
-                : t("admin.businessProfile.save", { defaultValue: "Save business type" })}
+                : t("admin.businessProfile.save", { defaultValue: "Save business profile" })}
             </button>
             {message && <p className={isError ? "hub-error" : "hub-caption"} role={isError ? "alert" : "status"}>{message}</p>}
           </form>}

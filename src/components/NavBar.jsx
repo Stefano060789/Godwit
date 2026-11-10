@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
 import godwitMark from "../assets/godwit-mark.svg";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { applyTheme, readTheme, THEME_EVENT } from "../lib/theme";
 import { isCreatorEmail } from "../lib/creatorAccess";
 
 export default function NavBar() {
@@ -20,16 +19,6 @@ export default function NavBar() {
   const isCreator = isCreatorEmail(displayUser?.email);
   const [menuOpen, setMenuOpen] = useState(false);
   const [installPrompt, setInstallPrompt] = useState(null);
-  const [theme, setTheme] = useState(() => readTheme());
-
-  useEffect(() => {
-    function handleThemeChange(event) {
-      setTheme(event.detail || readTheme());
-    }
-    window.addEventListener(THEME_EVENT, handleThemeChange);
-    return () => window.removeEventListener(THEME_EVENT, handleThemeChange);
-  }, []);
-
   useEffect(() => {
     async function loadUser() {
       const { data } = await supabase.auth.getUser();
@@ -100,15 +89,6 @@ export default function NavBar() {
           )}
           {!displayUser && <Link to="/essentials" onClick={closeMenu} className="site-nav-primary site-nav-start">{t("nav.getStarted")}</Link>}
           <LanguageSwitcher className="site-nav-lang" />
-          <button
-            type="button"
-            className="site-nav-theme"
-            onClick={() => setTheme(applyTheme(theme === "dark" ? "light" : "dark"))}
-            aria-label={theme === "dark" ? t("nav.lightTheme") : t("nav.darkTheme")}
-            title={theme === "dark" ? t("nav.lightTheme") : t("nav.darkTheme")}
-          >
-            {theme === "dark" ? "☀" : "◐"}
-          </button>
           {displayUser && <Link to="/admin/billing" onClick={closeMenu} className="site-nav-billing">{t("nav.billing")}</Link>}
           <button
             type="button"

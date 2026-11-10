@@ -27,14 +27,20 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("workspace business profile persistence", () => {
-  it("saves only the business type and caches it after the database update", async () => {
+  it("saves the business type and custom description and caches them after the database update", async () => {
     await expect(saveWorkspaceBusinessType("workspace-id", "cafe-pub")).resolves.toEqual({
-      businessType: "cafe-pub"
+      businessType: "cafe-pub",
+      businessDescription: ""
     });
 
     expect(from).toHaveBeenCalledWith("workspaces");
-    expect(update).toHaveBeenCalledWith({ business_type: "cafe-pub" });
+    expect(update).toHaveBeenCalledWith({ business_type: "cafe-pub", business_description: null });
     expect(eq).toHaveBeenCalledWith("id", "workspace-id");
+  });
+
+  it("requires a description when saving an unlisted business", async () => {
+    await expect(saveWorkspaceBusinessType("workspace-id", "other")).rejects.toThrow("Describe your business");
+    expect(from).not.toHaveBeenCalled();
   });
 
   it("rejects unknown categories before writing", async () => {

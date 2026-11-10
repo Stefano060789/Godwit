@@ -72,10 +72,10 @@ export async function loadWorkspaceProfile() {
   }
 
   const baseColumns = "id, name, logo_url, primary_color, accent_color, webhook_url, vote_retention_days";
-  let optionalColumns = ["review_platforms", "business_type"];
+  let optionalColumns = ["review_platforms", "business_type", "business_description"];
   let workspace;
   let error;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
     ({ data: workspace, error } = await supabase
       .from("workspaces")
       .select([baseColumns, ...optionalColumns].join(", "))
@@ -106,6 +106,7 @@ export async function loadWorkspaceProfile() {
     voteRetentionDays: workspace.vote_retention_days || "",
     reviewPlatforms: Array.isArray(workspace.review_platforms) ? workspace.review_platforms : [],
     businessType: workspace.business_type || "",
+    businessDescription: workspace.business_description || "",
     role,
     plan
   };
@@ -123,24 +124,27 @@ export async function loadWorkspacePlan(workspaceId) {
   return data || "free";
 }
 
-export async function saveWorkspaceBusinessType(workspaceId, businessType) {
+export async function saveWorkspaceBusinessType(workspaceId, businessType, businessDescription = "") {
   if (!workspaceId) throw new Error("A workspace is required.");
   if (!isBusinessType(businessType)) throw new Error("Choose a valid business type.");
+  const description = String(businessDescription || "").trim();
+  if (description.length > 500) throw new Error("Business description must be 500 characters or fewer.");
+  if (businessType === "other" && !description) throw new Error("Describe your business or organization.");
 
   const { error } = await supabase
     .from("workspaces")
-    .update({ business_type: businessType })
+    .update({ business_type: businessType, business_description: description || null })
     .eq("id", workspaceId);
-  if (error && (error.code === "42703" || error.message?.includes("business_type"))) {
+  if (error && (error.code === "42703" || error.message?.includes("business_type") || error.message?.includes("business_description"))) {
     throw new Error("Business type settings are unavailable until the workspace business profile migration is applied.");
   }
   if (error) throw new Error(`Unable to save business type: ${error.message}`);
 
   const profiles = readAllProfiles();
   const key = String(workspaceId);
-  profiles[key] = { ...(profiles[key] ?? {}), businessType };
+  profiles[key] = { ...(profiles[key] ?? {}), businessType, businessDescription: description };
   writeAllProfiles(profiles);
-  return { businessType };
+  return { businessType, businessDescription: description };
 }
 
 export async function saveWorkspaceProfile(workspaceId, patch = {}) {

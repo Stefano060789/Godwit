@@ -30,7 +30,7 @@ describe("Egg dashboard hub", () => {
   it.each(["en", "de", "it", "sl"])("localizes new dashboard pages in %s", async (language) => {
     const i18n = createInstance();
     await i18n.init({ lng: language, fallbackLng: false, resources: { [language]: { translation: locales[language] } } });
-    for (const section of ["hub", "goal", "businessProfile", "businessData", "eggList", "eggResults", "nfc"]) {
+    for (const section of ["hub", "goalProgress", "goal", "businessProfile", "businessData", "eggList", "eggResults", "nfc"]) {
       for (const key of Object.keys(en.admin[section])) {
         expect(i18n.exists(`admin.${section}.${key}`)).toBe(true);
       }

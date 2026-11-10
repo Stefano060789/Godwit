@@ -5,11 +5,13 @@ import { supabase } from "../lib/supabase";
 import { appendAuditLog, readAuditLog, readPollMeta, savePollMeta, isPollClosed } from "../lib/pollMeta";
 import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
 import { buildEggUrl } from "../lib/eggs";
+import godwitMark from "../assets/godwit-mark.svg";
 import DashboardHub from "../components/DashboardHub";
 import EggGoal from "../components/EggGoal";
 import EggResults from "../components/EggResults";
 import BusinessProfile from "../components/BusinessProfile";
 import BusinessData from "../components/BusinessData";
+import GoalProgress from "../components/GoalProgress";
 import EggNfcSetup from "../components/EggNfcSetup";
 import { createGoalEggSetup } from "../lib/goalEggSetup";
 import { getEggAccessAnalyticsErrorMessage } from "../lib/eggAccessAnalytics";
@@ -90,6 +92,7 @@ export default function Admin() {
     webhookUrl: "",
     reviewPlatforms: [],
     businessType: "",
+    businessDescription: "",
     role: "owner",
     plan: "free"
   });
@@ -1407,14 +1410,10 @@ export default function Admin() {
 
   function printCampaignQr(campaign, url, design = {}) {
     const formatConfig = getQrPrintFormatConfig();
-    const generatedStyle = generateQrStyle(design.seed || 1, design.preset || "brand");
     const customText = (design.text || "").trim().replace(/[<>&"']/g, "");
-    const logoUrl = (design.logoUrl || workspaceProfile.logoUrl || "").trim().replace(/[<>&"']/g, "");
-    const logoMarkup = logoUrl
-      ? `<img src="${logoUrl}" alt="Brand logo" style="max-height: 56px; max-width: 160px; object-fit: contain; margin-right: 16px;" />`
-      : "";
-    const companyName = (workspaceProfile.companyName || "Godwit").replace(/[<>&"']/g, "");
     const campaignName = (campaign?.name || "QR code").replace(/[<>&"']/g, "");
+    const markUrl = new URL(godwitMark, window.location.href).href;
+    const qrUrl = getCampaignQrImageUrl(url, 600);
 
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
@@ -1430,54 +1429,51 @@ export default function Admin() {
             @page { size: ${formatConfig.size}; margin: ${formatConfig.margin}; }
             body {
               margin: 0;
-              background: #f8fafc;
+              background: #f5f0e7;
               font-family: Arial, sans-serif;
-              color: #0f172a;
+              color: #263b39;
               display: flex;
               align-items: center;
               justify-content: center;
             }
             .page {
-              width: ${formatConfig.cssSize};
-              min-height: ${formatConfig.cssSize};
+              width: min(100%, 720px);
+              aspect-ratio: 1;
               display: flex;
               flex-direction: column;
               justify-content: center;
               align-items: center;
-              background: ${generatedStyle.background};
-              border-radius: 20px;
-              box-shadow: ${generatedStyle.shadow};
-              padding: 36px;
+              background: linear-gradient(145deg, #f8eee7 0%, #eee8f5 48%, #e8f0ed 100%);
+              border: 1px solid #d5c7a4;
+              border-radius: 28px;
+              padding: 18px;
               box-sizing: border-box;
             }
-            .header { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 18px; }
-            .brand { font-size: 28px; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }
-            .qr-box { position: relative; background: #fff; border: 12px solid #0b1a33; border-radius: 18px; padding: 18px 18px 44px; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12); }
-            .qr-box img { display: block; width: 260px; height: 260px; object-fit: contain; }
-            .qr-mark { position: absolute; right: 0; bottom: 8px; left: 0; color: #0b1a33; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-align: center; }
-            .title { margin-top: 18px; font-size: 20px; font-weight: 700; text-align: center; max-width: 620px; }
-            .custom-text { margin-top: 16px; font-size: 22px; font-weight: 700; text-align: center; max-width: 620px; color: #0f172a; }
-            .subtitle { margin-top: 8px; font-size: 14px; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; color: #334155; }
-            .godwit-footer { margin-top: 22px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; }
-            .godwit-footer img { display: block; width: 16px; height: 16px; border-radius: 50%; }
+            .brand { margin-bottom: 12px; color: #344f4b; font-size: 16px; font-weight: 700; letter-spacing: .08em; }
+            .egg { width: min(100%, 4.5in); aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; box-sizing: border-box; padding: 18px; border: 2px solid #c5a75e; border-radius: 49% 49% 46% 46% / 42% 42% 56% 56%; background: linear-gradient(145deg, #f0d7d0 0%, #dcd5ed 48%, #cbded6 100%); box-shadow: inset 0 0 0 8px rgba(255,255,255,.28), 0 18px 38px rgba(52,79,75,.16); }
+            .qr-box { display: grid; width: min(70%, 2.8in); aspect-ratio: 1; place-items: center; box-sizing: border-box; padding: 16px; border: 8px solid #fff; border-radius: 12px; background: #fff; box-shadow: 0 8px 22px rgba(38,59,57,.2); }
+            .qr-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
+            .title { max-width: 340px; font-size: 14px; font-weight: 700; text-align: center; color: #263b39; }
+            .custom-text { max-width: 340px; color: #263b39; font-size: 13px; font-weight: 700; text-align: center; }
+            .subtitle { color: #344f4b; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-align: center; text-transform: uppercase; }
+            .godwit-footer { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 12px; color: #9b7938; font-size: 10px; font-weight: 800; letter-spacing: .13em; }
+            .godwit-footer img { display: block; width: 24px; height: 24px; object-fit: contain; }
+            @media print { body { background: #fff; } .page { width: min(100%, 6in); border: 0; border-radius: 0; box-shadow: none; } .egg { width: min(100%, 4.2in); } }
+            @media (max-width: 520px) { .page { min-height: 100vh; aspect-ratio: auto; padding: 20px 12px; } .egg { aspect-ratio: auto; padding: 24px 16px; } .qr-box { width: min(70%, 270px); padding: 12px; } }
           </style>
         </head>
         <body>
           <div class="page">
-            <div class="header">
-              ${logoMarkup}
-              <div class="brand">${companyName}</div>
+            <div class="brand">GODWIT EGG</div>
+            <div class="egg">
+              <div class="subtitle">${t("admin.engagement.campaigns.scanToView")}</div>
+              <div class="qr-box"><img src="${qrUrl}" alt="QR code" /></div>
+              ${customText ? `<div class="custom-text">${customText}</div>` : ""}
+              <div class="title">${campaignName}</div>
             </div>
-            <div class="qr-box">
-              <img src="${getCampaignQrImageUrl(url, 600)}" alt="QR code" />
-              <div class="qr-mark">hellogodwit.com</div>
-            </div>
-            <div class="subtitle">${t("admin.engagement.campaigns.scanToView")}</div>
-            ${customText ? `<div class="custom-text">${customText}</div>` : ""}
-            <div class="title">${campaignName}</div>
             <div class="godwit-footer">
-              <img src="${window.location.origin}/favicon.svg" alt="" />
-              <span>${t("admin.polls.card.madeWithGodwit", { host: window.location.host })}</span>
+              <img src="${markUrl}" alt="" />
+              <span>hellogodwit.com</span>
             </div>
           </div>
         </body>
@@ -1566,7 +1562,9 @@ export default function Admin() {
         action: "generate-goal-setup",
         workspaceId: workspaceUserId,
         businessType: workspaceProfile.businessType,
+        businessDescription: workspaceProfile.businessDescription,
         goalKeys: fields.goalKeys,
+        goalContext: fields.goalContext,
         name: fields.name,
         placementLabel: fields.placementLabel,
         language: navigator.language
@@ -1660,6 +1658,7 @@ export default function Admin() {
       {activeTab === "your-business" && workspaceUserId && <BusinessProfile
         workspaceId={workspaceUserId}
         businessType={workspaceProfile.businessType}
+        businessDescription={workspaceProfile.businessDescription}
         canManage={permission.canManageWorkspace}
         onSaved={(profile) => setWorkspaceProfile((current) => ({ ...current, ...profile }))}
         t={t}
@@ -1675,6 +1674,7 @@ export default function Admin() {
         t={t}
       />}
       {activeTab === "results" && <EggResults campaigns={qrCampaigns} canViewMessages={permission.canManageWorkspace} onOpenEgg={goToEgg} t={t} />}
+      {activeTab === "goal-progress" && <GoalProgress campaigns={qrCampaigns} t={t} />}
 
       {activeTab === "overview" && (
       <>
