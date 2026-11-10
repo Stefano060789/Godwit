@@ -16,9 +16,9 @@ describe("Egg QR artwork and printing", () => {
     const svg = decodeURIComponent(artwork.split(",").slice(1).join(","));
     expect(svg).toContain('viewBox="0 0 400 480"');
     expect(svg).toContain('x="50" y="115" width="300" height="300"');
-    expect(svg).toContain('width="64" height="72"');
-    expect(svg).toContain('font-size="16" font-weight="700">&lt;script&gt;');
-    expect(svg).toContain('font-size="13" font-weight="700">hellogodwit.com</text>');
+    expect(svg).toContain('width="88" height="98"');
+    expect(svg).toContain('font-size="22" font-weight="700">&lt;script&gt;');
+    expect(svg).toContain('font-size="18" font-weight="700">hellogodwit.com</text>');
     expect(svg).toContain("&lt;script&gt;");
     expect(svg).not.toContain("<script>");
     expect(svg).not.toContain("api.qrserver.com");
