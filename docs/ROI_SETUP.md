@@ -83,6 +83,32 @@ features remain unchanged.
 
 ### Usage, top-ups, and warnings
 
+Account-management actions (refresh billing, manage/cancel a subscription, and buy
+100 extra interactions) are available under Dashboard > Settings. Billing remains
+the plan catalogue and also offers the one-time pack. Purchase buttons use the
+terracotta primary-action colour in both places.
+
+### Complimentary creator access
+
+After the paid-interaction migration, run
+[`20261119_creator_access.sql`](../supabase/20261119_creator_access.sql) in the
+Supabase SQL editor. It grants the existing confirmed account
+`bonomistefano@outlook.it` complimentary access to all available feature tiers,
+unlimited interactions, Eggs, polls and seats in accounts it owns. The grant is
+stored against its auth user ID, not an email supplied by the browser. The script
+fails explicitly if that confirmed user cannot be uniquely identified.
+
+Only a database administrator/service role can grant or revoke access; members
+cannot edit the grant table. Other accounts retain existing billing and quotas.
+The creator sees "Complimentary creator access" instead of the legacy warning.
+New subscription and top-up purchases are blocked in the UI and backend; existing
+Stripe subscriptions are not automatically cancelled. If one exists, cancel it
+through Settings to stop renewal. Removing the user's row from `creator_accounts`
+restores the original billing state. This migration must actually be applied to
+the target database; deploying the frontend alone does not grant access.
+
+### Interaction accounting
+
 One first customer Egg open per browser session across an account's Eggs consumes
 one interaction; this is not a verified unique-person count. Staff previews do not
 count. Base usage renews on Stripe's actual monthly period, not the calendar month,

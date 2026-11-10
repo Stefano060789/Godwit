@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Layout from "../components/Layout";
+import VisitorPreviewBar from "../components/VisitorPreviewBar";
 import { supabase } from "../lib/supabase";
 import { isRestrictedTopic } from "../lib/restrictedContent";
 import { readPollMeta, isPollClosed } from "../lib/pollMeta";
@@ -28,6 +29,10 @@ const TRANSLATION_ENABLED = import.meta.env.VITE_ENABLE_TRANSLATION !== "false";
 const TRANSLATION_TIMEOUT_MS = 5000;
 
 export default function Vote() {
+  return <><VisitorPreviewBar /><VoteContent /></>;
+}
+
+function VoteContent() {
   const { t } = useTranslation();
   const { pollId } = useParams();
   const navigate = useNavigate();
@@ -226,6 +231,7 @@ export default function Vote() {
         positive: isPositiveVote ? "1" : "0",
         answers: JSON.stringify(answersToSubmit)
       });
+      if (searchParams.get("preview") === "1") thanksParams.set("preview", "1");
       if (emailBenefitEligible) thanksParams.set("emailBenefit", "1");
       if (reviewEligible) thanksParams.set("reviewEligible", "1");
       if (visitCount > 0) thanksParams.set("visits", String(visitCount));

@@ -11,6 +11,21 @@
   background-color: var(--hub-background);
   color: var(--hub-ink);
 }
+.egg-print-proposal { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .7fr); gap: 1.25rem; align-items: start; margin-top: 1.25rem; }
+.egg-recognizer { display: grid; gap: .85rem; min-width: 0; }
+.egg-recognizer-form { display: grid; gap: .4rem; font-size: .85rem; font-weight: 600; }
+.egg-recognizer-link { display: flex; flex-wrap: wrap; gap: .65rem; }
+.egg-recognizer-link input { flex: 1 1 220px; min-width: 0; min-height: 44px; padding: .65rem; border: 1px solid var(--hub-line); border-radius: .6rem; }
+.egg-recognizer-link button, .egg-recognizer-actions button { min-height: 44px; }
+.egg-recognizer-actions { display: flex; flex-wrap: wrap; gap: .65rem; }
+.egg-print-artwork { min-width: 0; padding: 1rem; border: 1px solid var(--hub-line); border-radius: 1rem; background: white; }
+.egg-print-artwork img { display: block; width: 100%; max-width: 360px; height: auto; margin: auto; }
+.egg-print-dimensions { display: grid; gap: .8rem; color: var(--hub-ink); font-size: .85rem; }
+.egg-print-dimensions label { display: grid; gap: .5rem; font-weight: 700; }
+.egg-print-dimensions select { width: 100%; min-width: 0; min-height: 44px; padding: .5rem; border: 1px solid var(--hub-line); border-radius: .6rem; color: var(--hub-ink); background: var(--hub-surface); }
+.egg-print-dimensions p { margin: 0; line-height: 1.5; }
+.egg-print-dimensions strong { display: block; margin-top: .2rem; }
+@media (max-width: 640px) { .egg-print-proposal { grid-template-columns: minmax(0, 1fr); } .egg-print-dimensions { grid-row: 1; } }
 .dashboard-hub {
   --hub-gap: clamp(1.25rem, 3vw, 2.5rem);
   position: relative;
@@ -79,8 +94,7 @@
 .dashboard-hub-access { display: flex; gap: .85rem; margin-top: .5rem; color: var(--hub-muted); }
 .dashboard-hub-access > span { display: flex; align-items: center; gap: .25rem; padding: .25rem .4rem; border: 1px solid var(--hub-line); border-radius: .4rem; background: var(--hub-surface); font-size: .65rem; font-weight: 700; }
 .dashboard-hub-access svg { width: 18px; height: 18px; }
-.workspace-page .dashboard-hub-settings { grid-column: 1 / -1; grid-row: 2; width: max-content; justify-self: center; min-height: 44px; padding: .35rem .85rem; border-color: transparent; background: transparent; box-shadow: none; font-size: .75rem; }
-.dashboard-hub-settings .dashboard-hub-icon { flex-basis: 26px; height: 26px; background: transparent; }
+.workspace-page .dashboard-hub-settings { grid-column: 1 / -1; grid-row: 2; width: min(100%, 260px); justify-self: center; min-height: 64px; }
 .dashboard-hub-settings .dashboard-hub-chevron { display: none; }
 .egg-workspace button:focus-visible, .egg-workspace a:focus-visible, .egg-workspace summary:focus-visible { outline: 3px solid var(--hub-accent); outline-offset: 4px; }
 .hub-page-heading { margin-bottom: 1.5rem; }
@@ -284,7 +298,7 @@
   .dashboard-hub-icon { flex: 0 0 28px; width: 28px; height: 28px; border-radius: 9px; }
   .dashboard-hub-node svg { width: 18px; height: 18px; }
   .dashboard-hub-copy small, .dashboard-hub-chevron { display: none; }
-  .workspace-page .dashboard-hub-settings { flex-direction: row; width: max-content; min-height: 44px; padding: .35rem .85rem; font-size: .72rem; }
+  .workspace-page .dashboard-hub-settings { flex-direction: row; width: min(100%, 220px); min-height: 60px; padding: .75rem; font-size: .75rem; }
   .egg-workspace .egg-location-card { padding: .9rem; }
   .egg-card-header { flex-direction: column; }
   .egg-card-manage-actions { justify-content: flex-start; }

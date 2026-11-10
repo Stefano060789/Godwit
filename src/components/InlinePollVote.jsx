@@ -14,7 +14,7 @@ export function hasOptionalPollExtras(poll) {
 // Renders one "poll" QR-campaign item directly inline in the QR menu: the question and its
 // answer options are shown open, right there, so a voter can answer without clicking through to
 // a separate page. Optional follow-up features remain available on the full poll when configured.
-export default function InlinePollVote({ item, branding }) {
+export default function InlinePollVote({ item, branding, preview = false }) {
   const { t } = useTranslation();
   const [poll, setPoll] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -170,7 +170,7 @@ export default function InlinePollVote({ item, branding }) {
       </button>
       {submitError && <p className="qr-portal-poll-error" role="alert">{submitError}</p>}
       {hasOptionalPollExtras(poll) && (
-        <Link to={`/vote/${item.poll_id}?campaign=${item.campaign_id}&trialSessionId=${item.trial_session_id || ""}`} className="qr-portal-poll-more">
+        <Link to={`/vote/${item.poll_id}?campaign=${item.campaign_id}&trialSessionId=${item.trial_session_id || ""}${preview ? "&preview=1" : ""}`} className="qr-portal-poll-more">
           {t("vote.moreWaysToRespond", { defaultValue: "Optional ways to respond" })} →
         </Link>
       )}

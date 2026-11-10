@@ -4,8 +4,14 @@ import { interactionUsageProgress } from "../lib/interactionBilling";
 export default function InteractionUsageNotice({ usage, t }) {
   if (!usage) return null;
   const key = "billing.interactions";
-  if (usage.error || !["active", "exhausted", "expired", "inactive", "legacy"].includes(usage.state)) {
+  if (usage.error || !["active", "exhausted", "expired", "inactive", "legacy", "complimentary"].includes(usage.state)) {
     return <p role="alert" className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-rose-950">{t(`${key}.usageUnavailable`)} {usage.error ? usage.error.message || String(usage.error) : ""}</p>;
+  }
+  if (usage.state === "complimentary") {
+    return <section role="status" className="rounded-xl border p-4 text-sm">
+      <h2 className="font-bold">{t(`${key}.creatorTitle`)}</h2>
+      <p className="mt-1">{t(`${key}.creatorBody`)}</p>
+    </section>;
   }
   if (usage.state === "legacy") {
     return <p className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">{t(`${key}.legacy`)}</p>;

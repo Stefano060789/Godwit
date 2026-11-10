@@ -82,6 +82,15 @@ describe("InteractionUsageNotice", () => {
     expect(markup).not.toContain("<progress");
   });
 
+  it.each(Object.entries({ en, de, it: itLocale, sl }))("shows complimentary creator access without quotas or upsells in %s", async (language, resources) => {
+    const markup = await renderNotice({ state: "complimentary", plan: "creator", unlimited: true }, resources, language);
+    expect(markup).toContain(resources.billing.interactions.creatorTitle);
+    expect(markup).toContain(resources.billing.interactions.creatorBody);
+    expect(markup).not.toContain("<progress");
+    expect(markup).not.toContain('href="/billing');
+    expect(markup).not.toContain(resources.billing.interactions.legacy);
+  });
+
   it("shows unavailable usage and explicit load errors", async () => {
     const markup = await renderNotice({ state: "unavailable", error: "RPC unavailable" });
     expect(markup).toContain('role="alert"');

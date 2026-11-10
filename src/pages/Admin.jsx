@@ -5,14 +5,18 @@ import { supabase } from "../lib/supabase";
 import { appendAuditLog, readPollMeta, savePollMeta, isPollClosed } from "../lib/pollMeta";
 import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
 import { buildEggUrl } from "../lib/eggs";
+import { downloadEggQr, openEggQrPrint } from "../lib/eggQrPrint";
+import EggQrPreview from "../components/EggQrPreview";
 import DashboardHub from "../components/DashboardHub";
 import InteractionUsageNotice from "../components/InteractionUsageNotice";
+import BillingSettings from "../components/BillingSettings";
 import EggGoal from "../components/EggGoal";
 import EggResults from "../components/EggResults";
 import BusinessProfile from "../components/BusinessProfile";
 import BusinessData from "../components/BusinessData";
 import GoalProgress from "../components/GoalProgress";
 import EggNfcSetup from "../components/EggNfcSetup";
+import EggRecognizer from "../components/EggRecognizer";
 import { createGoalEggSetup } from "../lib/goalEggSetup";
 import { getEggAccessAnalyticsErrorMessage } from "../lib/eggAccessAnalytics";
 import { isRestrictedTopic } from "../lib/restrictedContent";
@@ -160,7 +164,6 @@ export default function Admin() {
   const [contentReports, setContentReports] = useState([]);
   const [moderationMessage, setModerationMessage] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
-  const [scanLookupValue, setScanLookupValue] = useState("");
   const [scanResult, setScanResult] = useState(null);
   const [scanMessage, setScanMessage] = useState("");
   const [personaKey, setPersonaKey] = useState(null);
@@ -844,22 +847,24 @@ export default function Admin() {
   }
 
   async function lookUpScannedQr(rawValue) {
-    const token = extractQrToken(rawValue);
-    if (!token) {
-      setScanResult(null);
-      setScanMessage("Could not read a QR link from that value.");
-      return;
-    }
-
-    const managed = await resolveManagedQrToken(token);
-    if (!managed) {
-      setScanResult(null);
-      setScanMessage("This Egg isn't linked to a poll in your workspace.");
-      return;
-    }
-
-    setScanResult(managed);
     setScanMessage("");
+    setScanResult(null);
+    try {
+      const token = extractQrToken(rawValue);
+      if (!token) {
+        setScanMessage(t("admin.engagement.scanner.invalidLink", { defaultValue: "Paste a valid Egg link or scan its QR code or NFC tag." }));
+        return;
+      }
+      const managed = await resolveManagedQrToken(token);
+      if (!managed) {
+        setScanMessage(t("admin.engagement.scanner.notFound", { defaultValue: "No Egg with this link was found in your account." }));
+        return;
+      }
+      setScanResult(managed);
+    } catch (error) {
+      console.error("Unable to recognize Egg link", error);
+      setScanMessage(t("admin.engagement.scanner.lookupError", { defaultValue: "Could not recognize this Egg. Please try again." }));
+    }
   }
 
   async function handleScanDecode(rawValue) {
@@ -1175,278 +1180,38 @@ export default function Admin() {
     setContentReports((current) => current.map((item) => (item.id === report.id ? { ...item, status } : item)));
   }
 
-  function getQrPrintFormatConfig(format = qrPrintFormat) {
-    const formatMap = {
-      letter: { label: "Letter", size: "8.5in 11in", cssSize: "820px 1050px", margin: "0.5in" },
-      a4: { label: "A4", size: "A4", cssSize: "794px 1123px", margin: "0.5in" },
-      a5: { label: "A5", size: "A5", cssSize: "562px 794px", margin: "0.4in" },
-      a6: { label: "A6", size: "A6", cssSize: "397px 562px", margin: "0.25in" },
-      a3: { label: "A3", size: "A3", cssSize: "1123px 1587px", margin: "0.5in" },
-      postcard: { label: "Postcard", size: "5in 7in", cssSize: "480px 680px", margin: "0.2in" },
-      beerHolder: { label: "Round beer holder", size: "4in 4in", cssSize: "560px 560px", margin: "0.15in", shape: "round" },
-      ticket: { label: "Ticket", size: "3.5in 8in", cssSize: "420px 960px", margin: "0.15in", shape: "ticket" }
-    };
-
-    return formatMap[format] || formatMap.a4;
-  }
-
-  function generateQrStyle(seedOverride = 1, presetOverride = "brand") {
-    const baseName = `${workspaceProfile.companyName || "Godwit"}-${seedOverride}`;
-    const hash = Array.from(baseName).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    const palette = [
-      workspaceProfile.primaryColor || "#2563eb",
-      workspaceProfile.accentColor || "#0f172a",
-      "#f8fafc",
-      "#e0f2fe",
-      "#fdf2f8",
-      "#ecfeff"
-    ];
-
-    const presetPalettes = {
-      brand: palette,
-      celebration: ["#fef3c7", "#fb7185", "#7c3aed", "#f97316", "#fefce8", "#be123c"],
-      fresh: ["#ecfeff", "#14b8a6", "#0ea5e9", "#f0fdf4", "#84cc16", "#f8fafc"],
-      premium: ["#f8fafc", "#cbd5e1", "#334155", "#0f172a", "#b08968", "#f5f5f4"],
-      ocean: ["#cffafe", "#0891b2", "#1d4ed8", "#172554", "#e0f2fe", "#0f766e"],
-      sunset: ["#ffedd5", "#fb923c", "#e11d48", "#7c2d12", "#fef3c7", "#c2410c"],
-      botanical: ["#ecfccb", "#65a30d", "#15803d", "#14532d", "#f0fdf4", "#a7f3d0"],
-      midnight: ["#dbeafe", "#4f46e5", "#312e81", "#111827", "#c4b5fd", "#0f172a"],
-      paper: ["#fff7ed", "#fed7aa", "#fef3c7", "#f8fafc", "#e7e5e4", "#d6d3d1"],
-      lavender: ["#f5f3ff", "#c4b5fd", "#8b5cf6", "#4c1d95", "#fdf4ff", "#e9d5ff"],
-      terracotta: ["#fff7ed", "#fdba74", "#c2410c", "#7c2d12", "#fef2f2", "#fb7185"],
-      aurora: ["#cffafe", "#2dd4bf", "#6366f1", "#312e81", "#f0fdf4", "#a7f3d0"],
-      coastal: ["#ecfeff", "#67e8f9", "#0e7490", "#164e63", "#eff6ff", "#93c5fd"],
-      citrus: ["#fefce8", "#fde047", "#f97316", "#c2410c", "#ecfccb", "#84cc16"]
-    };
-    const selectedPalette = presetPalettes[presetOverride] || palette;
-    const first = selectedPalette[hash % selectedPalette.length];
-    const second = selectedPalette[(hash + 2) % selectedPalette.length];
-    const third = selectedPalette[(hash + 4) % selectedPalette.length];
-    const fourth = selectedPalette[(hash + 5) % selectedPalette.length];
-
-    return {
-      background: ["premium", "paper"].includes(presetOverride)
-        ? `linear-gradient(135deg, ${first} 0%, ${second} 48%, ${fourth} 100%)`
-        : `radial-gradient(circle at top left, ${first} 0%, ${second} 32%, ${third} 62%, ${fourth} 100%)`,
-      colors: [first, second, third, fourth],
-      shadow: `0 20px 45px rgba(15, 23, 42, 0.18)`
-    };
-  }
-
-  // Eggs (the multi-item customer destinations) previously only offered a "copy link" text
-  // URL, with no actual QR image, download, or print option - unlike the older single-poll
-  // QR cards above, which have all three. These two functions bring campaigns up to the same
-  // level, reusing the same api.qrserver.com image source and branded print-poster layout,
-  // but without needing a persistent ref (multiple campaigns can be listed at once, so each
-  // builds its own QR image URL directly instead of sharing one ref).
-  function getCampaignQrImageUrl(url, size = 300) {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}`;
-  }
-
   function openQrModifier(campaign, url) {
     setQrModifier({
       campaign,
-      url,
-      text: campaign.name || "",
-      preset: "brand",
-      seed: 1,
-      logoUrl: workspaceProfile.logoUrl || ""
+      url
     });
   }
 
-  function downloadCampaignQr(campaign, url, design = {}) {
-    const generatedStyle = generateQrStyle(design.seed || 1, design.preset || "brand");
-    const customText = (design.text || "").trim();
-    const logoUrl = (design.logoUrl || "").trim();
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const framePadding = 42;
-      const footerHeight = 54;
-      const textHeight = customText ? 54 : 0;
-      const logoHeight = logoUrl ? 80 : 0;
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(img.naturalWidth + framePadding * 2 + 80, 520);
-      canvas.height = img.naturalHeight + framePadding * 2 + footerHeight + textHeight + logoHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      const paint = () => {
-        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        gradient.addColorStop(0, generatedStyle.colors[0]);
-        gradient.addColorStop(0.5, generatedStyle.colors[1]);
-        gradient.addColorStop(1, generatedStyle.colors[3]);
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = "#0b1a33";
-        ctx.lineWidth = 18;
-        ctx.strokeRect(9, 9, canvas.width - 18, canvas.height - 18);
-        if (logoUrl && logo.naturalWidth > 0) {
-          const scale = Math.min(160 / logo.naturalWidth, 52 / logo.naturalHeight);
-          const logoWidth = logo.naturalWidth * scale;
-          const logoHeight = logo.naturalHeight * scale;
-          ctx.drawImage(logo, (canvas.width - logoWidth) / 2, framePadding + (52 - logoHeight) / 2, logoWidth, logoHeight);
-        }
-        ctx.fillStyle = "#ffffff";
-        const qrTop = framePadding + logoHeight;
-        ctx.fillRect(framePadding, qrTop, img.naturalWidth, img.naturalHeight);
-        ctx.drawImage(img, framePadding, qrTop);
-        if (customText) {
-          ctx.fillStyle = "#0f172a";
-          ctx.font = "700 24px Arial, sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText(customText.slice(0, 80), canvas.width / 2, qrTop + img.naturalHeight + 36);
-        }
-        ctx.fillStyle = "#0b1a33";
-        ctx.font = "700 22px Arial, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("hellogodwit.com", canvas.width / 2, canvas.height - 18);
-        const link = document.createElement("a");
-        link.download = `${(campaign.name || "qr-campaign").replace(/[^a-z0-9-]+/gi, "-").toLowerCase()}-qr.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      };
-      paint();
-    };
-    img.onerror = () => console.error("Unable to load QR image for download.");
-    const logo = new Image();
-    logo.crossOrigin = "anonymous";
-    logo.onload = () => img.src = getCampaignQrImageUrl(url, 600);
-    logo.onerror = () => img.src = getCampaignQrImageUrl(url, 600);
-    if (logoUrl) {
-      logo.src = logoUrl;
-    } else {
-      img.src = getCampaignQrImageUrl(url, 600);
+  async function downloadCampaignQr(campaign, url) {
+    try {
+      await downloadEggQr(url, campaign.name, t("admin.engagement.campaigns.scanToView"));
+    } catch (error) {
+      console.error("Unable to download Egg QR", error);
+      alert(t("admin.engagement.campaigns.qrLoadError"));
     }
   }
 
-  function printCampaignQr(campaign, url, design = {}) {
-    const formatConfig = getQrPrintFormatConfig();
-    const customText = (design.text || "").trim().replace(/[<>&"']/g, "");
-    const campaignName = (campaign?.name || "QR code").replace(/[<>&"']/g, "");
-    const logoUrl = new URL("/godwit-logo.png", window.location.href).href;
-    const qrUrl = getCampaignQrImageUrl(url, 600);
-    const returnUrl = window.location.href.replace(/[&<>"']/g, (character) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    })[character]);
-
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) {
-      console.error("Unable to open print window.");
-      return;
+  async function printCampaignQr(campaign, url) {
+    try {
+      await openEggQrPrint({ url, format: qrPrintFormat, t, returnUrl: window.location.href });
+    } catch (error) {
+      console.error("Unable to prepare Egg QR print", error);
+      alert(error.message);
     }
-
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${t("admin.polls.card.printQr")}</title>
-          <style>
-            @page { size: ${formatConfig.size}; margin: ${formatConfig.margin}; }
-            * { box-sizing: border-box; }
-            body { min-height: 100vh; margin: 0; padding: 24px; background: #edf2f0; color: #284542; font-family: Arial, sans-serif; }
-            .print-toolbar { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 980px; margin: 0 auto 24px; padding: 14px 18px; border: 1px solid #d1ddd8; border-radius: 14px; background: #fff; box-shadow: 0 8px 24px #28454212; }
-            .toolbar-copy { min-width: 0; }
-            .toolbar-copy strong { display: block; font-size: 15px; }
-            .toolbar-copy p { margin: 4px 0 0; color: #5b706b; font-size: 13px; line-height: 1.4; }
-            .toolbar-actions { display: flex; flex: 0 0 auto; gap: 8px; }
-            .toolbar-actions button, .toolbar-actions a { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 0 15px; border: 1px solid #cbd7d1; border-radius: 9px; color: #284542; background: #fff; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; }
-            .toolbar-actions .print-button { border-color: #176f68; color: #fff; background: #176f68; }
-            .toolbar-actions button:disabled { cursor: wait; opacity: .58; }
-            .poster { display: grid; width: min(100%, 720px); aspect-ratio: 1; place-items: center; margin: 0 auto; padding: 30px; border: 1px solid #b99555; border-radius: 28px; background: radial-gradient(ellipse at 82% 100%, #e8c9c0 0%, transparent 44%), radial-gradient(ellipse at 8% 0%, #d5dfe0 0%, transparent 50%), #e9e2dc; box-shadow: 0 18px 50px #28454216; }
-            .egg { position: relative; display: flex; width: min(100%, 510px); aspect-ratio: .88; flex-direction: column; align-items: center; justify-content: center; gap: 9px; overflow: hidden; padding: 24px 30px 28px; border: 2px solid #d2a953; border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%; background: #fff2df; box-shadow: inset 0 0 0 5px #fffaf0; text-align: center; }
-            .egg::before { position: absolute; inset: 9px; border: 1px solid #925141; border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%; content: ""; pointer-events: none; }
-            .poster-logo { z-index: 1; display: block; width: min(32%, 1.3in); height: auto; clip-path: ellipse(49% 48% at 50% 50%); object-fit: contain; }
-            .qr-box { z-index: 1; display: grid; width: min(72%, 2.35in); aspect-ratio: 1; place-items: center; padding: 10px; border: 6px solid #fff; border-radius: 12px; background: #fff; box-shadow: 0 6px 18px #28454220; }
-            .qr-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
-            .subtitle { z-index: 1; color: #42645e; font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
-            .custom-text { z-index: 1; display: -webkit-box; max-width: 350px; overflow: hidden; color: #284542; font-size: 12px; font-weight: 700; line-height: 1.3; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-            .title { z-index: 1; display: -webkit-box; max-width: 350px; overflow: hidden; color: #284542; font-family: Georgia, "Times New Roman", serif; font-size: 16px; font-weight: 700; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-            .website { z-index: 1; margin-top: 1px; color: #725326; font-size: 11px; font-weight: 800; letter-spacing: .14em; }
-            .print-status { min-height: 18px; margin: 10px auto 0; color: #5b706b; font-size: 12px; text-align: center; }
-            .print-status[role="alert"] { color: #a33b32; }
-            @media print {
-              body { min-height: 0; padding: 0; background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-              .print-toolbar, .print-status { display: none !important; }
-              .poster { width: min(100%, 6in); margin: 0 auto; padding: 18px; border-color: transparent; border-radius: 0; box-shadow: none; break-inside: avoid; }
-              .egg { width: min(100%, 4.6in); }
-              .poster-logo { width: min(32%, 1.05in); }
-              .qr-box { width: min(72%, 2.15in); }
-            }
-            @media (max-width: 600px) {
-              body { padding: 12px; }
-              .print-toolbar { align-items: flex-start; flex-direction: column; margin-bottom: 14px; }
-              .toolbar-actions { width: 100%; }
-              .toolbar-actions button, .toolbar-actions a { flex: 1; padding: 0 8px; font-size: 12px; }
-              .poster { padding: 14px; border-radius: 18px; }
-              .egg { aspect-ratio: .72; gap: 8px; padding: 22px 20px 26px; }
-              .poster-logo { width: min(32%, 1in); }
-              .qr-box { width: min(72%, 1.8in); }
-            }
-          </style>
-        </head>
-        <body>
-          <header class="print-toolbar">
-            <div class="toolbar-copy">
-              <strong>${t("admin.engagement.campaigns.printTitle", { defaultValue: "Print your Egg QR" })}</strong>
-              <p>${t("admin.engagement.campaigns.printerHint", { defaultValue: "Choose Print to open your device's printer dialog, then select a printer or save as PDF." })}</p>
-            </div>
-            <div class="toolbar-actions">
-              <button id="print-button" class="print-button" type="button" disabled>${t("admin.engagement.campaigns.printAction", { defaultValue: "Choose printer" })}</button>
-              <a href="${returnUrl}">${t("admin.engagement.campaigns.returnToDashboard", { defaultValue: "Back to Godwit" })}</a>
-            </div>
-          </header>
-          <main>
-            <div class="poster">
-              <div class="egg">
-                <img id="logo-image" class="poster-logo" src="${logoUrl}" alt="Godwit" />
-                <div class="subtitle">${t("admin.engagement.campaigns.scanToView")}</div>
-                <div class="qr-box"><img id="qr-image" src="${qrUrl}" alt="QR code" /></div>
-                ${customText ? `<div class="custom-text">${customText}</div>` : ""}
-                <div class="title">${campaignName}</div>
-                <div class="website">hellogodwit.com</div>
-              </div>
-            </div>
-          <p id="print-status" class="print-status" role="status">${t("admin.engagement.campaigns.preparingQr", { defaultValue: "Preparing the QR code…" })}</p>
-          </main>
-        </body>
-      </html>
-    `);
-
-    printWindow.document.close();
-    printWindow.focus();
-    const posterImages = Array.from(printWindow.document.images);
-    const printButton = printWindow.document.getElementById("print-button");
-    const status = printWindow.document.getElementById("print-status");
-    const updateImageReadiness = () => {
-      if (posterImages.some((image) => image.complete && image.naturalWidth === 0)) {
-        printButton.disabled = true;
-        status.setAttribute("role", "alert");
-        status.textContent = t("admin.engagement.campaigns.qrLoadError", { defaultValue: "The poster artwork or QR code could not be loaded. Close this page and try again." });
-      } else if (posterImages.every((image) => image.complete && image.naturalWidth > 0)) {
-        printButton.disabled = false;
-        status.textContent = t("admin.engagement.campaigns.qrReady", { defaultValue: "QR code ready. Choose a printer to print." });
-      }
-    };
-    posterImages.forEach((image) => {
-      image.addEventListener("load", updateImageReadiness, { once: true });
-      image.addEventListener("error", updateImageReadiness, { once: true });
-    });
-    updateImageReadiness();
-    printButton.addEventListener("click", () => {
-      printWindow.focus();
-      printWindow.print();
-    });
   }
 
   if (loading) return <p className="text-center p-6">Loading polls...</p>;
 
   const entitlements = {
     ...getEntitlements(workspaceProfile.plan),
-    ...(["small", "standard", "scale", "regional"].includes(interactionUsage?.plan)
-      && ["active", "exhausted"].includes(interactionUsage.state) ? { campaignLimit: Infinity } : {})
+    ...(["small", "standard", "scale", "regional", "creator"].includes(interactionUsage?.plan)
+      && ["active", "exhausted", "complimentary"].includes(interactionUsage.state) ? { campaignLimit: Infinity } : {}),
+    ...(interactionUsage?.state === "complimentary" ? { pollLimit: Infinity, seatLimit: Infinity } : {})
   };
   const permission = getPermissionSet(currentUserRole);
   const canEditPolls = permission.canEditPolls;
@@ -2314,26 +2079,11 @@ export default function Admin() {
                       {showQr && (
                         <div className="space-y-3 rounded border border-[#2c3f66] bg-[#10203a] p-3">
                           <h4 className="font-semibold text-[#f4f7fb]">{t("admin.engagement.wizard.qrSetupTitle")}</h4>
-                          <div className="flex justify-center">
-                            <img src={getCampaignQrImageUrl(wizardUrl, 220)} alt={t("admin.engagement.campaigns.qrAlt", { name: qrWizardCampaign.name })} className="h-40 w-40 rounded border border-[#24345c] bg-white p-2" />
-                          </div>
+                          <EggQrPreview url={wizardUrl} format={qrPrintFormat} onFormatChange={setQrPrintFormat} t={t} />
                           <p className="truncate text-xs text-[#8ab4f8]">{wizardUrl}</p>
                           <button type="button" onClick={() => navigator.clipboard.writeText(wizardUrl)} className="rounded border border-[#385277] px-3 py-2 text-sm font-semibold text-[#dbe3f0] hover:bg-[#1f3252]">
                             {t("admin.engagement.campaigns.copyLink")}
                           </button>
-                          <div className="text-left">
-                            <label className="mb-1 block text-xs font-semibold text-[#c3cede]">{t("admin.polls.card.printFormat")}</label>
-                            <select value={qrPrintFormat} onChange={(event) => setQrPrintFormat(event.target.value)} className="w-full border p-2 rounded text-black">
-                              <option value="letter">{t("admin.polls.card.formats.letter")}</option>
-                              <option value="a4">{t("admin.polls.card.formats.a4")}</option>
-                              <option value="a5">{t("admin.polls.card.formats.a5")}</option>
-                              <option value="a6">{t("admin.polls.card.formats.a6")}</option>
-                              <option value="a3">{t("admin.polls.card.formats.a3")}</option>
-                              <option value="postcard">{t("admin.polls.card.formats.postcard")}</option>
-                              <option value="beerHolder">{t("admin.polls.card.formats.beerHolder")}</option>
-                              <option value="ticket">{t("admin.polls.card.formats.ticket")}</option>
-                            </select>
-                          </div>
                           <div className="flex flex-wrap justify-center gap-2">
                             <button onClick={() => downloadCampaignQr(qrWizardCampaign, wizardUrl)} className="rounded bg-[#f2c744] px-4 py-2 font-semibold text-[#0b1a33] hover:bg-[#e3b93c]">
                               {t("admin.polls.card.downloadQr")}
@@ -2342,7 +2092,7 @@ export default function Admin() {
                               {t("admin.polls.card.printQr")}
                             </button>
                             <button onClick={() => openQrModifier(qrWizardCampaign, wizardUrl)} className="rounded bg-violet-600 px-4 py-2 font-semibold text-white hover:bg-violet-700">
-                              {t("admin.polls.card.modifyQr")}
+                              {t("admin.engagement.campaigns.printPreview")}
                             </button>
                           </div>
                         </div>
@@ -2485,7 +2235,7 @@ export default function Admin() {
                         <EggNfcSetup url={nfcUrl} t={t} />
                         <button onClick={() => downloadCampaignQr(campaign, url)} className="egg-action egg-action-secondary">{t("admin.polls.card.downloadQr")}</button>
                         <button onClick={() => printCampaignQr(campaign, url)} className="egg-action egg-action-secondary">{t("admin.polls.card.printQr")}</button>
-                        <button onClick={() => openQrModifier(campaign, url)} className="egg-action egg-action-secondary">{t("admin.polls.card.modifyQr")}</button>
+                        <button onClick={() => openQrModifier(campaign, url)} className="egg-action egg-action-secondary">{t("admin.engagement.campaigns.printPreview")}</button>
                       </div>
                     </div>
                   </section>
@@ -2552,21 +2302,8 @@ export default function Admin() {
       <details className="mb-6 border rounded bg-gray-900 p-4">
         <summary className="text-xl font-bold">{t("admin.engagement.scanner.title")}</summary>
         <p className="mt-1 mb-3 text-sm text-slate-400">{t("admin.engagement.scanner.subtitle")}</p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button onClick={() => { setScannerOpen(true); setScanMessage(""); }} className="bg-teal-500 text-slate-950 px-4 py-2 rounded font-semibold">
-            {t("admin.engagement.scanner.openCamera")}
-          </button>
-          <input
-            value={scanLookupValue}
-            onChange={(event) => setScanLookupValue(event.target.value)}
-            placeholder={t("admin.engagement.scanner.pastePlaceholder")}
-            className="flex-1 border p-2 rounded text-black"
-          />
-          <button onClick={() => lookUpScannedQr(scanLookupValue)} className="egg-scanner-lookup px-4 py-2 rounded font-semibold">
-            {t("admin.engagement.scanner.lookUp")}
-          </button>
-        </div>
-        {scanMessage && <p className="mt-3 text-sm text-amber-300">{scanMessage}</p>}
+        <EggRecognizer t={t} onRecognize={lookUpScannedQr} onOpenCamera={() => { setScannerOpen(true); setScanMessage(""); }} />
+        {scanMessage && <p role="alert" className="mt-3 text-sm text-amber-300">{scanMessage}</p>}
         {scanResult && (
           <div className="mt-4 rounded border border-teal-700 bg-slate-950 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-teal-300">{scanResult.campaign.name}</p>
@@ -2593,102 +2330,30 @@ export default function Admin() {
       </details>
       )}
 
-      {qrModifier && (() => {
-        const generatedStyle = generateQrStyle(qrModifier.seed, qrModifier.preset);
-        return (
+      {qrModifier && (
           <div className="godwit-dialog-overlay fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modify-qr-title">
             <div className="godwit-dialog-panel qr-modifier-modal max-h-[calc(100vh-2rem)] w-full max-w-3xl overflow-y-auto rounded-xl border p-5 shadow-2xl">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 id="modify-qr-title" className="text-xl font-bold">{t("admin.polls.card.modifyQr")}</h2>
-                  <p className="mt-1 text-sm text-slate-300">{t("admin.polls.card.modifyQrHint")}</p>
+                  <h2 id="modify-qr-title" className="text-xl font-bold">{t("admin.engagement.campaigns.printPreview")}</h2>
+                  <p className="mt-1 text-sm">{t("admin.engagement.campaigns.simplePrintHint")}</p>
                 </div>
                 <button type="button" onClick={() => setQrModifier(null)} className="rounded border border-slate-600 px-3 py-1 text-sm text-slate-200 hover:bg-slate-800">
                   {t("admin.polls.card.cancel")}
                 </button>
               </div>
-              <div className="mt-5 grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
-                <div className="space-y-4">
-                  <label className="block text-sm font-semibold">
-                    {t("admin.polls.card.modifyQrText")}
-                    <textarea
-                      value={qrModifier.text}
-                      maxLength={120}
-                      onChange={(event) => setQrModifier({ ...qrModifier, text: event.target.value })}
-                      className="mt-1 w-full rounded border border-slate-600 bg-white p-2 text-black"
-                      rows="3"
-                      placeholder={t("admin.polls.card.modifyQrTextPlaceholder")}
-                    />
-                  </label>
-                  <label className="block text-sm font-semibold">
-                    {t("admin.polls.card.logo")}
-                    <input
-                      type="text"
-                      value={qrModifier.logoUrl || ""}
-                      onChange={(event) => setQrModifier({ ...qrModifier, logoUrl: event.target.value })}
-                      className="mt-1 w-full rounded border border-slate-600 bg-white p-2 text-black"
-                      placeholder={t("admin.polls.card.logoUrlPlaceholder")}
-                    />
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = () => setQrModifier((current) => ({ ...current, logoUrl: String(reader.result || "") }));
-                        reader.readAsDataURL(file);
-                      }}
-                      className="mt-2 block w-full text-xs text-slate-300 file:mr-3 file:rounded file:border-0 file:bg-slate-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white"
-                    />
-                    <span className="mt-1 block text-xs font-normal text-slate-300">{t("admin.polls.card.logoHint")}</span>
-                  </label>
-                  <label className="block text-sm font-semibold">
-                    {t("admin.polls.card.backgroundTemplate")}
-                    <select
-                      value={qrModifier.preset}
-                      onChange={(event) => setQrModifier({ ...qrModifier, preset: event.target.value, seed: qrModifier.seed + 1 })}
-                      className="mt-1 w-full rounded border border-slate-600 bg-white p-2 text-black"
-                    >
-                      <option value="brand">{t("admin.polls.card.templates.brand")}</option>
-                      <option value="ocean">{t("admin.polls.card.templates.ocean")}</option>
-                      <option value="sunset">{t("admin.polls.card.templates.sunset")}</option>
-                      <option value="botanical">{t("admin.polls.card.templates.botanical")}</option>
-                      <option value="midnight">{t("admin.polls.card.templates.midnight")}</option>
-                      <option value="paper">{t("admin.polls.card.templates.paper")}</option>
-                      <option value="celebration">{t("admin.polls.card.templates.celebration")}</option>
-                      <option value="fresh">{t("admin.polls.card.templates.fresh")}</option>
-                      <option value="premium">{t("admin.polls.card.templates.premium")}</option>
-                      <option value="lavender">{t("admin.polls.card.templates.lavender")}</option>
-                      <option value="terracotta">{t("admin.polls.card.templates.terracotta")}</option>
-                      <option value="aurora">{t("admin.polls.card.templates.aurora")}</option>
-                      <option value="coastal">{t("admin.polls.card.templates.coastal")}</option>
-                      <option value="citrus">{t("admin.polls.card.templates.citrus")}</option>
-                    </select>
-                  </label>
-                  <p className="text-xs text-slate-300">{t("admin.polls.card.backgroundTemplateHint")}</p>
-                </div>
-                <div className="qr-modifier-preview rounded-xl bg-cover bg-center p-4 text-center shadow-lg" style={{ backgroundImage: generatedStyle.background }}>
-                  {qrModifier.logoUrl && <img src={qrModifier.logoUrl} alt={t("admin.polls.card.logoAlt")} className="mx-auto mb-3 max-h-14 max-w-40 object-contain" />}
-                  <p className="mb-3 text-sm font-bold text-slate-900">{qrModifier.text || qrModifier.campaign.name}</p>
-                  <div className="mx-auto w-fit rounded-xl border-8 border-[#0b1a33] bg-white p-3 shadow-lg">
-                    <img src={getCampaignQrImageUrl(qrModifier.url, 220)} alt={t("admin.engagement.campaigns.qrAlt", { name: qrModifier.campaign.name })} className="h-44 w-44" />
-                  </div>
-                  <p className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-900">{qrModifier.campaign.name}</p>
-                </div>
-              </div>
+              <EggQrPreview url={qrModifier.url} format={qrPrintFormat} onFormatChange={setQrPrintFormat} t={t} />
               <div className="mt-5 flex flex-wrap justify-end gap-2 border-t border-slate-700 pt-4">
-                <button type="button" onClick={() => downloadCampaignQr(qrModifier.campaign, qrModifier.url, qrModifier)} className="rounded bg-[#f2c744] px-4 py-2 font-semibold text-[#0b1a33] hover:bg-[#e3b93c]">
+                <button type="button" onClick={() => downloadCampaignQr(qrModifier.campaign, qrModifier.url)} className="rounded bg-[#f2c744] px-4 py-2 font-semibold text-[#0b1a33] hover:bg-[#e3b93c]">
                   {t("admin.polls.card.downloadQr")}
                 </button>
-                <button type="button" onClick={() => printCampaignQr(qrModifier.campaign, qrModifier.url, qrModifier)} className="rounded bg-[#0f766e] px-4 py-2 font-semibold text-white hover:bg-[#0d6259]">
+                <button type="button" onClick={() => printCampaignQr(qrModifier.campaign, qrModifier.url)} className="rounded bg-[#0f766e] px-4 py-2 font-semibold text-white hover:bg-[#0d6259]">
                   {t("admin.polls.card.printQr")}
                 </button>
               </div>
             </div>
           </div>
-        );
-      })()}
+      )}
 
       {scannerOpen && <QrScanner onDecode={handleScanDecode} onClose={() => setScannerOpen(false)} />}
 
@@ -2823,6 +2488,7 @@ export default function Admin() {
         <h2>{t("admin.hub.settings", { defaultValue: "Settings" })}</h2>
         <p>{t("admin.settingsIntro", { defaultValue: "Manage your customer review links." })}</p>
       </header>
+      <BillingSettings onUsageChange={setInteractionUsage} />
       {DONATION_FEATURE_ENABLED && <details id="donation-settings" className="mb-6 border rounded bg-gray-900">
         <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.engagement.donations.title")}</summary>
         <div className="px-4 pb-4 space-y-3">

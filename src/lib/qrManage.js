@@ -12,21 +12,23 @@ export function extractQrToken(rawValue) {
 export async function resolveManagedQrToken(token) {
   if (!token) return null;
 
-  const { data: campaign } = await supabase
+  const { data: campaign, error: campaignError } = await supabase
     .from("qr_campaigns")
     .select("id, name, poll_id, workspace_id, placement_label, variant_label")
     .eq("token", token)
     .maybeSingle();
 
+  if (campaignError) throw new Error(campaignError.message);
   if (!campaign) return null;
 
-  const [{ data: polls }, { data: currentPoll }] = await Promise.all([
+  const [{ data: polls, error: pollsError }, { data: currentPoll, error: currentPollError }] = await Promise.all([
     supabase.from("polls").select("id, question").eq("workspace_id", campaign.workspace_id).order("id", { ascending: false }),
     campaign.poll_id
       ? supabase.from("polls").select("id, question").eq("id", campaign.poll_id).maybeSingle()
       : Promise.resolve({ data: null })
   ]);
 
+  if (pollsError || currentPollError) throw new Error((pollsError || currentPollError).message);
   return { campaign, currentPoll, polls: polls || [] };
 }
 

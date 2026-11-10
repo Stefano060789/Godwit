@@ -43,7 +43,7 @@ export async function loadInteractionBilling(client) {
     target_workspace_id: membership.workspace_id
   });
   if (usageError) throw new Error(usageError.message);
-  if (!usage || !["active", "exhausted", "expired", "inactive", "legacy"].includes(usage.state)) {
+  if (!usage || !["active", "exhausted", "expired", "inactive", "legacy", "complimentary"].includes(usage.state)) {
     throw new Error("Interaction usage is unavailable.");
   }
   return { signedIn: true, membership, usage };

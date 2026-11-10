@@ -174,6 +174,7 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
                     <InlinePollVote
                       item={{ poll_id: message.poll.id, campaign_id: message.poll.campaignId, trial_session_id: trialSessionId }}
                       branding={branding}
+                      preview={preview}
                     />
                   </div>
                 )}

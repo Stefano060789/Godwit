@@ -11,8 +11,16 @@ import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 import { normalizeEggAccessMethod } from "../lib/eggs";
 import { getEggTrialSessionId } from "../lib/eggTrial";
 import { useTranslation } from "react-i18next";
+import VisitorPreviewBar from "../components/VisitorPreviewBar";
 
 export default function QrRedirect() {
+  return <>
+    <VisitorPreviewBar />
+    <QrRedirectContent />
+  </>;
+}
+
+function QrRedirectContent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { token } = useParams();
@@ -53,9 +61,15 @@ export default function QrRedirect() {
       } = await supabase.auth.getUser();
 
       if (user && isManageMode && !isPreview) {
-        const managed = await resolveManagedQrToken(token);
-        if (managed) {
-          setManage(managed);
+        try {
+          const managed = await resolveManagedQrToken(token);
+          if (managed) {
+            setManage(managed);
+            return;
+          }
+        } catch (error) {
+          console.error("Unable to recognize managed Egg", error);
+          setErrorMessage(t("admin.engagement.scanner.lookupError", { defaultValue: "Could not recognize this Egg. Please try again." }));
           return;
         }
       }
@@ -116,7 +130,7 @@ export default function QrRedirect() {
         // question with answer options ready to tap, instead of an extra "Share feedback"
         // click. Only collapse when there's truly one thing to show; a poll alongside other
         // items still needs the menu so those other items remain visible.
-        if (sessionItems.length === 1 && sessionItems[0].item_type === "poll" && !eggAiEnabled) {
+        if (sessionItems.length === 1 && sessionItems[0].item_type === "poll" && !eggAiEnabled && !isPreview) {
           navigate(`/vote/${sessionItems[0].poll_id}?campaign=${sessionItems[0].campaign_id}&trialSessionId=${trialSessionId}`, { replace: true });
           return;
         }
@@ -145,11 +159,11 @@ export default function QrRedirect() {
         const { data: campaignPoll } = await supabase
           .rpc("get_public_poll", { target_poll_id: campaign.poll_id })
           .single();
-        if (campaignPoll?.allow_organizer_messages !== true && !eggAiEnabled) {
+        if (campaignPoll?.allow_organizer_messages !== true && !eggAiEnabled && !isPreview) {
           navigate(`/vote/${campaign.poll_id}?campaign=${campaign.campaign_id}&trialSessionId=${trialSessionId}`, { replace: true });
           return;
         }
-        if (eggAiEnabled) {
+        if (eggAiEnabled || isPreview) {
           const branding = getPollBranding(campaignPoll ? {
             brand_name: campaignPoll.brand_name,
             brand_logo_url: campaignPoll.brand_logo_url,
@@ -170,8 +184,8 @@ export default function QrRedirect() {
             }],
             branding,
             trialSessionId,
-            aiEnabled: !isPreview,
-            aiPreview: isPreview
+            aiEnabled: eggAiEnabled && !isPreview,
+            aiPreview: eggAiEnabled && isPreview
           });
           return;
         }
@@ -202,7 +216,10 @@ export default function QrRedirect() {
         return;
       }
 
-      navigate(`/vote/${data.id}`, { replace: true });
+      if (isPreview) {
+        setMenu({ items: [{ item_id: `legacy-${data.id}`, item_type: "poll", poll_id: data.id, poll_question: data.question, trial_session_id: trialSessionId }],
+          branding: getPollBranding(data), trialSessionId, aiEnabled: false, aiPreview: false });
+      } else navigate(`/vote/${data.id}`, { replace: true });
     }
 
     resolveQr();
@@ -280,7 +297,7 @@ export default function QrRedirect() {
               if (item.item_type === "poll") {
                 return (
                   <div key={item.item_id} id={`egg-option-${item.item_id}`}>
-                    <InlinePollVote item={item} branding={branding} />
+                    <InlinePollVote item={item} branding={branding} preview={isPreview} />
                   </div>
                 );
               }

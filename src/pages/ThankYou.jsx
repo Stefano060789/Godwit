@@ -2,8 +2,13 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
+import VisitorPreviewBar from "../components/VisitorPreviewBar";
 
 export default function ThankYou() {
+  return <><VisitorPreviewBar /><ThankYouContent /></>;
+}
+
+function ThankYouContent() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const pollId = searchParams.get("poll");

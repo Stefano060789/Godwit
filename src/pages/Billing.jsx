@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Layout from "../components/Layout";
 import InteractionUsageNotice from "../components/InteractionUsageNotice";
-import { supabase } from "../lib/supabase";
-import { createInteractionCheckout, INTERACTION_PLANS, isInteractionPaidPlan, loadInteractionBilling } from "../lib/interactionBilling";
+import { INTERACTION_PLANS } from "../lib/interactionBilling";
+import useInteractionBilling from "../lib/useInteractionBilling";
 
 export default function Billing() {
   const { t, i18n } = useTranslation();
@@ -12,42 +11,7 @@ export default function Billing() {
   const key = "billing.interactions";
   const language = i18n.resolvedLanguage || i18n.language;
   const currency = new Intl.NumberFormat(language, { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
-  const [billing, setBilling] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [pending, setPending] = useState("");
-  const [refresh, setRefresh] = useState(0);
-
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    setError("");
-    loadInteractionBilling(supabase)
-      .then((result) => { if (active) setBilling(result); })
-      .catch((cause) => { if (active) { setBilling(null); setError(cause.message || String(cause)); } })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [refresh]);
-
-  const usage = billing?.usage;
-  const owner = billing?.membership?.role === "owner";
-  const paid = isInteractionPaidPlan(usage?.plan);
-  const disabled = loading || !owner || !usage || Boolean(pending);
-  const canTopup = usage?.can_topup === true && usage?.plan !== "trial" && ["active", "exhausted"].includes(usage?.state);
-
-  async function checkout(mode, plan) {
-    if (disabled) return;
-    setPending(plan || mode);
-    setError("");
-    try {
-      const url = await createInteractionCheckout(supabase, { mode, plan });
-      window.location.assign(url);
-    } catch (cause) {
-      setError(cause.message || String(cause));
-    } finally {
-      setPending("");
-    }
-  }
+  const { billing, usage, owner, paid, complimentary, disabled, canTopup, loading, error, pending, checkout } = useInteractionBilling();
 
   return (
     <Layout theme="workspace">
@@ -63,11 +27,6 @@ export default function Billing() {
         <div className="mt-4"><InteractionUsageNotice usage={usage} t={t} /></div>
         {billing?.signedIn && !billing.membership && <p role="alert" className="mt-4">{t(`${key}.noWorkspace`)}</p>}
         {billing?.membership && !owner && <p className="mt-4">{t(`${key}.ownerOnly`)}</p>}
-        <div className="mt-4 flex flex-wrap justify-center gap-3">
-          <button type="button" onClick={() => setRefresh((value) => value + 1)} disabled={loading || Boolean(pending)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm disabled:opacity-50">{t(`${key}.refresh`)}</button>
-          {owner && usage && (paid || usage.state === "legacy") && <button type="button" onClick={() => checkout("interaction-portal")} disabled={disabled} className="rounded-lg border border-teal-700 px-4 py-2 text-sm text-teal-800 disabled:opacity-50">{pending === "interaction-portal" ? t(`${key}.opening`) : t(`${key}.manage`)}</button>}
-        </div>
-
         <section aria-label={t("billing.proposed.packagesTitle")} className="mt-8">
           <h2 className="text-center text-2xl font-bold text-slate-900">{t("billing.proposed.packagesTitle")}</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -82,8 +41,8 @@ export default function Billing() {
                 <p className="mt-1 text-xs text-slate-500">{t(`${key}.vat`)}</p>
                 <p className="mt-4 text-sm leading-6 text-slate-600">{t(`billing.proposed.useCases.${tier.key}`)}</p>
                 {billing?.signedIn || loading || error ? (
-                  <button type="button" onClick={() => checkout(paid ? "interaction-portal" : "interaction-subscription", paid ? undefined : tier.key)} disabled={disabled || usage?.plan === tier.key} className="mt-4 w-full rounded-lg bg-teal-800 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
-                    {pending === tier.key ? t(`${key}.opening`) : usage?.plan === tier.key ? t("billing.currentPlanButton") : paid ? t(`${key}.changePlan`) : t(`${key}.subscribe`)}
+                  <button type="button" onClick={() => checkout(paid ? "interaction-portal" : "interaction-subscription", paid ? undefined : tier.key)} disabled={disabled || complimentary || usage?.plan === tier.key} className="billing-purchase-action mt-4 w-full rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-50">
+                    {complimentary ? t(`${key}.creatorIncluded`) : pending === tier.key ? t(`${key}.opening`) : usage?.plan === tier.key ? t("billing.currentPlanButton") : paid ? t(`${key}.changePlan`) : t(`${key}.subscribe`)}
                   </button>
                 ) : <Link to="/register" className="mt-4 block font-semibold text-teal-800 underline">{t(`${key}.signIn`)}</Link>}
               </article>
@@ -104,7 +63,7 @@ export default function Billing() {
             <p className="mt-1 text-xs text-slate-500">{t(`${key}.vat`)}</p>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t(`${key}.topupBody`)}</p>
             <p className="mt-2 text-sm text-slate-600">{t(`${key}.topupEligibility`)}</p>
-            <button type="button" onClick={() => checkout("interaction-topup")} disabled={disabled || !canTopup} className="mt-4 rounded-lg bg-teal-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{pending === "interaction-topup" ? t(`${key}.opening`) : t(`${key}.buyTopup`)}</button>
+            <button type="button" onClick={() => checkout("interaction-topup")} disabled={disabled || !canTopup} className="billing-purchase-action mt-4 rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50">{pending === "interaction-topup" ? t(`${key}.opening`) : t(`${key}.buyTopup`)}</button>
           </article>
         </section>
         <p className="mt-6 text-center text-xs leading-5 text-slate-500">{t(`${key}.refunds`)} <Link to="/support" className="underline">{t("trial.supportLink")}</Link></p>

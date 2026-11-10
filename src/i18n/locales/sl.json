@@ -112,6 +112,10 @@
       "noWorkspace": "Obstoječi delovni prostor ni bil najden. Pred nakupom odpri nadzorno ploščo in ga nastavi.",
       "ownerOnly": "Samo lastnik delovnega prostora lahko kupuje interakcije ali upravlja obračunavanje.",
       "refresh": "Osveži obračunavanje",
+      "settingsIntro": "Upravljaj obračunavanje, naročnine in enkratne pakete interakcij.",
+      "creatorTitle": "Brezplačen dostop za ustvarjalca",
+      "creatorBody": "Vse razpoložljive funkcije paketov, neomejena jajca in interakcije. Naročnina ali dodaten paket nista potrebna.",
+      "creatorIncluded": "Vključeno v dostop za ustvarjalca",
       "opening": "Odpiranje obračunavanja…",
       "manage": "Upravljaj obračunavanje / prekliči naročnino",
       "subscribe": "Nadaljuj na plačilo",
@@ -322,6 +326,41 @@
     "openDashboard": "Odpri nadzorno ploščo"
   },
   "admin": {
+    "engagement": {
+      "scanner": {
+        "title": "Prepoznajte svoj Egg",
+        "subtitle": "Prilepite povezavo Egg, skenirajte QR ali preberite oznako NFC, da prepoznate Egg in posodobite izkušnjo.",
+        "openCamera": "Odpri kamero",
+        "pastePlaceholder": "Prilepite povezavo QR ali NFC za Egg",
+        "lookUp": "Prepoznaj Egg",
+        "linkLabel": "Povezava Egg",
+        "recognizing": "Prepoznavanje...",
+        "readNfc": "Prepoznaj z NFC",
+        "holdNfc": "Približajte oznako NFC telefonu za prepoznavanje Egga.",
+        "nfcUnsupported": "Neposredno branje NFC zahteva združljiv telefon in brskalnik prek HTTPS, na primer Chrome na Androidu. Sicer se s telefonom dotaknite oznake, kopirajte odprto povezavo Egg in jo prilepite zgoraj.",
+        "nfcError": "Povezave NFC ni bilo mogoče prebrati. Preverite NFC in dovoljenja brskalnika, poskusite znova ali prilepite povezavo Egg.",
+        "lookupError": "Tega Egga ni bilo mogoče prepoznati. Poskusite znova.",
+        "invalidLink": "Prilepite veljavno povezavo Egg ali skenirajte njegov QR ali oznako NFC.",
+        "notFound": "V vašem računu ni Egga s to povezavo.",
+        "unlabeledPlacement": "Lokacija brez oznake",
+        "noPollAssigned": "Anketa še ni dodeljena",
+        "redirectLabel": "Spremeni anketo tega Egga",
+        "choosePoll": "Izberi anketo",
+        "createNewPoll": "Ustvari novo anketo za ta Egg"
+      },
+      "campaigns": {
+        "visitorPreview": "Predogled za obiskovalce",
+        "printPreview": "Predogled tiskanja",
+        "paperSize": "Velikost papirja",
+        "artworkSize": "Natisnjeno jajce",
+        "qrSize": "Obmo\u010dje QR (z belim robom)",
+        "printScale": "Tiskajte pri 100 % / dejanski velikosti. Izklopite glave in noge brskalnika. Mere vklju\u010dujejo beli rob QR.",
+        "simplePrintHint": "Velik QR, preprost okvir jajca in majhen logotip Godwit. Predogled se ujema s prenosom in tiskom.",
+        "popupBlocked": "Dovolite pojavna okna za predogled tiskanja.",
+        "scanToView": "Skenirajte za ogled",
+        "returnToDashboard": "Nazaj na Godwit"
+      }
+    },
     "hub": {
       "descriptions": {
         "your-business": "Identiteta in profil",
@@ -356,7 +395,7 @@
       "loadError": "Podatkov o napredku ni bilo mogoče naložiti. Poskusite znova pozneje.",
       "emptyEggs": "Ustvarite Egg za spremljanje napredka."
     },
-    "settingsIntro": "Upravljajte povezave do ocen strank.",
+    "settingsIntro": "Upravljajte obračunavanje in povezave do ocen strank.",
     "goal": {
       "title": "Ustvarite Egg z jasnim ciljem",
       "intro": "Ustvarjate nov Egg: izberite cilje, ime in lokacijo ter po želji dodajte zahvalo strankam. Po ustvarjanju upravljajte vsebino ter dostop QR ali NFC v razdelku Eggs.",

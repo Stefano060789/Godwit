@@ -308,6 +308,41 @@ try {
   await check(`select count(*)::int as value from public.get_public_qr_campaign_items(
     'one','${session(600)}',true)`, 0, 'service role without manager identity cannot preview items');
   await db.exec(`reset role`);
+  const normalState = await value(status('state', trialWorkspace));
+  await db.exec(`
+    alter table auth.users add column email text, add column email_confirmed_at timestamptz;
+    update auth.users set email='bonomistefano@outlook.it', email_confirmed_at=now() where id='${owner}';
+  `);
+  await migration('20261119_creator_access.sql');
+  await migration('20261119_creator_access.sql');
+  await check(status('state'), 'complimentary', 'creator replaces legacy/expired warning');
+  await check(status('unlimited'), true, 'creator interactions are unlimited');
+  await check(status('can_topup'), false, 'creator never needs topups');
+  await check(`select public.workspace_plan('${workspace}') as value`, 'growth', 'all existing plan features unlocked');
+  for (const limit of ['poll_limit', 'campaign_limit', 'seat_limit']) {
+    await check(`select ${limit} as value from public.workspace_plan_limits('${workspace}')`, 2147483647, `creator ${limit}`);
+  }
+  await check(status('state', trialWorkspace), normalState, 'unrelated account remains unchanged');
+  for (let n = 900; n < 912; n++) await check(access(n), true, 'creator access bypasses expired subscription');
+  await check(`select public.can_access_egg_session('${workspace}','${session(900)}',false) as value`, true, 'creator customer session valid');
+  await check(`select public.can_access_egg_session('${workspace}','${session(999)}',false) as value`, false, 'unregistered session not admitted');
+  await check(`select public.can_access_egg_session('${workspace}','${session(600)}',false) as value`, false, 'anonymous cannot reuse creator preview');
+  await check(access(600), false, 'creator preview cannot become a customer session');
+  await check(access(999, 1, 'qr', true), false, 'creator preview still requires manager');
+  await rejects(`select public.record_egg_access(1,'invalid','${session(999)}',false)`, /Unsupported/);
+  await db.exec(`set role authenticated; set request.jwt.claim.role='authenticated'; set request.jwt.claim.sub='${owner}'`);
+  await check(status('state'), 'complimentary', 'creator member can read access');
+  await rejects(`delete from public.creator_accounts`, /permission denied/);
+  await rejects(`insert into public.creator_accounts(user_id) values ('${owner}')`, /permission denied/);
+  await rejects(`select public.workspace_interaction_status_metered('${workspace}')`, /permission denied/);
+  await db.exec(`set request.jwt.claim.sub='20000000-0000-0000-0000-000000000002'`);
+  await rejects(status('state'), /access to this workspace/);
+  await db.exec(`reset role; set role anon; set request.jwt.claim.role='anon'; set request.jwt.claim.sub=''`);
+  await check(access(912), true, 'anonymous visitors can access creator Eggs');
+  await rejects(`select * from public.creator_accounts`, /permission denied/);
+  await db.exec(`reset role; set request.jwt.claim.role='service_role';
+    delete from public.creator_accounts where user_id='${owner}';`);
+  await check(status('state'), 'expired', 'revoking grant restores original paid status without changing billing records');
   console.log(`Paid interaction billing SQL: ${checks} checks passed (real embedded PostgreSQL).`);
 } finally {
   await db.close();

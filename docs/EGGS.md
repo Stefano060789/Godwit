@@ -20,6 +20,40 @@ Both access links point to the same stable Egg token. Changing its customer
 experience does not require replacing the printed QR code or rewriting the NFC
 tag. Scan/tap counts are stored separately from submitted feedback.
 
+### Recognizing an existing Egg
+
+Open **Recognize your Egg** in the Eggs page. Paste its QR or NFC link and press
+**Recognize Egg**, scan its QR code with the camera, or press **Recognize with NFC**
+on a compatible Web NFC phone/browser over HTTPS. NFC recognition only reads the
+tag; it does not rewrite it. Hold the tag near the phone after granting permission.
+Cancel or close the section to stop listening. Unsupported browsers show instructions
+to tap the tag normally, copy the opened link, and paste it instead.
+Every method uses the same account-authorized lookup; tags do not grant management
+access to someone else's Egg. A recognized Egg shows its location/current poll and
+the existing controls for changing or creating a poll.
+
+### Visitor preview and QR printing
+
+**See what visitors see** opens a staff preview with a persistent **Back to Godwit**
+link returning to Eggs. Single-poll previews stay in the Egg page so the return
+control is retained, including while loading or showing an error. Ordinary customer
+scans have no dashboard controls. Preview access still requires a signed-in manager.
+The return control also follows preview links to full polls and their thank-you page.
+
+**Print preview** shows the proposed artwork beside its paper format, printed Egg
+dimensions, and QR area in millimetres. On phones the controls stack above the artwork;
+the print page includes its own mobile viewport and does not rely on the app header.
+Choose a paper size in either preview or the print page, then use **Print / choose
+printer**. Use 100% / actual-size printing with browser headers and footers disabled.
+Dimensions include a four-module white QR quiet zone; printer scaling can change the
+physical result. Paper formats include A3-A6, Letter, postcard, coaster, and ticket.
+
+PNG downloads and print use the same minimal artwork: a large locally generated QR,
+an Egg-shaped outline, a small Godwit logo, scan instruction, and website. There is
+no campaign title, custom background, or business-logo overlay. Downloads are
+1200 by 1440 pixels; printing uses the vector artwork at the displayed dimensions.
+QR contents are not sent to an external QR image service for these exports.
+
 ## Creating an Egg
 
 The public **Quick start** guide offers five business groups and a choice of

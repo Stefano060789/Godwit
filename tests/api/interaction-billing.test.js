@@ -73,6 +73,7 @@ function setupFetch({ current = [], owner = true, reserved = true, checkouts = [
     if (path.endsWith("/rpc/current_workspace_id")) return json(workspace);
     if (path.includes("/workspaces?")) return json(owner ? [{ id: workspace }] : []);
     if (path.includes("/workspace_interaction_subscriptions?")) return json(current);
+    if (path.endsWith("/rpc/workspace_interaction_status")) return json({ state: "active", plan: "small" });
     if (path.includes("/workspace_billing_checkouts?")) return options.method === "POST"
       ? json(reserved ? [{ workspace_id: workspace }] : [])
       : !options.method || options.method === "GET" ? json(checkouts) : new Response(null, { status: 204 });
@@ -103,6 +104,15 @@ afterEach(() => { vi.unstubAllGlobals(); process.env = { ...originalEnv }; });
 describe("interaction billing checkout", () => {
   const request = (mode = "interaction-subscription", plan = "small") => ({
     method: "POST", headers: { authorization: "Bearer user_fixture" }, body: { mode, plan }
+  });
+  it.each(["interaction-subscription", "interaction-topup"])("blocks unnecessary %s charges for creator accounts", async mode => {
+    const fetchMock = setupFetch({ overrides: { "/rpc/workspace_interaction_status": { state: "complimentary" } } });
+    vi.stubGlobal("fetch", fetchMock);
+    const res = response();
+    await checkoutHandler(request(mode), res);
+    expect(res.statusCode).toBe(409);
+    expect(res.body.error).toContain("complimentary");
+    expect(fetchMock.mock.calls.some(([url]) => url.includes("api.stripe.com"))).toBe(false);
   });
   it.each(Object.keys(INTERACTION_PLANS))("creates the exact %s subscription without another trial", async plan => {
     const fetchMock = setupFetch();

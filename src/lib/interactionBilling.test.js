@@ -79,6 +79,11 @@ describe("read-only billing load", () => {
     expect(client.rpc).toHaveBeenCalledExactlyOnceWith("workspace_interaction_status", { target_workspace_id: "workspace-1" });
   });
 
+  it("accepts database-granted complimentary creator access", async () => {
+    const usage = { state: "complimentary", plan: "creator", unlimited: true, can_topup: false };
+    expect((await loadInteractionBilling(clientWith({ usage }))).usage).toEqual(usage);
+  });
+
   it.each(["authError", "membershipError", "usageError"])("does not swallow %s", async (field) => {
     const client = clientWith({ [field]: { message: "Local failure" } });
     await expect(loadInteractionBilling(client)).rejects.toThrow("Local failure");

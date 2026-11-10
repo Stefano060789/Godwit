@@ -55,6 +55,13 @@ describe("interaction billing", () => {
     expect(markup).not.toContain("Opening billing");
     expect(markup).toMatch(/disabled=""[^>]*>Buy 100 extra interactions/);
   });
+  it("keeps account-management controls in Settings and uses non-green purchase buttons", async () => {
+    const markup = await renderBilling("en", en);
+    expect(markup).not.toContain(en.billing.interactions.refresh);
+    expect(markup).not.toContain(en.billing.interactions.manage);
+    expect(markup).toContain("billing-purchase-action");
+    expect(markup).not.toContain("bg-teal-800");
+  });
 
   it("does not claim that a return URL confirms payment", async () => {
     const markup = await renderBilling("en", en, "/billing?checkout=success");

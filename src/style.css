@@ -67,6 +67,8 @@ textarea {
   color: black;
 }
 
+.egg-preview-bar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; padding: .65rem 1rem; border-bottom: 1px solid #cbd7d1; background: #fffdf7; color: #284542; font: 600 .8rem Arial, sans-serif; }
+.egg-preview-bar a { display: inline-flex; align-items: center; min-height: 44px; padding: .5rem .85rem; border-radius: .65rem; background: #176f68; color: white; text-decoration: none; }
 .qr-portal {
   min-height: 100vh;
   display: grid;
@@ -1074,6 +1076,30 @@ textarea {
 .app-page a[class*="bg-"],
 .workspace-page a[class*="bg-"] {
   border-radius: 8px;
+}
+
+.workspace-page .billing-purchase-action {
+  min-height: 44px;
+  background: var(--action-primary);
+  color: var(--action-on-dark);
+}
+.workspace-page .billing-purchase-action:hover:not(:disabled) {
+  background: var(--action-primary-hover);
+}
+.workspace-page .billing-purchase-action:focus-visible {
+  outline: 3px solid var(--link);
+  outline-offset: 3px;
+}
+.workspace-page .billing-settings {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+.workspace-page .billing-settings-secondary {
+  min-height: 44px;
+  border-color: var(--line);
+  background: var(--surface-soft);
+  color: var(--ink);
 }
 
 .app-page .bg-slate-900 {
