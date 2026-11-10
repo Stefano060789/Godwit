@@ -25,12 +25,12 @@ export async function createEggQrArtwork(url, { caption, logoDataUrl }) {
   const qr = await QRCode.toString(url, { type: "svg", margin: 4, errorCorrectionLevel: "M", color: { dark: "#102e2b", light: "#ffffff" } });
   const qrData = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(qr)}`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1440" viewBox="0 0 400 480">
-    <defs><clipPath id="logo-clip"><ellipse cx="200" cy="49" rx="21" ry="24"/></clipPath></defs>
+    <defs><clipPath id="logo-clip"><ellipse cx="200" cy="52" rx="29" ry="33"/></clipPath></defs>
     <path d="M200 8C90 8 8 110 8 260C8 400 80 472 200 472C320 472 392 400 392 260C392 110 310 8 200 8Z" fill="#fffdf7" stroke="#ba985f" stroke-width="2"/>
-    <image href="${escape(logoDataUrl)}" x="178" y="24" width="44" height="50" clip-path="url(#logo-clip)"/>
+    <image href="${escape(logoDataUrl)}" x="168" y="16" width="64" height="72" clip-path="url(#logo-clip)"/>
     <image href="${escape(qrData)}" x="50" y="115" width="300" height="300"/>
-    <text x="200" y="440" text-anchor="middle" fill="#284542" font-family="Arial,sans-serif" font-size="12" font-weight="700">${escape(caption)}</text>
-    <text x="200" y="458" text-anchor="middle" fill="#725326" font-family="Arial,sans-serif" font-size="10">hellogodwit.com</text>
+    <text x="200" y="439" text-anchor="middle" fill="#284542" font-family="Arial,sans-serif" font-size="16" font-weight="700">${escape(caption)}</text>
+    <text x="200" y="462" text-anchor="middle" fill="#725326" font-family="Arial,sans-serif" font-size="13" font-weight="700">hellogodwit.com</text>
   </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }

@@ -56,11 +56,23 @@
 .workspace-page .dashboard-hub-node {
   position: relative; display: flex; justify-content: flex-start; align-items: center; gap: .8rem;
   width: 100%; min-height: 78px; padding: .85rem;
-  border: 1px solid var(--hub-line); border-radius: 1rem;
-  background: var(--hub-surface); color: var(--hub-ink); font-size: .85rem; font-weight: 700; text-align: left;
+  border: 1px solid color-mix(in srgb, var(--hub-accent) 15%, var(--hub-line)); border-radius: 1rem;
+  background: linear-gradient(135deg, var(--hub-surface), color-mix(in srgb, var(--hub-surface) 82%, var(--hub-active))); color: var(--hub-ink); font-size: .85rem; font-weight: 700; text-align: left;
   box-shadow: 0 3px 6px rgba(37, 62, 61, .025), 0 8px 20px rgba(37, 62, 61, .035);
   transition: transform .18s ease, background .18s, border-color .18s, box-shadow .18s;
 }
+.workspace-page .dashboard-hub-inputs .dashboard-hub-node {
+  background: linear-gradient(135deg, var(--hub-surface), color-mix(in srgb, var(--hub-surface) 78%, var(--rose-soft)));
+}
+.workspace-page .dashboard-hub-outputs .dashboard-hub-node {
+  background: linear-gradient(135deg, var(--hub-surface), color-mix(in srgb, var(--hub-surface) 76%, var(--blue-soft)));
+}
+.workspace-page .dashboard-hub-settings {
+  background: linear-gradient(110deg, color-mix(in srgb, var(--hub-surface) 72%, var(--gold-soft)), color-mix(in srgb, var(--hub-surface) 88%, var(--teal-soft)));
+}
+.dashboard-hub-inputs .dashboard-hub-icon { background: color-mix(in srgb, var(--rose-soft) 45%, var(--hub-surface)); }
+.dashboard-hub-outputs .dashboard-hub-icon { background: color-mix(in srgb, var(--blue-soft) 58%, var(--hub-surface)); }
+.dashboard-hub-settings .dashboard-hub-icon { background: color-mix(in srgb, var(--teal-soft) 65%, var(--hub-surface)); }
 .dashboard-hub-icon { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 11px; background: var(--hub-soft); color: var(--hub-accent); }
 .dashboard-hub-node svg { width: 20px; height: 20px; }
 .dashboard-hub-copy { display: grid; gap: .3rem; min-width: 0; line-height: 1.3; }

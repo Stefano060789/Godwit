@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabase";
 import { isPollClosed } from "../lib/pollMeta";
+import { getContrastingTextColor } from "../lib/pollBranding";
 
 export function hasOptionalPollExtras(poll) {
   return Boolean(poll.allow_organizer_messages === true
@@ -164,7 +165,7 @@ export default function InlinePollVote({ item, branding, preview = false }) {
         onClick={handleSubmit}
         disabled={!canSubmit || submitting}
         className="qr-portal-menu-item-cta qr-portal-poll-submit"
-        style={{ backgroundColor: branding.primaryColor }}
+        style={{ backgroundColor: branding.primaryColor, color: getContrastingTextColor(branding.primaryColor) }}
       >
         {submitting ? "Submitting…" : "Submit"}
       </button>

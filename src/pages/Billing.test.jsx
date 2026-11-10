@@ -3,15 +3,23 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { I18nextProvider } from "react-i18next";
 import { createInstance } from "i18next";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import en from "../i18n/locales/en.json";
 import de from "../i18n/locales/de.json";
 import itLocale from "../i18n/locales/it.json";
 import sl from "../i18n/locales/sl.json";
 import Billing from "./Billing";
+import useInteractionBilling from "../lib/useInteractionBilling";
 
 vi.mock("../components/Layout", () => ({ default: ({ children }) => children }));
 vi.mock("../lib/supabase", () => ({ supabase: {} }));
+vi.mock("../lib/useInteractionBilling", () => ({ default: vi.fn() }));
+beforeEach(() => {
+  useInteractionBilling.mockReturnValue({
+    billing: null, usage: null, owner: false, paid: false, complimentary: false,
+    disabled: true, canTopup: false, loading: false, error: "", pending: "", checkout: vi.fn()
+  });
+});
 
 async function renderBilling(language, resources, path = "/billing") {
   const i18n = createInstance();
@@ -61,6 +69,26 @@ describe("interaction billing", () => {
     expect(markup).not.toContain(en.billing.interactions.manage);
     expect(markup).toContain("billing-purchase-action");
     expect(markup).not.toContain("bg-teal-800");
+  });
+
+  it("does not show complimentary creator-only messaging", async () => {
+    useInteractionBilling.mockReturnValue({
+      billing: { signedIn: true, membership: { role: "owner" } },
+      usage: { state: "complimentary", plan: "creator" },
+      owner: true,
+      paid: false,
+      complimentary: true,
+      disabled: true,
+      canTopup: false,
+      loading: false,
+      error: "",
+      pending: "",
+      checkout: vi.fn()
+    });
+    const markup = await renderBilling("en", en);
+    expect(markup).not.toContain("Complimentary creator access");
+    expect(markup).not.toContain("Included with creator access");
+    expect(markup).toContain(en.billing.interactions.included);
   });
 
   it("does not claim that a return URL confirms payment", async () => {

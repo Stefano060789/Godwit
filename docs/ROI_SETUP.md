@@ -100,8 +100,8 @@ fails explicitly if that confirmed user cannot be uniquely identified.
 
 Only a database administrator/service role can grant or revoke access; members
 cannot edit the grant table. Other accounts retain existing billing and quotas.
-The creator sees "Complimentary creator access" instead of the legacy warning.
-New subscription and top-up purchases are blocked in the UI and backend; existing
+Complimentary access has no usage notice or creator-specific copy in the dashboard
+or plan cards. New subscription and top-up purchases are blocked in the UI and backend; existing
 Stripe subscriptions are not automatically cancelled. If one exists, cancel it
 through Settings to stop renewal. Removing the user's row from `creator_accounts`
 restores the original billing state. This migration must actually be applied to

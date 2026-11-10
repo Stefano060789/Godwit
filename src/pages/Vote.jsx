@@ -6,7 +6,7 @@ import VisitorPreviewBar from "../components/VisitorPreviewBar";
 import { supabase } from "../lib/supabase";
 import { isRestrictedTopic } from "../lib/restrictedContent";
 import { readPollMeta, isPollClosed } from "../lib/pollMeta";
-import { getPollBranding } from "../lib/pollBranding";
+import { getContrastingTextColor, getPollBranding } from "../lib/pollBranding";
 import { dispatchWorkspaceWebhook } from "../lib/webhooks";
 import { isValidEmail } from "../lib/validators";
 import { isValidEggTrialSessionId } from "../lib/eggTrial";
@@ -566,8 +566,8 @@ function VoteContent() {
             {!showAddField && (
               <button
                 onClick={() => setShowAddField(true)}
-                className="px-3 py-2 rounded text-white"
-                style={{ backgroundColor: branding.primaryColor }}
+                className="px-3 py-2 rounded"
+                style={{ backgroundColor: branding.primaryColor, color: getContrastingTextColor(branding.primaryColor) }}
               >
                 {t("vote.addOwnAnswer")}
               </button>
@@ -586,8 +586,8 @@ function VoteContent() {
 
                 <button
                   onClick={submitNewAnswer}
-                  className="text-white px-3 py-2 rounded mt-2"
-                  style={{ backgroundColor: branding.primaryColor }}
+                  className="px-3 py-2 rounded mt-2"
+                  style={{ backgroundColor: branding.primaryColor, color: getContrastingTextColor(branding.primaryColor) }}
                 >
                   {t("vote.submitAnswer")}
                 </button>
@@ -610,8 +610,8 @@ function VoteContent() {
         <button
           onClick={() => submitVote(selectedAnswers)}
           disabled={selectedAnswers.length === 0}
-          className="text-white p-3 rounded mt-6 w-full font-semibold disabled:opacity-60"
-          style={{ backgroundColor: branding.primaryColor }}
+          className="p-3 rounded mt-6 w-full font-semibold disabled:opacity-60"
+          style={{ backgroundColor: branding.primaryColor, color: getContrastingTextColor(branding.primaryColor) }}
         >
           {selectedAnswers.length === 0 ? t("vote.selectAnswerToVote") : `${t("vote.submitVote")}${selectedAnswers.length > 1 ? ` (${selectedAnswers.length})` : ""}`}
         </button>

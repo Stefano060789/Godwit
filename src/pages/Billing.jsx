@@ -42,7 +42,7 @@ export default function Billing() {
                 <p className="mt-4 text-sm leading-6 text-slate-600">{t(`billing.proposed.useCases.${tier.key}`)}</p>
                 {billing?.signedIn || loading || error ? (
                   <button type="button" onClick={() => checkout(paid ? "interaction-portal" : "interaction-subscription", paid ? undefined : tier.key)} disabled={disabled || complimentary || usage?.plan === tier.key} className="billing-purchase-action mt-4 w-full rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-50">
-                    {complimentary ? t(`${key}.creatorIncluded`) : pending === tier.key ? t(`${key}.opening`) : usage?.plan === tier.key ? t("billing.currentPlanButton") : paid ? t(`${key}.changePlan`) : t(`${key}.subscribe`)}
+                    {complimentary ? t(`${key}.included`) : pending === tier.key ? t(`${key}.opening`) : usage?.plan === tier.key ? t("billing.currentPlanButton") : paid ? t(`${key}.changePlan`) : t(`${key}.subscribe`)}
                   </button>
                 ) : <Link to="/register" className="mt-4 block font-semibold text-teal-800 underline">{t(`${key}.signIn`)}</Link>}
               </article>

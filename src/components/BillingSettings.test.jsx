@@ -28,14 +28,15 @@ describe("billing in Settings", () => {
     expect(markup).toContain('href="/billing"');
     expect(markup).not.toContain('disabled=""');
   });
-  it("does not offer paid purchases for complimentary access", () => {
+  it("does not disclose complimentary creator access", () => {
     useInteractionBilling.mockReturnValue({
       ...useInteractionBilling(), usage: { state: "complimentary", plan: "creator" },
       canTopup: false, canManage: false
     });
     const markup = render();
-    expect(markup).toContain(en.billing.interactions.creatorTitle);
-    expect(markup).toMatch(/disabled=""[^>]*>Buy 100 extra interactions/);
+    expect(markup).not.toContain("Complimentary creator access");
+    expect(markup).not.toContain("creator access");
+    expect(markup).toContain(en.billing.interactions.buyTopup);
     expect(markup).not.toContain(en.billing.interactions.manage);
     expect(markup).not.toContain(en.billing.interactions.legacy);
   });

@@ -9,14 +9,16 @@ describe("Egg QR artwork and printing", () => {
     expect(paper.qrWidth).toBe(paper.artworkWidth * .75);
     expect(paper.artworkHeight).toBe(paper.artworkWidth * 1.2);
   });
-  it("generates a local vector QR with an Egg outline, small logo and safe caption", async () => {
+  it("generates a local vector QR with an Egg outline, larger logo and readable captions", async () => {
     const artwork = await createEggQrArtwork("https://hellogodwit.com/qr/example?via=qr", {
       caption: '<script>alert("x")</script>', logoDataUrl: "data:image/png;base64,abc"
     });
     const svg = decodeURIComponent(artwork.split(",").slice(1).join(","));
     expect(svg).toContain('viewBox="0 0 400 480"');
     expect(svg).toContain('x="50" y="115" width="300" height="300"');
-    expect(svg).toContain('width="44" height="50"');
+    expect(svg).toContain('width="64" height="72"');
+    expect(svg).toContain('font-size="16" font-weight="700">&lt;script&gt;');
+    expect(svg).toContain('font-size="13" font-weight="700">hellogodwit.com</text>');
     expect(svg).toContain("&lt;script&gt;");
     expect(svg).not.toContain("<script>");
     expect(svg).not.toContain("api.qrserver.com");
