@@ -2993,9 +2993,11 @@ textarea {
   }
 
   .site-nav-lang {
-    max-width: 50px;
+    width: 100px;
+    max-width: 100px;
+    flex: 0 0 100px;
     min-height: 32px;
-    padding: 0 4px;
+    padding: 0 6px;
     font-size: 0.72rem;
   }
 }
