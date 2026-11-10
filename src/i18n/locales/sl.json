@@ -361,11 +361,11 @@
     },
     "hub": {
       "descriptions": {
-        "your-business": "Identiteta in profil",
-        "business": "Znanje za va\u0161a jajca",
-        "goal": "Kaj \u017eelite dose\u010di",
-        "results": "Odgovori in vpogledi",
-        "goal-progress": "Spremljajte svoj napredek"
+        "your-business": "Uredite profil in znamko",
+        "business": "Dodajte podatke za svoje Egg-e",
+        "goal": "Izberite želeni rezultat",
+        "results": "Preglejte odzive in dejavnost",
+        "goal-progress": "Spremljajte interakcije in cilje"
       },
       "label": "Vaše podjetje, povezano z Eggi",
       "yourBusiness": "Vaše podjetje",

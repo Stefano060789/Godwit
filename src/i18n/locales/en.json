@@ -545,11 +545,11 @@
     "hub": {
       "label": "Your business, connected by Eggs",
       "descriptions": {
-        "your-business": "Identity and profile",
-        "business": "Knowledge for your Eggs",
-        "goal": "What you want to achieve",
-        "results": "Responses and insights",
-        "goal-progress": "See your impact grow"
+        "your-business": "Set your profile and brand",
+        "business": "Add details your Eggs can share",
+        "goal": "Choose the result you want",
+        "results": "Review feedback and activity",
+        "goal-progress": "Track interactions and outcomes"
       },
       "yourBusiness": "Your Business",
       "business": "Business Data",

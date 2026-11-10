@@ -11,16 +11,18 @@ import sl from "../i18n/locales/sl.json";
 const locales = { en, de, it: itLocale, sl };
 describe("Egg dashboard hub", () => {
   it("places inputs left, the Egg in the center, results right and settings below", () => {
-    const t = (key, options) => options?.defaultValue || key;
+    const t = (key, options) => key.split(".").reduce((value, part) => value?.[part], en) || options?.defaultValue || key;
     const markup = renderToStaticMarkup(createElement(DashboardHub, { activeTab: "engagement", onSelect: vi.fn(), t }));
     expect(markup.indexOf("Your Business")).toBeLessThan(markup.indexOf("Business Data"));
     expect(markup).toContain("Business Data");
     expect(markup).toContain("dashboard-hub-your-business");
+    expect(markup).toContain("Set your profile and brand");
     expect(markup).toContain("Goal");
     expect(markup).toContain('class="dashboard-hub-egg" aria-current="page"');
     expect(markup).toContain("dashboard-hub-results");
     expect(markup).toContain("dashboard-hub-settings");
     expect(markup).toContain("dashboard-hub-outputs");
+    expect(markup).toContain("Review feedback and activity");
     expect(markup.match(/class="dashboard-hub-connector"/g)).toHaveLength(2);
     expect(markup.match(/<button /g)).toHaveLength(7);
     expect(markup).toContain(">QR<");

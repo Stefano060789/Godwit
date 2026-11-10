@@ -464,11 +464,11 @@
   "admin": {
     "hub": {
       "descriptions": {
-        "your-business": "Identit\u00e4t und Profil",
-        "business": "Wissen f\u00fcr Ihre Eggs",
-        "goal": "Was Sie erreichen wollen",
-        "results": "Antworten und Einblicke",
-        "goal-progress": "Ihre Wirkung im Blick"
+        "your-business": "Profil und Marke gestalten",
+        "business": "Infos für Ihre Eggs ergänzen",
+        "goal": "Gewünschtes Ergebnis festlegen",
+        "results": "Feedback und Aktivität ansehen",
+        "goal-progress": "Interaktionen und Ziele verfolgen"
       },
       "label": "Ihr Unternehmen, verbunden durch Eggs",
       "yourBusiness": "Ihr Unternehmen",

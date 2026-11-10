@@ -464,11 +464,11 @@
   "admin": {
     "hub": {
       "descriptions": {
-        "your-business": "Identit\u00e0 e profilo",
-        "business": "Informazioni per i tuoi Egg",
-        "goal": "Cosa vuoi raggiungere",
-        "results": "Risposte e spunti",
-        "goal-progress": "Segui il tuo impatto"
+        "your-business": "Imposta profilo e identità",
+        "business": "Aggiungi info per i tuoi Egg",
+        "goal": "Scegli il risultato desiderato",
+        "results": "Consulta feedback e attività",
+        "goal-progress": "Monitora interazioni e risultati"
       },
       "label": "La tua attività, collegata dagli Egg",
       "yourBusiness": "La tua attività",
