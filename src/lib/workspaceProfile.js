@@ -96,6 +96,7 @@ export async function loadWorkspaceProfile() {
   const { data: { user } } = await supabase.auth.getUser();
   const role = await getCurrentUserRole(user?.id);
   const plan = await loadWorkspacePlan(workspaceId);
+  const trial = await loadWorkspaceTrial(workspaceId);
   return {
     id: workspace.id,
     companyName: workspace.name || "Godwit",
@@ -108,7 +109,8 @@ export async function loadWorkspaceProfile() {
     businessType: workspace.business_type || "",
     businessDescription: workspace.business_description || "",
     role,
-    plan
+    plan,
+    trial
   };
 }
 
@@ -122,6 +124,16 @@ export async function loadWorkspacePlan(workspaceId) {
     return "free";
   }
   return data || "free";
+}
+
+export async function loadWorkspaceTrial(workspaceId) {
+  if (!workspaceId) return null;
+  const { data, error } = await supabase.rpc("workspace_trial_status", { target_workspace_id: workspaceId });
+  if (error) {
+    console.error("Unable to load workspace trial status", error);
+    return { state: "unavailable", error: error.message };
+  }
+  return data || null;
 }
 
 export async function saveWorkspaceBusinessType(workspaceId, businessType, businessDescription = "") {

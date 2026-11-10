@@ -45,7 +45,7 @@ function createSessionId() {
   }
 }
 
-export default function EggAiAssistant({ token, campaignId, branding, preview = false, initiallyExpanded = true }) {
+export default function EggAiAssistant({ token, campaignId, trialSessionId, branding, preview = false, initiallyExpanded = true }) {
   const { t } = useTranslation("translation", { keyPrefix: "eggAi" });
   const [enabled, setEnabled] = useState(preview);
   const [expanded, setExpanded] = useState(initiallyExpanded);
@@ -93,13 +93,18 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
           action: "chat",
           token,
           sessionId,
+          trialSessionId,
           message,
           history: messages.slice(-4).map(({ role, content }) => ({ role, content }))
         })
       });
       const result = await response.json();
       if (!response.ok) {
-        throw new Error(response.status === 429 ? t("usageLimit") : t("assistantError"));
+        throw new Error(response.status === 429
+          ? t("usageLimit")
+          : response.status === 403
+            ? t("trialAccessPaused", { defaultValue: "This Egg is temporarily unavailable because the trial allowance has ended." })
+            : t("assistantError"));
       }
       const poll = result.poll && Number.isSafeInteger(Number(result.poll.id)) && Array.isArray(result.poll.answers)
         ? { id: Number(result.poll.id), campaignId, answers: result.poll.answers }
@@ -160,7 +165,7 @@ export default function EggAiAssistant({ token, campaignId, branding, preview = 
                 {message.poll && (
                   <div className="mt-2">
                     <InlinePollVote
-                      item={{ poll_id: message.poll.id, campaign_id: message.poll.campaignId }}
+                      item={{ poll_id: message.poll.id, campaign_id: message.poll.campaignId, trial_session_id: trialSessionId }}
                       branding={branding}
                     />
                   </div>

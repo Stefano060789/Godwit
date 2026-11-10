@@ -1,5 +1,3 @@
-import godwitMark from "../assets/godwit-mark.svg";
-
 export function HubIcon({ type }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
@@ -47,8 +45,7 @@ export default function DashboardHub({ activeTab, onSelect, t }) {
       </svg>
       <div className="dashboard-hub-inputs">{node("your-business", "yourBusiness")}{node("business", "business")}{node("goal", "goal")}</div>
       <button type="button" className="dashboard-hub-egg" aria-current={activeTab === "engagement" ? "page" : undefined} onClick={() => onSelect("engagement")}>
-        <img src={godwitMark} alt="" width="84" height="84" />
-        <span className="dashboard-hub-wordmark">Godwit</span>
+        <img src="/godwit-logo.png" alt="" width="88" height="99" />
         <strong>{labels.engagement}</strong>
         <span className="dashboard-hub-access"><span><HubIcon type="qr" />QR</span><span><HubIcon type="nfc" />NFC</span></span>
       </button>

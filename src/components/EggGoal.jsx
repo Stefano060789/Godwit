@@ -65,12 +65,12 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
             <span className="goal-choice-check" aria-hidden="true">{goalKeys.includes(entry.key) ? "\u2713" : "+"}</span>
           </button>)}
         </div>
-      </fieldset>
-      <fieldset disabled={!canManage || busy || !businessType}>
-        <legend><span className="hub-step">02</span>{t("admin.goal.placementTitle", { defaultValue: "Name & location" })}</legend>
         <label className="goal-context-field">{t("admin.goal.contextLabel", { defaultValue: "What would success look like for this Egg? (optional)" })}
           <textarea maxLength={500} rows={3} value={goalContext} onChange={(event) => setGoalContext(event.target.value)} placeholder={t("admin.goal.contextPlaceholder", { defaultValue: "Add a specific outcome or detail to guide the AI and help you interpret progress." })} />
         </label>
+      </fieldset>
+      <fieldset disabled={!canManage || busy || !businessType}>
+        <legend><span className="hub-step">02</span>{t("admin.goal.placementTitle", { defaultValue: "Name & location" })}</legend>
         <div className="hub-form-grid">
           <label>{t("admin.engagement.campaigns.nameLabel")}<input required maxLength={120} value={name} onChange={(event) => setName(event.target.value)} placeholder={t("admin.goal.nameExample", { defaultValue: "Gallery welcome" })} /></label>
           <label>{t("admin.engagement.campaigns.placementLabel")}<input required maxLength={80} value={placement} onChange={(event) => setPlacement(event.target.value)} placeholder={t("admin.goal.locationExample", { defaultValue: "Main entrance" })} /></label>

@@ -61,6 +61,46 @@
     "dashboard": "Nadzorna plošča",
     "getStarted": "Začni"
   },
+  "trial": {
+    "signupTitle": "Preizkusite Godwit brezplačno en mesec",
+    "signupBody": "Novi računi, ki ustvarijo svoj prvi prostor Godwit, prejmejo neomejeno število Eggov in do 100 uporabniških sej prek Eggov v 30 dneh – kar nastopi prej. Kartica ni potrebna in samodejnih bremenitev ne bo. Preizkus se začne, ko Godwit po potrditvi e-pošte ustvari vaš prostor, običajno ob prvem obisku nadzorne plošče. Nato se nove seje Eggov ustavijo. Plačljivih paketov še ni mogoče kupiti.",
+    "dashboardActive": "Preizkus: uporabljenih {{used}} od {{limit}} uporabniških sej Eggov. Konec: {{date}}.",
+    "dashboardPaused": "Brezplačni preizkus se je končal ali pa je bilo uporabljenih vseh 100 sej Eggov.",
+    "dashboardPausedDetail": "Nove uporabniške seje Eggov so ustavljene. Plačljivi paketi še niso na voljo za nakup.",
+    "statusUnavailable": "Stanja preizkusa ni bilo mogoče naložiti. Preverite, ali je bila uporabljena najnovejša Supabase migracija.",
+    "billingLink": "Oglejte si podrobnosti obračunavanja",
+    "supportLink": "Obrnite se na podporo",
+    "billingPrompt": "Ste novi pri Godwitu? Začnite z brezplačnim preizkusom.",
+    "billingSignup": "Ustvarite račun",
+    "customerPaused": "Ta Egg trenutno ni na voljo. Obrnite se neposredno na ponudnika.",
+    "verifyFailed": "Dostopa do tega Egga trenutno ni bilo mogoče preveriti. Poskusite znova pozneje."
+  },
+  "dashboardDemo": {
+    "eyebrow": "Pogled v Godwit",
+    "title": "Oglejte si, kaj povedo interakcije s strankami.",
+    "intro": "Raziščite vzorčno nadzorno ploščo z obiski Eggov, povratnimi informacijami in merljivimi cilji.",
+    "sampleBadge": "Vzorčni podatki",
+    "tabsLabel": "Razdelki predstavitve nadzorne plošče",
+    "metricsLabel": "Vzorčni kazalniki",
+    "samplePeriod": "Primer · zadnjih 30 dni",
+    "tabs": { "overview": "Pregled", "eggs": "Eggi", "results": "Rezultati", "goalProgress": "Napredek cilja" },
+    "metrics": { "interactions": "Uporabniške seje Eggov", "feedback": "Odgovori s povratnimi informacijami", "responseRate": "Stopnja odziva" },
+    "chartTitle": "Interakcije s strankami",
+    "chartDescription": "Vzorčne seje Eggov po dnevih v zadnjem tednu",
+    "days": ["Pon", "Tor", "Sre", "Čet", "Pet", "Sob", "Ned"],
+    "goalTitle": "Primer cilja",
+    "goalDescription": "Povečajte povpraševanja strank prek ponovno uporabnega Egga.",
+    "goalProgress": "68 % vzorčnega cilja",
+    "eggTitle": "Vaši Eggi",
+    "eggDescription": "Ponovno uporabne QR- in NFC-točke, vsaka povezana s ciljem.",
+    "sectionTitle": "Razumite dogajanje na enem mestu.",
+    "sectionDescription": "Prava nadzorna plošča združuje dejavnost strank, povratne informacije in napredek ciljev. V tej predstavitvi si lahko ogledate:",
+    "sampleEgg": "Preverite, katere Egge stranke odpirajo.",
+    "sampleResponses": "Preglejte povratne informacije in ponavljajoče se teme.",
+    "sampleTrend": "Spremljajte merljive dejavnosti skozi čas.",
+    "disclaimer": "To je predstavitev samo za branje z izmišljenimi vzorčnimi podatki. Po prijavi boste videli samo podatke svojega prostora.",
+    "cta": "Ustvarite račun"
+  },
   "billing": {
     "title": "Paketi in obračunavanje",
     "subtitle": "Neomejeno Eggov z jasno mesečno kvoto interakcij s strankami.",
@@ -78,11 +118,11 @@
       "interactionsPerMonth": "interakcij s strankami / mesec",
       "unlimitedEggs": "Vključeno neomejeno število Eggov",
       "priceToBeConfirmed": "Mesečna cena bo določena pozneje",
-      "countingTitle": "Kaj bi štelo kot interakcija?",
-      "countingBody": "Predlagano pravilo: šteje se prvo odprtje Egg s strani stranke v posamezni seji. Predogledi zaposlenih in ponovljena dejanja v isti seji se izključijo. To štetje se trenutno ne uporablja.",
+      "countingTitle": "Kako se šteje brezplačno preizkusno obdobje?",
+      "countingBody": "Štetje v preizkusnem obdobju je aktivno: prvo odprtje Egg s strani stranke v posamezni seji brskalnika se šteje v omejitev 100 interakcij za vse Egge v delovnem prostoru. Ponovna odprtja v isti seji in predogledi zaposlenih se ne štejejo. Štetje in plačilo za plačljive pakete sta še vedno predlog.",
       "topUpsTitle": "Potrebujete več interakcij?",
       "topUpsBody": "Načrtovani so neobvezni dodatni paketi. Velikosti, cene in način nakupa še niso določeni.",
-      "statusNote": "Obstoječe funkcije in omejitve paketov ostajajo v veljavi. Pred nakupom tega predloga bo treba ločeno urediti cene, štetje interakcij, dodatne pakete in Stripe."
+      "statusNote": "Obstoječe funkcije in omejitve paketov ostajajo v veljavi. Pred nakupom predloga bo treba ločeno urediti cene in štetje plačljivih paketov, dodatne pakete ter plačila prek Stripe."
     }
   },
   "quickStart": {

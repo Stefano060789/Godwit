@@ -53,6 +53,7 @@ function makeChatRequest(overrides = {}) {
     action: "chat",
     token: "egg-token",
     sessionId: "a2a8d950-a23f-4f49-b8c0-c7809c9c029b",
+    trialSessionId: "38dfeb63-639c-4c17-8882-7a82da0e84cc",
     message: "Do you have step-free access?",
     history: [],
     ...overrides
@@ -70,6 +71,13 @@ describe("Egg AI API", () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) {
+        expect(JSON.parse(options.body)).toEqual({
+          target_campaign_token: "egg-token",
+          target_session_id: "38dfeb63-639c-4c17-8882-7a82da0e84cc"
+        });
+        return jsonResponse(true);
+      }
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
         return jsonResponse([{
           id: 42,
@@ -88,6 +96,10 @@ describe("Egg AI API", () => {
         return jsonResponse([{ title: "Business notes", content: "The cafe opens at nine.", source_type: "notes" }]);
       }
       if (href.includes("/rest/v1/rpc/get_public_qr_campaign_items")) {
+        expect(JSON.parse(options.body)).toMatchObject({
+          target_token: "egg-token",
+          target_session_id: "38dfeb63-639c-4c17-8882-7a82da0e84cc"
+        });
         return jsonResponse([{ item_id: 17, item_type: "poll", poll_question: "How was the service?" }]);
       }
       if (href.includes("/rest/v1/rpc/get_public_woodpecker_portal")) return jsonResponse([]);
@@ -122,10 +134,31 @@ describe("Egg AI API", () => {
     expect(response.body.suggestions).toEqual([{ id: "17", type: "poll", title: "How was the service?" }]);
   });
 
+  it("blocks Egg AI requests after the customer's trial session is no longer allowed", async () => {
+    configureEnvironment();
+    const fetchMock = vi.fn(async (url) => {
+      const href = String(url);
+      if (href.includes("/rest/v1/qr_campaigns?token=")) {
+        return jsonResponse([{ id: 42, workspace_id: "workspace-1", is_active: true, ai_enabled: true }]);
+      }
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) return jsonResponse(false);
+      throw new Error(`Unexpected request after trial access was denied: ${href}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = makeResponse();
+    await handler(makeChatRequest(), response);
+
+    expect(response.statusCode).toBe(403);
+    expect(response.body.error).toContain("trial has ended");
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("api.anthropic.com"))).toBe(false);
+  });
+
   it("creates and returns one saved poll for a clear customer interest", async () => {
     configureEnvironment();
     const fetchMock = vi.fn(async (url, options = {}) => {
       const href = String(url);
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) return jsonResponse(true);
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
         return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Cafe", is_active: true, ai_enabled: true }]);
       }
@@ -179,6 +212,7 @@ describe("Egg AI API", () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url) => {
       const href = String(url);
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) return jsonResponse(true);
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
         return jsonResponse([{ id: 42, workspace_id: "workspace-1", is_active: true, ai_enabled: true }]);
       }
@@ -222,6 +256,7 @@ describe("Egg AI API", () => {
     configureEnvironment();
     const fetchMock = vi.fn(async (url) => {
       const href = String(url);
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) return jsonResponse(true);
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
         return jsonResponse([{ id: 42, workspace_id: "workspace-1", is_active: true, ai_enabled: true }]);
       }
@@ -256,6 +291,7 @@ describe("Egg AI API", () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) return jsonResponse(true);
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
         return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Cafe", is_active: true, ai_enabled: true }]);
       }
@@ -292,6 +328,7 @@ describe("Egg AI API", () => {
     configureEnvironment();
     const fetchMock = vi.fn(async (url) => {
       const href = String(url);
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) return jsonResponse(true);
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
         return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Cafe", is_active: true, ai_enabled: true }]);
       }
@@ -356,6 +393,7 @@ describe("Egg AI API", () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) return jsonResponse(true);
       if (href.includes("/rest/v1/qr_campaigns?token=")) return jsonResponse([{
         id: 42,
         workspace_id: "workspace-1",
@@ -400,6 +438,7 @@ describe("Egg AI API", () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
       const href = String(url);
+      if (href.includes("/rest/v1/rpc/check_egg_trial_session")) return jsonResponse(true);
       if (href.includes("/rest/v1/qr_campaigns?token=")) {
         expect(href).toContain("goal_key");
         expect(href).toContain("goal_keys");

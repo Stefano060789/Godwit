@@ -8,6 +8,7 @@ import { readPollMeta, isPollClosed } from "../lib/pollMeta";
 import { getPollBranding } from "../lib/pollBranding";
 import { dispatchWorkspaceWebhook } from "../lib/webhooks";
 import { isValidEmail } from "../lib/validators";
+import { isValidEggTrialSessionId } from "../lib/eggTrial";
 
 const TRANSLATION_LANGUAGES = [
   { value: "original", label: "Original" },
@@ -36,6 +37,7 @@ export default function Vote() {
   const [submitted, setSubmitted] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [duplicate, setDuplicate] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [showAddField, setShowAddField] = useState(false);
   const [newAnswer, setNewAnswer] = useState("");
   const [userAnswers, setUserAnswers] = useState([]);
@@ -60,6 +62,8 @@ export default function Vote() {
   const MIN_DWELL_MS = 1200;
   const campaignId = Number(searchParams.get("campaign"));
   const validCampaignId = Number.isSafeInteger(campaignId) && campaignId > 0 ? campaignId : null;
+  const rawTrialSessionId = searchParams.get("trialSessionId");
+  const trialSessionId = isValidEggTrialSessionId(rawTrialSessionId) ? rawTrialSessionId : null;
 
   const pollMeta = poll ? readPollMeta(poll.id) : {};
   const alreadyVoted = localStorage.getItem(`voted_${pollId}`);
@@ -101,6 +105,7 @@ export default function Vote() {
 
   async function submitVote(answersToSubmit) {
     if (!Array.isArray(answersToSubmit) || answersToSubmit.length === 0) return;
+    setSubmitError("");
 
     // Silently drop obvious bot submissions: a filled honeypot, or a submission that
     // arrived faster than a human could plausibly read the question and choose an answer.
@@ -130,7 +135,8 @@ export default function Vote() {
       poll_id: poll.id,
       answer,
       user_id: user?.id || null,
-      campaign_id: validCampaignId
+      campaign_id: validCampaignId,
+      trial_session_id: trialSessionId
     }));
 
     const isAdmin = !!user;
@@ -147,6 +153,11 @@ export default function Vote() {
       }
 
       console.error(error);
+      setSubmitError(
+        /trial|egg session/i.test(error.message || "")
+          ? t("vote.trialPaused", { defaultValue: "This Egg is no longer accepting new responses. Please contact the business directly." })
+          : t("vote.submitError", { defaultValue: "Your response could not be submitted. Please try again." })
+      );
       return;
     }
 
@@ -598,6 +609,7 @@ export default function Vote() {
         >
           {selectedAnswers.length === 0 ? t("vote.selectAnswerToVote") : `${t("vote.submitVote")}${selectedAnswers.length > 1 ? ` (${selectedAnswers.length})` : ""}`}
         </button>
+        {submitError && <p className="mt-3 text-sm text-red-700" role="alert">{submitError}</p>}
 
         <div className="mt-5 border-t border-slate-600 pt-4">
           <p className="text-sm font-semibold">{poll.raffle_enabled ? t("vote.prizeDrawTitle") : t("vote.keepInTouchTitle")}</p>

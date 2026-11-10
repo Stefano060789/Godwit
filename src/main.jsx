@@ -24,6 +24,7 @@ const Register = lazy(() => import("./pages/Register"));
 const ThankYou = lazy(() => import("./pages/ThankYou"));
 const QrRedirect = lazy(() => import("./pages/QrRedirect"));
 const Billing = lazy(() => import("./pages/Billing"));
+const DashboardDemo = lazy(() => import("./pages/DashboardDemo"));
 const Creator = lazy(() => import("./pages/Creator"));
 const Landing = lazy(() => import("./pages/Landing"));
 const Account = lazy(() => import("./pages/Account"));
@@ -77,10 +78,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/results/:pollId" element={<Results />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/dashboard-demo" element={<DashboardDemo />} />
         <Route path="/thanks" element={<ThankYou />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/analytics" element={<AdminAnalytics />} />
         <Route path="/admin/billing" element={<Billing />} />
+        <Route path="/billing" element={<Billing />} />
         <Route path="/creator" element={<Creator />} />
         <Route path="/admin/woodpecker" element={<Woodpecker />} />
         <Route path="/qr/:token/tasks" element={<QrTasks />} />

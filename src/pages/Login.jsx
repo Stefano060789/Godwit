@@ -107,7 +107,7 @@ export default function Login() {
 
   return (
     <div className="app-page auth-page max-w-md mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center">Sign in to your workspace</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Sign in to Godwit</h1>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
 
@@ -142,7 +142,7 @@ export default function Login() {
         </button>
         <button type="button" onClick={resetPassword} className="auth-secondary">Forgot password?</button>
       </form>
-      <p className="auth-footer"><Link to="/register" state={{ returnTo: returnPath }}>Create your workspace</Link></p>
+      <p className="auth-footer"><Link to="/register" state={{ returnTo: returnPath }}>Create a Godwit account</Link></p>
     </div>
   );
 }

@@ -8,10 +8,10 @@
   "theme_color": "#0b1a33",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/godwit-logo.png",
+      "sizes": "295x331",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

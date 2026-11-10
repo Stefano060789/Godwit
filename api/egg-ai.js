@@ -6,6 +6,7 @@ import { isRestrictedTopic } from "../src/lib/restrictedContent.js";
 
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{4,120}$/;
 const SESSION_PATTERN = /^[0-9a-f-]{36}$/i;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const WORKSPACE_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_MESSAGE_LENGTH = 600;
 const MAX_CONTEXT_LENGTH = 8000;
@@ -86,13 +87,13 @@ async function loadCampaign(token) {
   };
 }
 
-async function loadEggOptions(token, campaign) {
+async function loadEggOptions(token, campaign, trialSessionId) {
   const { serviceKey } = getSupabaseConfig();
   const [items, campaigns] = await Promise.all([
     supabaseRequest("/rest/v1/rpc/get_public_qr_campaign_items", {
       key: serviceKey,
       method: "POST",
-      body: { target_token: token }
+      body: { target_token: token, target_session_id: trialSessionId }
     }),
     supabaseRequest("/rest/v1/rpc/get_public_qr_campaign", {
       key: serviceKey,
@@ -427,7 +428,8 @@ function validateInterestPoll(value) {
 async function handleChat(request, token, response) {
   const message = String(request.body?.message || "").trim();
   const sessionId = String(request.body?.sessionId || "");
-  if (!message || message.length > MAX_MESSAGE_LENGTH || !SESSION_PATTERN.test(sessionId)) {
+  const trialSessionId = String(request.body?.trialSessionId || "");
+  if (!message || message.length > MAX_MESSAGE_LENGTH || !SESSION_PATTERN.test(sessionId) || !UUID_PATTERN.test(trialSessionId)) {
     return response.status(400).json({ error: "Send a short message to continue." });
   }
   const apiKey = process.env.CLAUDE_API_KEY?.trim();
@@ -439,11 +441,20 @@ async function handleChat(request, token, response) {
   }
 
   const { serviceKey } = getSupabaseConfig();
+  const trialAccessAllowed = await supabaseRequest("/rest/v1/rpc/check_egg_trial_session", {
+    key: serviceKey,
+    method: "POST",
+    body: { target_campaign_token: token, target_session_id: trialSessionId }
+  });
+  if (trialAccessAllowed !== true) {
+    return response.status(403).json({ error: "This Egg trial has ended. New customer interactions are paused." });
+  }
+
   const [sources, sharedSources] = await Promise.all([
     supabaseRequest(`/rest/v1/egg_ai_sources?campaign_id=eq.${campaign.id}&select=title,content&order=created_at.desc&limit=8`, { key: serviceKey }),
     supabaseRequest(`/rest/v1/workspace_ai_sources?workspace_id=eq.${encodeURIComponent(campaign.workspace_id)}&select=title,content,source_type&order=created_at.desc&limit=8`, { key: serviceKey })
   ]);
-  const eggOptions = await loadEggOptions(token, campaign);
+  const eggOptions = await loadEggOptions(token, campaign, trialSessionId);
 
   const sessionHash = createHash("sha256").update(sessionId).digest("hex");
   try {

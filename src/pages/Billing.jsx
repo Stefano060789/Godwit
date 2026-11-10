@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Layout from "../components/Layout";
 import { supabase } from "../lib/supabase";
-import { loadWorkspaceProfile } from "../lib/workspaceProfile";
 import { planLabel } from "../lib/entitlements";
 
 const INTERACTION_PACKAGES = [
@@ -14,17 +14,35 @@ const INTERACTION_PACKAGES = [
 export default function Billing() {
   const { t } = useTranslation();
   const [currentPlan, setCurrentPlan] = useState("");
+  const [trial, setTrial] = useState(null);
+  const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
     async function loadCurrentPlan() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.id) return;
-      try {
-        const profile = await loadWorkspaceProfile();
-        setCurrentPlan(profile.plan || "free");
-      } catch (profileError) {
-        console.error(profileError);
+      setSignedIn(true);
+      const { data: membership, error: membershipError } = await supabase
+        .from("workspace_members")
+        .select("workspace_id")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (membershipError) {
+        console.error("Unable to load billing workspace", membershipError);
+        return;
       }
+      if (!membership?.workspace_id) return;
+
+      const [planResult, trialResult] = await Promise.all([
+        supabase.rpc("workspace_plan", { target_workspace_id: membership.workspace_id }),
+        supabase.rpc("workspace_trial_status", { target_workspace_id: membership.workspace_id })
+      ]);
+      if (planResult.error) console.error("Unable to load billing plan", planResult.error);
+      if (trialResult.error) console.error("Unable to load billing trial status", trialResult.error);
+      setCurrentPlan(planResult.data || "free");
+      setTrial(trialResult.error ? { state: "unavailable" } : trialResult.data || null);
     }
     loadCurrentPlan();
   }, []);
@@ -38,7 +56,27 @@ export default function Billing() {
         <p className="mx-auto mt-5 max-w-3xl rounded-xl border border-amber-500/40 bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-950">
           {t("billing.proposed.notice")}
         </p>
-        {currentPlan && <p className="mt-3 text-center text-sm text-teal-800">{t("billing.currentPlanNotice", { plan: planLabel(currentPlan) })}</p>}
+        {currentPlan && !["active", "unavailable"].includes(trial?.state) && <p className="mt-3 text-center text-sm text-teal-800">{t("billing.currentPlanNotice", { plan: planLabel(currentPlan) })}</p>}
+        {trial?.state === "active" && (
+          <p className="mx-auto mt-4 max-w-3xl rounded-xl border border-teal-300 bg-teal-50 px-4 py-3 text-center text-sm text-teal-950">
+            {t("trial.dashboardActive", {
+              used: trial.interactions_used,
+              limit: trial.interaction_limit,
+              date: new Date(trial.ends_at).toLocaleDateString()
+            })}
+          </p>
+        )}
+        {["expired", "used_up", "inactive"].includes(trial?.state) && (
+          <p className="mx-auto mt-4 max-w-3xl rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-center text-sm text-rose-950">
+            <strong>{t("trial.dashboardPaused")}</strong> {t("trial.dashboardPausedDetail")}{" "}
+            <Link to="/support" className="font-semibold underline">{t("trial.supportLink")}</Link>
+          </p>
+        )}
+        {trial?.state === "unavailable" && (
+          <p className="mx-auto mt-4 max-w-3xl rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-center text-sm text-rose-950" role="alert">
+            {t("trial.statusUnavailable")}
+          </p>
+        )}
 
         <section aria-label={t("billing.proposed.packagesTitle")} className="mt-8">
           <h2 className="text-center text-2xl font-bold text-slate-900">{t("billing.proposed.packagesTitle")}</h2>
@@ -70,6 +108,11 @@ export default function Billing() {
           </article>
         </section>
         <p className="mt-6 text-center text-xs leading-5 text-slate-500">{t("billing.proposed.statusNote")}</p>
+        {!signedIn && (
+          <p className="mt-5 text-center text-sm text-slate-700">
+            {t("trial.billingPrompt")} <Link to="/register" className="font-semibold text-teal-800 underline">{t("trial.billingSignup")}</Link>
+          </p>
+        )}
       </div>
     </Layout>
   );

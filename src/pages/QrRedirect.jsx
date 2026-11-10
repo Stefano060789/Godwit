@@ -9,6 +9,7 @@ import EggAiAssistant from "../components/EggAiAssistant";
 import { accessibilityTagIcon, accessibilityTagLabel } from "../lib/accessibilityTags";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 import { normalizeEggAccessMethod } from "../lib/eggs";
+import { getEggTrialSessionId } from "../lib/eggTrial";
 import { useTranslation } from "react-i18next";
 
 export default function QrRedirect() {
@@ -27,13 +28,23 @@ export default function QrRedirect() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    async function recordEggAccess(campaignId) {
-      if (isPreview || !campaignId) return;
-      const { error: accessError } = await supabase.rpc("record_egg_access", {
+    async function recordEggAccess(campaignId, trialSessionId) {
+      const { data: allowed, error: accessError } = await supabase.rpc("record_egg_access", {
         target_campaign_id: campaignId,
-        target_access_method: accessMethod
+        target_access_method: accessMethod,
+        target_session_id: trialSessionId,
+        target_is_preview: isPreview
       });
-      if (accessError) console.error("Unable to record Egg access:", accessError);
+      if (accessError) {
+        console.error("Unable to verify Egg access:", accessError);
+        setErrorMessage(t("trial.verifyFailed", { defaultValue: "We couldn't verify access to this Egg right now. Please try again later." }));
+        return false;
+      }
+      if (allowed !== true) {
+        setErrorMessage(t("trial.customerPaused", { defaultValue: "This Egg is temporarily unavailable. Please contact the business directly." }));
+        return false;
+      }
+      return true;
     }
 
     async function resolveQr() {
@@ -49,15 +60,38 @@ export default function QrRedirect() {
         }
       }
 
+      let trialSessionId;
+      try {
+        trialSessionId = getEggTrialSessionId({ preview: isPreview });
+      } catch (sessionError) {
+        setErrorMessage(sessionError.message);
+        return;
+      }
+
+      const { data: campaign, error: campaignError } = await supabase
+        .rpc("get_public_qr_campaign", { target_token: token })
+        .maybeSingle();
+      if (campaignError) {
+        console.error("Unable to load Egg campaign:", campaignError);
+        setErrorMessage(t("trial.verifyFailed", { defaultValue: "We couldn't verify access to this Egg right now. Please try again later." }));
+        return;
+      }
+      if (campaign && !(await recordEggAccess(campaign.campaign_id, trialSessionId))) return;
+
       // A QR code can be linked to several things at once (extra polls, admin-authored
       // info cards). If it has any, show a menu of everything instead of jumping
       // straight to a single poll - this also covers info-only QR codes with no poll.
       const { data: items, error: itemsError } = await supabase
-        .rpc("get_public_qr_campaign_items", { target_token: token });
+        .rpc("get_public_qr_campaign_items", {
+          target_token: token,
+          target_session_id: trialSessionId,
+          target_is_preview: isPreview
+        });
 
       const visibleItems = DONATION_FEATURE_ENABLED
-        ? items
+        ? (items || [])
         : (items || []).filter((item) => item.item_type !== "donation");
+      const sessionItems = visibleItems.map((item) => ({ ...item, trial_session_id: trialSessionId }));
       let eggAiEnabled = false;
       try {
         const aiConfigResponse = await fetch("/api/egg-ai", {
@@ -71,20 +105,23 @@ export default function QrRedirect() {
         console.error("Unable to load Egg AI settings:", aiConfigError);
       }
 
-      if (!itemsError && Array.isArray(visibleItems) && visibleItems.length > 0) {
-        await recordEggAccess(visibleItems[0].campaign_id);
-
+      if (itemsError) {
+        console.error("Unable to load Egg options:", itemsError);
+        setErrorMessage(t("trial.verifyFailed", { defaultValue: "We couldn't verify access to this Egg right now. Please try again later." }));
+        return;
+      }
+      if (sessionItems.length > 0) {
         // If this QR code carries just one poll and nothing else (no info card, donation, or
         // reward), skip the intermediate "menu" screen entirely - land directly on the
         // question with answer options ready to tap, instead of an extra "Share feedback"
         // click. Only collapse when there's truly one thing to show; a poll alongside other
         // items still needs the menu so those other items remain visible.
-        if (visibleItems.length === 1 && visibleItems[0].item_type === "poll" && !eggAiEnabled) {
-          navigate(`/vote/${visibleItems[0].poll_id}?campaign=${visibleItems[0].campaign_id}`, { replace: true });
+        if (sessionItems.length === 1 && sessionItems[0].item_type === "poll" && !eggAiEnabled) {
+          navigate(`/vote/${sessionItems[0].poll_id}?campaign=${sessionItems[0].campaign_id}&trialSessionId=${trialSessionId}`, { replace: true });
           return;
         }
 
-        const firstPollItem = visibleItems.find((item) => item.item_type === "poll");
+        const firstPollItem = sessionItems.find((item) => item.item_type === "poll");
         const branding = getPollBranding(firstPollItem ? {
           brand_name: firstPollItem.poll_brand_name,
           brand_logo_url: firstPollItem.poll_brand_logo_url,
@@ -92,28 +129,24 @@ export default function QrRedirect() {
           brand_accent_color: firstPollItem.poll_brand_accent_color
         } : null);
         setMenu({
-          campaignId: visibleItems[0].campaign_id,
-          portalTitle: visibleItems[0].portal_title,
-          portalMessage: visibleItems[0].portal_message,
-          items: visibleItems,
+          campaignId: campaign?.campaign_id || sessionItems[0].campaign_id,
+          portalTitle: campaign?.portal_title || sessionItems[0].portal_title,
+          portalMessage: campaign?.portal_message || sessionItems[0].portal_message,
+          items: sessionItems,
           branding,
+          trialSessionId,
           aiEnabled: eggAiEnabled && !isPreview,
           aiPreview: eggAiEnabled && isPreview
         });
         return;
       }
 
-      const { data: campaign, error: campaignError } = await supabase
-        .rpc("get_public_qr_campaign", { target_token: token })
-        .maybeSingle();
-
-      if (!campaignError && campaign?.poll_id) {
-        await recordEggAccess(campaign.campaign_id);
+      if (campaign?.poll_id) {
         const { data: campaignPoll } = await supabase
           .rpc("get_public_poll", { target_poll_id: campaign.poll_id })
           .single();
         if (campaignPoll?.allow_organizer_messages !== true && !eggAiEnabled) {
-          navigate(`/vote/${campaign.poll_id}?campaign=${campaign.campaign_id}`, { replace: true });
+          navigate(`/vote/${campaign.poll_id}?campaign=${campaign.campaign_id}&trialSessionId=${trialSessionId}`, { replace: true });
           return;
         }
         if (eggAiEnabled) {
@@ -132,9 +165,11 @@ export default function QrRedirect() {
               campaign_id: campaign.campaign_id,
               item_type: "poll",
               poll_id: campaign.poll_id,
-              poll_question: campaignPoll?.question
+              poll_question: campaignPoll?.question,
+              trial_session_id: trialSessionId
             }],
             branding,
+            trialSessionId,
             aiEnabled: !isPreview,
             aiPreview: isPreview
           });
@@ -142,14 +177,14 @@ export default function QrRedirect() {
         }
       }
 
-      if (!campaignError && campaign && eggAiEnabled) {
-        await recordEggAccess(campaign.campaign_id);
+      if (campaign && eggAiEnabled) {
         setMenu({
           campaignId: campaign.campaign_id,
           portalTitle: null,
           portalMessage: null,
           items: [],
           branding: getPollBranding(null),
+          trialSessionId,
           aiEnabled: !isPreview,
           aiPreview: isPreview
         });
@@ -223,7 +258,7 @@ export default function QrRedirect() {
   }
 
   if (menu) {
-    const { portalTitle, portalMessage, items, branding, aiEnabled } = menu;
+    const { portalTitle, portalMessage, items, branding, aiEnabled, trialSessionId } = menu;
     return (
       <main className="qr-portal" style={{ backgroundColor: branding.accentColor }}>
         <section className="qr-portal-card qr-portal-menu">
@@ -236,6 +271,7 @@ export default function QrRedirect() {
               <EggAiAssistant
                 token={token}
                 campaignId={menu.campaignId}
+                trialSessionId={trialSessionId}
                 branding={branding}
                 preview={menu.aiPreview}
               />

@@ -32,6 +32,19 @@ describe("Egg goal setup", () => {
     expect(markup).toContain("Public reviews must stay optional and cannot be rewarded.");
     expect(markup).not.toContain("admin.goal.");
   });
+  it("places the specific success detail in step 01 with the goal choices", () => {
+    const markup = render();
+    const firstFieldsetStart = markup.indexOf("<fieldset");
+    const firstFieldsetEnd = markup.indexOf("</fieldset>", firstFieldsetStart);
+    const secondFieldsetStart = markup.indexOf("<fieldset", firstFieldsetEnd);
+    const secondFieldsetEnd = markup.indexOf("</fieldset>", secondFieldsetStart);
+    const goalStep = markup.slice(firstFieldsetStart, firstFieldsetEnd);
+    const detailsStep = markup.slice(secondFieldsetStart, secondFieldsetEnd);
+
+    expect(goalStep).toContain("Add a specific goal or success detail (optional)");
+    expect(goalStep).toContain("collect 20 poll responses this month");
+    expect(detailsStep).not.toContain("Add a specific goal or success detail");
+  });
   it("disables the form for viewers", () => {
     expect(render({ canManage: false }).match(/<fieldset disabled=""/g)).toHaveLength(2);
   });

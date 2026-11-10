@@ -5,7 +5,6 @@ import { supabase } from "../lib/supabase";
 import { appendAuditLog, readAuditLog, readPollMeta, savePollMeta, isPollClosed } from "../lib/pollMeta";
 import { createQrCampaign, loadQrCampaigns } from "../lib/qrCampaigns";
 import { buildEggUrl } from "../lib/eggs";
-import godwitMark from "../assets/godwit-mark.svg";
 import DashboardHub from "../components/DashboardHub";
 import EggGoal from "../components/EggGoal";
 import EggResults from "../components/EggResults";
@@ -94,7 +93,8 @@ export default function Admin() {
     businessType: "",
     businessDescription: "",
     role: "owner",
-    plan: "free"
+    plan: "free",
+    trial: null
   });
   const [workspaceUserId, setWorkspaceUserId] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState("viewer");
@@ -1412,8 +1412,15 @@ export default function Admin() {
     const formatConfig = getQrPrintFormatConfig();
     const customText = (design.text || "").trim().replace(/[<>&"']/g, "");
     const campaignName = (campaign?.name || "QR code").replace(/[<>&"']/g, "");
-    const markUrl = new URL(godwitMark, window.location.href).href;
+    const logoUrl = new URL("/godwit-logo.png", window.location.href).href;
     const qrUrl = getCampaignQrImageUrl(url, 600);
+    const returnUrl = window.location.href.replace(/[&<>"']/g, (character) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    })[character]);
 
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
@@ -1427,68 +1434,100 @@ export default function Admin() {
           <title>${t("admin.polls.card.printQr")}</title>
           <style>
             @page { size: ${formatConfig.size}; margin: ${formatConfig.margin}; }
-            body {
-              margin: 0;
-              background: #f5f0e7;
-              font-family: Arial, sans-serif;
-              color: #263b39;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-            .page {
-              width: min(100%, 720px);
-              aspect-ratio: 1;
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              align-items: center;
-              background: linear-gradient(145deg, #f8eee7 0%, #eee8f5 48%, #e8f0ed 100%);
-              border: 1px solid #d5c7a4;
-              border-radius: 28px;
-              padding: 18px;
-              box-sizing: border-box;
-            }
-            .brand { margin-bottom: 12px; color: #344f4b; font-size: 16px; font-weight: 700; letter-spacing: .08em; }
-            .egg { width: min(100%, 4.5in); aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; box-sizing: border-box; padding: 18px; border: 2px solid #c5a75e; border-radius: 49% 49% 46% 46% / 42% 42% 56% 56%; background: linear-gradient(145deg, #f0d7d0 0%, #dcd5ed 48%, #cbded6 100%); box-shadow: inset 0 0 0 8px rgba(255,255,255,.28), 0 18px 38px rgba(52,79,75,.16); }
-            .qr-box { display: grid; width: min(70%, 2.8in); aspect-ratio: 1; place-items: center; box-sizing: border-box; padding: 16px; border: 8px solid #fff; border-radius: 12px; background: #fff; box-shadow: 0 8px 22px rgba(38,59,57,.2); }
+            * { box-sizing: border-box; }
+            body { min-height: 100vh; margin: 0; padding: 24px; background: #edf2f0; color: #284542; font-family: Arial, sans-serif; }
+            .print-toolbar { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 980px; margin: 0 auto 24px; padding: 14px 18px; border: 1px solid #d1ddd8; border-radius: 14px; background: #fff; box-shadow: 0 8px 24px #28454212; }
+            .toolbar-copy { min-width: 0; }
+            .toolbar-copy strong { display: block; font-size: 15px; }
+            .toolbar-copy p { margin: 4px 0 0; color: #5b706b; font-size: 13px; line-height: 1.4; }
+            .toolbar-actions { display: flex; flex: 0 0 auto; gap: 8px; }
+            .toolbar-actions button, .toolbar-actions a { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 0 15px; border: 1px solid #cbd7d1; border-radius: 9px; color: #284542; background: #fff; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; }
+            .toolbar-actions .print-button { border-color: #176f68; color: #fff; background: #176f68; }
+            .toolbar-actions button:disabled { cursor: wait; opacity: .58; }
+            .poster { display: grid; width: min(100%, 720px); aspect-ratio: 1; place-items: center; margin: 0 auto; padding: 30px; border: 1px solid #b99555; border-radius: 28px; background: radial-gradient(ellipse at 82% 100%, #e8c9c0 0%, transparent 44%), radial-gradient(ellipse at 8% 0%, #d5dfe0 0%, transparent 50%), #e9e2dc; box-shadow: 0 18px 50px #28454216; }
+            .egg { position: relative; display: flex; width: min(100%, 510px); aspect-ratio: .88; flex-direction: column; align-items: center; justify-content: center; gap: 9px; overflow: hidden; padding: 24px 30px 28px; border: 2px solid #d2a953; border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%; background: #fff2df; box-shadow: inset 0 0 0 5px #fffaf0; text-align: center; }
+            .egg::before { position: absolute; inset: 9px; border: 1px solid #925141; border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%; content: ""; pointer-events: none; }
+            .poster-logo { z-index: 1; display: block; width: min(32%, 1.3in); height: auto; clip-path: ellipse(49% 48% at 50% 50%); object-fit: contain; }
+            .qr-box { z-index: 1; display: grid; width: min(72%, 2.35in); aspect-ratio: 1; place-items: center; padding: 10px; border: 6px solid #fff; border-radius: 12px; background: #fff; box-shadow: 0 6px 18px #28454220; }
             .qr-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
-            .title { max-width: 340px; font-size: 14px; font-weight: 700; text-align: center; color: #263b39; }
-            .custom-text { max-width: 340px; color: #263b39; font-size: 13px; font-weight: 700; text-align: center; }
-            .subtitle { color: #344f4b; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-align: center; text-transform: uppercase; }
-            .godwit-footer { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 12px; color: #9b7938; font-size: 10px; font-weight: 800; letter-spacing: .13em; }
-            .godwit-footer img { display: block; width: 24px; height: 24px; object-fit: contain; }
-            @media print { body { background: #fff; } .page { width: min(100%, 6in); border: 0; border-radius: 0; box-shadow: none; } .egg { width: min(100%, 4.2in); } }
-            @media (max-width: 520px) { .page { min-height: 100vh; aspect-ratio: auto; padding: 20px 12px; } .egg { aspect-ratio: auto; padding: 24px 16px; } .qr-box { width: min(70%, 270px); padding: 12px; } }
+            .subtitle { z-index: 1; color: #42645e; font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+            .custom-text { z-index: 1; display: -webkit-box; max-width: 350px; overflow: hidden; color: #284542; font-size: 12px; font-weight: 700; line-height: 1.3; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+            .title { z-index: 1; display: -webkit-box; max-width: 350px; overflow: hidden; color: #284542; font-family: Georgia, "Times New Roman", serif; font-size: 16px; font-weight: 700; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+            .website { z-index: 1; margin-top: 1px; color: #725326; font-size: 11px; font-weight: 800; letter-spacing: .14em; }
+            .print-status { min-height: 18px; margin: 10px auto 0; color: #5b706b; font-size: 12px; text-align: center; }
+            .print-status[role="alert"] { color: #a33b32; }
+            @media print {
+              body { min-height: 0; padding: 0; background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+              .print-toolbar, .print-status { display: none !important; }
+              .poster { width: min(100%, 6in); margin: 0 auto; padding: 18px; border-color: transparent; border-radius: 0; box-shadow: none; break-inside: avoid; }
+              .egg { width: min(100%, 4.6in); }
+              .poster-logo { width: min(32%, 1.05in); }
+              .qr-box { width: min(72%, 2.15in); }
+            }
+            @media (max-width: 600px) {
+              body { padding: 12px; }
+              .print-toolbar { align-items: flex-start; flex-direction: column; margin-bottom: 14px; }
+              .toolbar-actions { width: 100%; }
+              .toolbar-actions button, .toolbar-actions a { flex: 1; padding: 0 8px; font-size: 12px; }
+              .poster { padding: 14px; border-radius: 18px; }
+              .egg { aspect-ratio: .72; gap: 8px; padding: 22px 20px 26px; }
+              .poster-logo { width: min(32%, 1in); }
+              .qr-box { width: min(72%, 1.8in); }
+            }
           </style>
         </head>
         <body>
-          <div class="page">
-            <div class="brand">GODWIT EGG</div>
-            <div class="egg">
-              <div class="subtitle">${t("admin.engagement.campaigns.scanToView")}</div>
-              <div class="qr-box"><img src="${qrUrl}" alt="QR code" /></div>
-              ${customText ? `<div class="custom-text">${customText}</div>` : ""}
-              <div class="title">${campaignName}</div>
+          <header class="print-toolbar">
+            <div class="toolbar-copy">
+              <strong>${t("admin.engagement.campaigns.printTitle", { defaultValue: "Print your Egg QR" })}</strong>
+              <p>${t("admin.engagement.campaigns.printerHint", { defaultValue: "Choose Print to open your device's printer dialog, then select a printer or save as PDF." })}</p>
             </div>
-            <div class="godwit-footer">
-              <img src="${markUrl}" alt="" />
-              <span>hellogodwit.com</span>
+            <div class="toolbar-actions">
+              <button id="print-button" class="print-button" type="button" disabled>${t("admin.engagement.campaigns.printAction", { defaultValue: "Choose printer" })}</button>
+              <a href="${returnUrl}">${t("admin.engagement.campaigns.returnToDashboard", { defaultValue: "Back to Godwit" })}</a>
             </div>
-          </div>
+          </header>
+          <main>
+            <div class="poster">
+              <div class="egg">
+                <img id="logo-image" class="poster-logo" src="${logoUrl}" alt="Godwit" />
+                <div class="subtitle">${t("admin.engagement.campaigns.scanToView")}</div>
+                <div class="qr-box"><img id="qr-image" src="${qrUrl}" alt="QR code" /></div>
+                ${customText ? `<div class="custom-text">${customText}</div>` : ""}
+                <div class="title">${campaignName}</div>
+                <div class="website">hellogodwit.com</div>
+              </div>
+            </div>
+          <p id="print-status" class="print-status" role="status">${t("admin.engagement.campaigns.preparingQr", { defaultValue: "Preparing the QR code…" })}</p>
+          </main>
         </body>
       </html>
     `);
 
     printWindow.document.close();
     printWindow.focus();
-    const printImages = Array.from(printWindow.document.images);
-    Promise.all(printImages.map((image) => image.complete
-      ? Promise.resolve()
-      : new Promise((resolve) => {
-          image.onload = resolve;
-          image.onerror = resolve;
-        }))).then(() => printWindow.print());
+    const posterImages = Array.from(printWindow.document.images);
+    const printButton = printWindow.document.getElementById("print-button");
+    const status = printWindow.document.getElementById("print-status");
+    const updateImageReadiness = () => {
+      if (posterImages.some((image) => image.complete && image.naturalWidth === 0)) {
+        printButton.disabled = true;
+        status.setAttribute("role", "alert");
+        status.textContent = t("admin.engagement.campaigns.qrLoadError", { defaultValue: "The poster artwork or QR code could not be loaded. Close this page and try again." });
+      } else if (posterImages.every((image) => image.complete && image.naturalWidth > 0)) {
+        printButton.disabled = false;
+        status.textContent = t("admin.engagement.campaigns.qrReady", { defaultValue: "QR code ready. Choose a printer to print." });
+      }
+    };
+    posterImages.forEach((image) => {
+      image.addEventListener("load", updateImageReadiness, { once: true });
+      image.addEventListener("error", updateImageReadiness, { once: true });
+    });
+    updateImageReadiness();
+    printButton.addEventListener("click", () => {
+      printWindow.focus();
+      printWindow.print();
+    });
   }
 
   if (loading) return <p className="text-center p-6">Loading polls...</p>;
@@ -1647,12 +1686,30 @@ export default function Admin() {
   }
 
   return (
-    <div className="workspace-page egg-workspace max-w-4xl mx-auto p-6">
-      <div className="dashboard-hub-header">
-        <p className="goal-eyebrow">Godwit</p>
-        <h1>{workspaceProfile.companyName}</h1>
-      </div>
-
+    <div className="workspace-page egg-workspace max-w-5xl mx-auto p-6">
+      {workspaceProfile.trial?.state === "active" && (
+        <aside className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <p>
+            <strong>{t("trial.dashboardActive", {
+              used: workspaceProfile.trial.interactions_used,
+              limit: workspaceProfile.trial.interaction_limit,
+              date: new Date(workspaceProfile.trial.ends_at).toLocaleDateString()
+            })}</strong>
+          </p>
+          <Link to="/admin/billing" className="font-semibold underline">{t("trial.billingLink")}</Link>
+        </aside>
+      )}
+      {["expired", "used_up", "inactive"].includes(workspaceProfile.trial?.state) && (
+        <aside className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-950" role="status">
+          <p><strong>{t("trial.dashboardPaused")}</strong> {t("trial.dashboardPausedDetail")}</p>
+          <Link to="/support" className="font-semibold underline">{t("trial.supportLink")}</Link>
+        </aside>
+      )}
+      {workspaceProfile.trial?.state === "unavailable" && (
+        <aside className="mb-5 rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-950" role="alert">
+          {t("trial.statusUnavailable")} {workspaceProfile.trial.error}
+        </aside>
+      )}
       <DashboardHub activeTab={["feedback", "woodpecker", "connection"].includes(activeTab) ? "results" : activeTab} onSelect={setActiveTab} t={t} />
 
       {activeTab === "your-business" && workspaceUserId && <BusinessProfile
@@ -2415,27 +2472,44 @@ export default function Admin() {
               previewUrl.searchParams.set("preview", "1");
               const goalKeys = getCampaignGoalKeys(campaign);
               return (
-                <div key={campaign.id} id={`egg-card-${campaign.id}`} className="egg-location-card gap-3 border border-gray-700 rounded p-3">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-semibold"><span className="egg-type-label">Egg</span> · {campaign.name}</p>
-                      <p className="egg-target">{goalKeys.length
-                        ? goalKeys.map((key) => t(`quickStart.goals.${key}.title`)).join(" · ")
-                        : t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</p>
-                      <p className="text-xs text-gray-400">
-                        {campaign.placement_label || t("admin.engagement.scanner.unlabeledPlacement")}{campaign.variant_label ? ` · ${campaign.variant_label}` : ""} · {campaign.is_active ? t("admin.engagement.campaigns.active") : t("admin.engagement.campaigns.paused")}
+                <article key={campaign.id} id={`egg-card-${campaign.id}`} className="egg-location-card">
+                  <header className="egg-card-header">
+                    <div className="egg-card-identity">
+                      <div className="egg-card-eyebrow">
+                        <span className="egg-type-label">Egg</span>
+                        <span className={`egg-status ${campaign.is_active ? "is-active" : "is-paused"}`}>
+                          <span aria-hidden="true" />
+                          {campaign.is_active ? t("admin.engagement.campaigns.active") : t("admin.engagement.campaigns.paused")}
+                        </span>
+                      </div>
+                      <h3 className="egg-card-title">{campaign.name}</h3>
+                      <p className="egg-card-placement">
+                        {campaign.placement_label || t("admin.engagement.scanner.unlabeledPlacement")}
+                        {campaign.variant_label ? ` · ${campaign.variant_label}` : ""}
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button onClick={() => navigator.clipboard.writeText(url)} className="shrink-0 rounded bg-[#0f766e] px-3 py-2 font-semibold text-[#f8fafc] hover:bg-[#0d6259]">{t("admin.engagement.campaigns.copyLink")}</button>
-                      {canReuseQr && <button onClick={() => beginEditEgg(campaign)} className="egg-edit-trigger shrink-0 rounded border px-3 py-2 font-semibold">{t("admin.engagement.campaigns.editEgg")}</button>}
-                      {permission.canDeletePolls && <button onClick={() => handleDeleteQrCampaign(campaign.id, campaign.name)} className="shrink-0 rounded border border-[#c0392b] bg-white px-3 py-2 font-semibold text-[#c0392b] hover:bg-[#fdeceb]">{t("admin.engagement.campaigns.delete")}</button>}
+                    <div className="egg-card-manage-actions">
+                      <button onClick={() => navigator.clipboard.writeText(url)} className="egg-action egg-action-primary">{t("admin.engagement.campaigns.copyLink")}</button>
+                      {canReuseQr && <button onClick={() => beginEditEgg(campaign)} className="egg-action egg-action-secondary">{t("admin.engagement.campaigns.editEgg")}</button>}
+                      {permission.canDeletePolls && <button onClick={() => handleDeleteQrCampaign(campaign.id, campaign.name)} className="egg-action egg-action-danger">{t("admin.engagement.campaigns.delete")}</button>}
                     </div>
-                  </div>
+                  </header>
 
-                  <div className="egg-access-counts mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs" aria-label="Egg access counts">
-                    <span>{t("admin.engagement.campaigns.qrAccessCount", { count: accessCounts.qr })}</span>
-                    <span>{t("admin.engagement.campaigns.nfcAccessCount", { count: accessCounts.nfc })}</span>
+                  <section className="egg-card-goals" aria-label={t("admin.hub.goal", { defaultValue: "Goal" })}>
+                    <span className="egg-card-section-label">{t("admin.hub.goal", { defaultValue: "Goal" })}</span>
+                    <div className="egg-card-goal-list">
+                      {goalKeys.length
+                        ? goalKeys.map((key) => <span className="egg-target" key={key}>{t(`quickStart.goals.${key}.title`)}</span>)
+                        : <span className="egg-card-no-goal">{t("admin.eggResults.noGoal", { defaultValue: "No target set" })}</span>}
+                    </div>
+                  </section>
+
+                  <div
+                    className="egg-card-stats"
+                    aria-label={`${t("admin.engagement.campaigns.qrAccessCount", { count: accessCounts.qr })}; ${t("admin.engagement.campaigns.nfcAccessCount", { count: accessCounts.nfc })}`}
+                  >
+                    <div><span>QR</span><strong>{accessCounts.qr}</strong><small>{t("admin.engagement.campaigns.qrAccessLabel", { defaultValue: "Scans" })}</small></div>
+                    <div><span>NFC</span><strong>{accessCounts.nfc}</strong><small>{t("admin.engagement.campaigns.nfcAccessLabel", { defaultValue: "Taps" })}</small></div>
                   </div>
 
                   {editingEggId === campaign.id && (
@@ -2480,31 +2554,31 @@ export default function Admin() {
 
 
 
-                  <div className="mt-2 flex items-center gap-3">
+                  <section className="egg-card-share">
                     <img
-                      src={getCampaignQrImageUrl(url, 120)}
+                      src={getCampaignQrImageUrl(url, 160)}
                       alt={t("admin.engagement.campaigns.qrAlt", { name: campaign.name })}
-                      className="h-16 w-16 rounded border border-slate-700 bg-white p-1"
+                      className="egg-card-qr"
                     />
-                    <div className="flex flex-wrap gap-2">
-                      <EggNfcSetup url={nfcUrl} t={t} />
-                      <button
-                        onClick={() => window.open(previewUrl.toString(), "_blank", "noopener,noreferrer")}
-                        className="bg-violet-600 text-white px-3 py-1.5 rounded text-sm font-semibold"
-                      >
-                        {t("admin.engagement.campaigns.viewVisitorExperience")}
-                      </button>
-                      <button onClick={() => downloadCampaignQr(campaign, url)} className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-semibold">
-                        {t("admin.polls.card.downloadQr")}
-                      </button>
-                      <button onClick={() => printCampaignQr(campaign, url)} className="bg-violet-600 text-white px-3 py-1.5 rounded text-sm font-semibold">
-                        {t("admin.polls.card.printQr")}
-                      </button>
-                      <button onClick={() => openQrModifier(campaign, url)} className="bg-fuchsia-600 text-white px-3 py-1.5 rounded text-sm font-semibold">
-                        {t("admin.polls.card.modifyQr")}
-                      </button>
+                    <div className="egg-card-share-content">
+                      <div>
+                        <h4>{t("admin.engagement.campaigns.shareTitle", { defaultValue: "Share your Egg" })}</h4>
+                        <p>{t("admin.engagement.campaigns.shareHint", { defaultValue: "Preview the customer experience or prepare your QR and NFC access." })}</p>
+                      </div>
+                      <div className="egg-card-share-actions">
+                        <button
+                          onClick={() => window.open(previewUrl.toString(), "_blank", "noopener,noreferrer")}
+                          className="egg-action egg-action-primary"
+                        >
+                          {t("admin.engagement.campaigns.viewVisitorExperience")}
+                        </button>
+                        <EggNfcSetup url={nfcUrl} t={t} />
+                        <button onClick={() => downloadCampaignQr(campaign, url)} className="egg-action egg-action-secondary">{t("admin.polls.card.downloadQr")}</button>
+                        <button onClick={() => printCampaignQr(campaign, url)} className="egg-action egg-action-secondary">{t("admin.polls.card.printQr")}</button>
+                        <button onClick={() => openQrModifier(campaign, url)} className="egg-action egg-action-secondary">{t("admin.polls.card.modifyQr")}</button>
+                      </div>
                     </div>
-                  </div>
+                  </section>
 
                   {(() => {
                     const items = itemsForCampaign(campaign.id);
@@ -2517,32 +2591,32 @@ export default function Admin() {
                       return null;
                     }
                     return (
-                      <div className="mt-2 flex flex-wrap gap-1.5">
+                      <div className="egg-card-content-summary">
                         {pollCount > 0 && (
-                          <span className="rounded-full bg-blue-950/60 border border-blue-800 px-2.5 py-0.5 text-xs font-semibold text-blue-300">
-                            📊 {pollCount} {pollCount === 1 ? t("admin.engagement.campaigns.summaryPoll") : t("admin.engagement.campaigns.summaryPollPlural")}
+                          <span className="egg-content-pill">
+                            {pollCount} {pollCount === 1 ? t("admin.engagement.campaigns.summaryPoll") : t("admin.engagement.campaigns.summaryPollPlural")}
                           </span>
                         )}
                         {infoCount > 0 && (
-                          <span className="rounded-full bg-slate-800 border border-slate-600 px-2.5 py-0.5 text-xs font-semibold text-slate-300">
-                            📄 {infoCount} {infoCount === 1 ? t("admin.engagement.campaigns.summaryInfoCard") : t("admin.engagement.campaigns.summaryInfoCardPlural")}
+                          <span className="egg-content-pill">
+                            {infoCount} {infoCount === 1 ? t("admin.engagement.campaigns.summaryInfoCard") : t("admin.engagement.campaigns.summaryInfoCardPlural")}
                           </span>
                         )}
                         {hasDonation && (
-                          <span className="rounded-full bg-amber-950/60 border border-amber-700 px-2.5 py-0.5 text-xs font-semibold text-amber-300">
-                            💛 {t("admin.engagement.campaigns.summaryDonation")}
+                          <span className="egg-content-pill">
+                            {t("admin.engagement.campaigns.summaryDonation")}
                           </span>
                         )}
                         {rewardCount > 0 && (
-                          <span className="rounded-full bg-fuchsia-950/60 border border-fuchsia-700 px-2.5 py-0.5 text-xs font-semibold text-fuchsia-300">
-                            🎁 {rewardCount} {rewardCount === 1 ? t("admin.engagement.campaigns.summaryReward") : t("admin.engagement.campaigns.summaryRewardPlural")}
+                          <span className="egg-content-pill">
+                            {rewardCount} {rewardCount === 1 ? t("admin.engagement.campaigns.summaryReward") : t("admin.engagement.campaigns.summaryRewardPlural")}
                           </span>
                         )}
                       </div>
                     );
                   })()}
 
-                  {false && <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {false && <div className="egg-card-content-summary">
                     <label className="text-xs text-slate-400">{t("admin.engagement.campaigns.changePoll")}</label>
                     <select
                       value={campaign.poll_id ? String(campaign.poll_id) : ""}
@@ -2555,7 +2629,7 @@ export default function Admin() {
                   </div>}
 
 
-                </div>
+                </article>
               );
             })}
           </div>

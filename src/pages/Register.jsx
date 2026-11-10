@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { getLoginReturnPath } from "../lib/startGuide";
+import { useTranslation } from "react-i18next";
 
 export default function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const returnPath = getLoginReturnPath(location.state?.returnTo);
@@ -38,7 +40,11 @@ export default function Register() {
 
   return (
     <div className="app-page auth-page max-w-md mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center">Create your workspace</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Create your Godwit account</h1>
+      <section className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+        <h2 className="font-bold">{t("trial.signupTitle")}</h2>
+        <p className="mt-1 leading-6">{t("trial.signupBody")}</p>
+      </section>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
       {message && <p className="text-green-600 mb-4">{message}</p>}
@@ -72,10 +78,10 @@ export default function Register() {
           type="submit"
           className="auth-primary"
         >
-          Create workspace
+          Create account
         </button>
       </form>
-      <p className="auth-footer"><Link to="/login" state={{ returnTo: returnPath }}>Sign in to your workspace</Link></p>
+      <p className="auth-footer"><Link to="/login" state={{ returnTo: returnPath }}>Already have an account? Sign in</Link></p>
     </div>
   );
 }

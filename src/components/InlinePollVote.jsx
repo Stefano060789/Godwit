@@ -23,6 +23,7 @@ export default function InlinePollVote({ item, branding }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [duplicate, setDuplicate] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const pageOpenedAtRef = useRef(Date.now());
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function InlinePollVote({ item, branding }) {
     if (answersToSubmit.length === 0 || submitting || Date.now() - pageOpenedAtRef.current < 800) return;
 
     setSubmitting(true);
+    setSubmitError("");
     const {
       data: { user }
     } = await supabase.auth.getUser();
@@ -71,7 +73,8 @@ export default function InlinePollVote({ item, branding }) {
       poll_id: item.poll_id,
       answer,
       user_id: user?.id || null,
-      campaign_id: item.campaign_id || null
+      campaign_id: item.campaign_id || null,
+      trial_session_id: item.trial_session_id || null
     }));
 
     const { error } = await supabase.from("votes").insert(rows);
@@ -84,6 +87,11 @@ export default function InlinePollVote({ item, branding }) {
         return;
       }
       console.error(error);
+      setSubmitError(
+        /trial|egg session/i.test(error.message || "")
+          ? t("vote.trialPaused", { defaultValue: "This Egg is no longer accepting new responses. Please contact the business directly." })
+          : t("vote.submitError", { defaultValue: "Your response could not be submitted. Please try again." })
+      );
       return;
     }
 
@@ -160,8 +168,9 @@ export default function InlinePollVote({ item, branding }) {
       >
         {submitting ? "Submitting…" : "Submit"}
       </button>
+      {submitError && <p className="qr-portal-poll-error" role="alert">{submitError}</p>}
       {hasOptionalPollExtras(poll) && (
-        <Link to={`/vote/${item.poll_id}?campaign=${item.campaign_id}`} className="qr-portal-poll-more">
+        <Link to={`/vote/${item.poll_id}?campaign=${item.campaign_id}&trialSessionId=${item.trial_session_id || ""}`} className="qr-portal-poll-more">
           {t("vote.moreWaysToRespond", { defaultValue: "Optional ways to respond" })} →
         </Link>
       )}
