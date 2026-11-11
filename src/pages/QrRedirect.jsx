@@ -13,6 +13,7 @@ import { getEggTrialSessionId } from "../lib/eggTrial";
 import { useTranslation } from "react-i18next";
 import VisitorPreviewBar from "../components/VisitorPreviewBar";
 import IssueReportForm from "../components/IssueReportForm";
+import { recordEggPromotionLinkClick } from "../lib/goalProgress";
 
 export default function QrRedirect() {
   return <>
@@ -291,6 +292,11 @@ function QrRedirectContent() {
 
   if (menu) {
     const { portalTitle, portalMessage, items, branding, aiEnabled, trialSessionId } = menu;
+    const trackPromotionClick = (itemId) => {
+      if (isPreview || !menu.campaignId || !trialSessionId) return;
+      void recordEggPromotionLinkClick(menu.campaignId, itemId, trialSessionId)
+        .catch((failure) => console.error("Unable to record promotion link click:", failure));
+    };
     return (
       <main className="qr-portal" style={{ backgroundColor: branding.accentColor }}>
         <section className="qr-portal-card qr-portal-menu">
@@ -336,6 +342,7 @@ function QrRedirectContent() {
                         href={item.link_url}
                         target="_blank"
                         rel="noreferrer"
+                        onClick={() => trackPromotionClick(item.item_id)}
                         className="qr-portal-menu-item-cta"
                         style={{ color: branding.primaryColor }}
                       >
@@ -366,6 +373,7 @@ function QrRedirectContent() {
                       href={item.link_url}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() => trackPromotionClick(item.item_id)}
                       className="qr-portal-menu-item-cta"
                       style={{ color: branding.primaryColor }}
                     >

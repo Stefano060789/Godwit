@@ -4,9 +4,12 @@ import { getCampaignGoalKeys } from "../lib/startGuide";
 
 const DAY_COUNT = 30;
 const GOAL_MEASURES = [
+  { metric: "help_interactions", goals: ["help-and-guide", "information", "answers", "next-step"] },
   { metric: "responses", goals: ["feedback", "preferences", "satisfaction", "event-interest"] },
   { metric: "contacts", goals: ["contacts"] },
-  { metric: "issues", goals: ["issue-reporting"] }
+  { metric: "private_reviews", goals: ["reviews"] },
+  { metric: "issues", goals: ["issue-reporting"] },
+  { metric: "promotion_clicks", goals: ["promotion"] }
 ];
 
 function createTimeline(now) {
@@ -185,7 +188,8 @@ export default function GoalProgress({ campaigns, t }) {
         <p>{t("admin.goalProgress.untrackedNote", { defaultValue: "Godwit does not yet track the outcome for these goals, so no estimated value is shown." })}</p>
         <ul>{progress.untrackedGoals.map((key) => <li key={key}>{t(`quickStart.goals.${key}.title`)}</li>)}</ul>
       </aside>}
-      <p className="goal-progress-footnote">{t("admin.goalProgress.metricNote", { defaultValue: "Poll responses, consented email sign-ups, and issue reports are counted from recorded activity. Goals without that data are shown separately." })}</p>
+      {progress.untrackedGoals.includes("return-visits") && <p className="goal-progress-footnote">{t("admin.goalProgress.repeatVisitNote", { defaultValue: "Repeat visits are not measured because Godwit does not identify returning visitors across separate sessions." })}</p>}
+      <p className="goal-progress-footnote">{t("admin.goalProgress.metricNote", { defaultValue: "Egg interactions, poll responses, opted-in email contacts, private feedback submitted through Godwit, promotion link clicks, and issue reports are counted from recorded activity. Link clicks do not confirm a purchase, booking, or public review." })}</p>
     </>}
   </section>;
 }

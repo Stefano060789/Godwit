@@ -6,6 +6,15 @@
     "title": "Ti serve una mano?",
     "description": "Fai una domanda o scegli un suggerimento.",
     "privacyHint": "Il tuo messaggio ci aiuta a rispondere. Non condividere dati personali sensibili.",
+    "reviewTitle": "Lascia un feedback privato all'attività",
+    "reviewDescription": "Il feedback viene salvato in Godwit per l'attività e non viene pubblicato. Evita di condividere dati personali o sensibili.",
+    "reviewLabel": "Il tuo feedback",
+    "reviewPlaceholder": "Racconta all'attività la tua esperienza (10–1200 caratteri).",
+    "reviewSubmit": "Invia feedback privato",
+    "reviewSubmitting": "Invio…",
+    "reviewSubmitted": "Grazie. Il feedback è stato inviato all'attività.",
+    "reviewAlreadySubmitted": "Hai già inviato un feedback durante questa visita.",
+    "reviewError": "Impossibile inviare il feedback. Riprova.",
     "you": "Tu",
     "assistant": "Assistente",
     "questionLabel": "Fai una domanda",
@@ -132,6 +141,7 @@
     "goalGroups": {
       "help": "Aiutare i clienti",
       "listen": "Ascoltare e migliorare",
+      "report": "Segnalare un problema",
       "growth": "Promuovere e favorire il ritorno",
       "customer-connection": "Relazioni con i clienti"
     },
@@ -535,9 +545,12 @@
       "outcomesTitle": "Risultati degli obiettivi",
       "legend": "Legenda del grafico",
       "series": {
+        "help_interactions": "Interazioni con Egg",
         "responses": "Risposte ai sondaggi",
         "contacts": "Nuovi contatti consenzienti",
-        "issues": "Segnalazioni di problemi"
+        "private_reviews": "Feedback privati inviati",
+        "issues": "Segnalazioni di problemi",
+        "promotion_clicks": "Clic sui link promozionali"
       },
       "metrics": {
         "interactions": "Aperture degli Egg",
@@ -547,7 +560,8 @@
       },
       "period": "Ultimi 30 giorni",
       "chartLabel": "Risultati degli obiettivi registrati negli ultimi 30 giorni",
-      "metricNote": "Risposte ai sondaggi, iscrizioni email con consenso e segnalazioni di problemi sono conteggiate dai dati registrati. Gli obiettivi senza questi dati sono mostrati separatamente.",
+      "metricNote": "I conteggi derivano da interazioni registrate con Egg, risposte ai sondaggi, contatti email consenzienti, feedback privati inviati tramite Godwit, segnalazioni e clic sui link promozionali. I clic non confermano un acquisto, una prenotazione o una recensione pubblica.",
+      "repeatVisitNote": "Le visite ripetute non sono misurate perché Godwit non riconosce i visitatori tra sessioni separate.",
       "untrackedTitle": "Gli altri obiettivi non sono ancora misurati qui",
       "untrackedNote": "Godwit non registra ancora il risultato di questi obiettivi, quindi non mostra valori stimati.",
       "noTrackedOutcomes": "Non ci sono ancora risultati registrati per questi obiettivi Egg.",

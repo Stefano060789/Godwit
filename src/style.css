@@ -959,6 +959,33 @@ textarea {
   justify-content: flex-end;
 }
 
+.qr-portal-ai-review-form {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid var(--control-line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.qr-portal-ai-review-form h3 {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.qr-portal-ai-review-form p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.qr-portal-ai-review-form > div {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .qr-portal-ai-input {
   width: 100%;
   min-height: 42px;

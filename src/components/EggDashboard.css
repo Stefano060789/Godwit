@@ -134,9 +134,12 @@
 .goal-progress-outcome p { color: var(--hub-muted); font-size: .75rem; font-weight: 650; }
 .goal-progress-outcome small { display: block; min-height: 2.2em; margin-top: .2rem; color: var(--hub-muted); font-size: .68rem; line-height: 1.4; }
 .goal-progress-outcome strong { display: block; margin-top: .15rem; color: var(--hub-ink); font-size: 1.45rem; }
-.goal-progress-color-responses { --goal-progress-color: #287c91; }
+.goal-progress-color-help_interactions { --goal-progress-color: #287c91; }
+.goal-progress-color-responses { --goal-progress-color: #497c47; }
 .goal-progress-color-contacts { --goal-progress-color: #986500; }
+.goal-progress-color-private_reviews { --goal-progress-color: #8056a5; }
 .goal-progress-color-issues { --goal-progress-color: #b9473d; }
+.goal-progress-color-promotion_clicks { --goal-progress-color: #2478a5; }
 .goal-progress-line { fill: none; stroke: var(--goal-progress-color); stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; }
 .goal-progress-chart-scroll { overflow-x: auto; }
 .goal-progress-chart { display: block; width: 100%; min-width: 540px; height: auto; }

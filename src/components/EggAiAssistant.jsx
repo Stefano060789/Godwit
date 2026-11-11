@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import InlinePollVote from "./InlinePollVote";
 import { supabase } from "../lib/supabase";
+import { submitEggReviewFeedback } from "../lib/goalProgress";
 
 const GOAL_PROMPTS = {
   "help-and-guide": ["askQuestion", "findNextStep"],
@@ -64,6 +65,10 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
   const [feedbackTopics, setFeedbackTopics] = useState([]);
   const [goalKeys, setGoalKeys] = useState([]);
   const [input, setInput] = useState("");
+  const [reviewFeedback, setReviewFeedback] = useState("");
+  const [reviewStatus, setReviewStatus] = useState("");
+  const [reviewError, setReviewError] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
   const [sessionId] = useState(createSessionId);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
@@ -150,6 +155,25 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
     void sendMessage(input);
   }
 
+  async function handleReviewSubmit(event) {
+    event.preventDefault();
+    const feedback = reviewFeedback.trim();
+    if (feedback.length < 10 || feedback.length > 1200 || submittingReview) return;
+    setSubmittingReview(true);
+    setReviewError("");
+    setReviewStatus("");
+    try {
+      const submitted = await submitEggReviewFeedback(campaignId, trialSessionId, feedback);
+      setReviewStatus(submitted ? "submitted" : "alreadySubmitted");
+      setReviewFeedback("");
+    } catch (failure) {
+      console.error("Unable to submit visitor review feedback:", failure);
+      setReviewError(failure.message || t("reviewError"));
+    } finally {
+      setSubmittingReview(false);
+    }
+  }
+
   function getSuggestionHref(suggestion) {
     return `#egg-option-${encodeURIComponent(suggestion.id)}`;
   }
@@ -206,6 +230,35 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
               </div>
             ))}
           </div>
+          {goalKeys.includes("reviews") && !preview && (
+            <form onSubmit={handleReviewSubmit} className="qr-portal-ai-review-form">
+              <h3>{t("reviewTitle")}</h3>
+              <p>{t("reviewDescription")}</p>
+              <label className="sr-only" htmlFor="egg-ai-review">{t("reviewLabel")}</label>
+              <textarea
+                id="egg-ai-review"
+                rows={3}
+                minLength={10}
+                maxLength={1200}
+                value={reviewFeedback}
+                onChange={(event) => setReviewFeedback(event.target.value)}
+                placeholder={t("reviewPlaceholder")}
+                className="qr-portal-ai-input"
+                disabled={submittingReview || reviewStatus === "submitted" || reviewStatus === "alreadySubmitted"}
+              />
+              <div>
+                <button
+                  type="submit"
+                  disabled={submittingReview || reviewFeedback.trim().length < 10 || reviewStatus === "submitted" || reviewStatus === "alreadySubmitted"}
+                  className="qr-portal-ai-submit"
+                >
+                  {submittingReview ? t("reviewSubmitting") : t("reviewSubmit")}
+                </button>
+              </div>
+              {reviewStatus && <p role="status" className="qr-portal-ai-status">{t(`review${reviewStatus === "submitted" ? "Submitted" : "AlreadySubmitted"}`)}</p>}
+              {reviewError && <p role="alert" className="qr-portal-ai-error">{reviewError}</p>}
+            </form>
+          )}
           {messages.length === 0 && guidedPrompts.length > 0 && (
             <div className="qr-portal-ai-prompts">
               <p>{t("guidedPromptLabel")}</p>

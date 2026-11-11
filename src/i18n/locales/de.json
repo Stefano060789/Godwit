@@ -6,6 +6,15 @@
     "title": "Wie können wir helfen?",
     "description": "Stellen Sie eine Frage oder wählen Sie einen Vorschlag.",
     "privacyHint": "Ihre Nachricht hilft uns bei der Antwort. Bitte teilen Sie keine sensiblen persönlichen Daten.",
+    "reviewTitle": "Privates Feedback für das Unternehmen hinterlassen",
+    "reviewDescription": "Dieses Feedback wird in Godwit für das Unternehmen gespeichert und nicht öffentlich veröffentlicht. Bitte teilen Sie keine persönlichen oder sensiblen Daten.",
+    "reviewLabel": "Ihr Feedback",
+    "reviewPlaceholder": "Teilen Sie Ihre Erfahrung mit dem Unternehmen (10–1200 Zeichen).",
+    "reviewSubmit": "Privates Feedback senden",
+    "reviewSubmitting": "Wird gesendet…",
+    "reviewSubmitted": "Vielen Dank. Ihr Feedback wurde an das Unternehmen gesendet.",
+    "reviewAlreadySubmitted": "Von diesem Besuch wurde bereits Feedback gesendet.",
+    "reviewError": "Ihr Feedback konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
     "you": "Sie",
     "assistant": "Assistent",
     "questionLabel": "Eine Frage stellen",
@@ -132,6 +141,7 @@
     "goalGroups": {
       "help": "Kunden helfen",
       "listen": "Zuhören und verbessern",
+      "report": "Problem melden",
       "growth": "Angebote teilen und Wiederbesuche fördern",
       "customer-connection": "Kundenkontakte"
     },
@@ -535,9 +545,12 @@
       "outcomesTitle": "Zielergebnisse",
       "legend": "Diagrammlegende",
       "series": {
+        "help_interactions": "Egg-Interaktionen",
         "responses": "Umfrageantworten",
         "contacts": "Neue Kontakte mit Einwilligung",
-        "issues": "Problemmeldungen"
+        "private_reviews": "Privates Feedback eingereicht",
+        "issues": "Problemmeldungen",
+        "promotion_clicks": "Klicks auf Angebotslinks"
       },
       "metrics": {
         "interactions": "Egg-Aufrufe",
@@ -547,7 +560,8 @@
       },
       "period": "Letzte 30 Tage",
       "chartLabel": "Erfasste Zielergebnisse der letzten 30 Tage",
-      "metricNote": "Umfrageantworten, E-Mail-Anmeldungen mit Einwilligung und Problemmeldungen werden anhand gespeicherter Aktivitäten gezählt. Ziele ohne diese Daten werden separat angezeigt.",
+      "metricNote": "Gezählt werden aufgezeichnete Egg-Interaktionen, Umfrageantworten, E-Mail-Kontakte mit Einwilligung, privates Feedback in Godwit, Problemmeldungen und Klicks auf Angebotslinks. Klicks bestätigen weder einen Kauf noch eine Buchung oder öffentliche Bewertung.",
+      "repeatVisitNote": "Wiederbesuche werden nicht gemessen, da Godwit Besucher nicht über getrennte Sitzungen hinweg wiedererkennt.",
       "untrackedTitle": "Andere Ziele werden hier noch nicht gemessen",
       "untrackedNote": "Godwit erfasst das Ergebnis dieser Ziele noch nicht und zeigt deshalb keinen geschätzten Wert an.",
       "noTrackedOutcomes": "Für diese Egg-Ziele gibt es noch keine erfassten Ergebnisse.",

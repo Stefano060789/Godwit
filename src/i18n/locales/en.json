@@ -72,6 +72,15 @@
     "title": "Need a hand?",
     "description": "Ask a question or choose a suggestion.",
     "privacyHint": "Your message helps us answer. Please don't share sensitive personal details.",
+    "reviewTitle": "Leave private feedback for the business",
+    "reviewDescription": "This is saved in Godwit for the business and is not posted publicly. Please avoid personal or sensitive information.",
+    "reviewLabel": "Your feedback",
+    "reviewPlaceholder": "Tell the business about your experience (10–1200 characters).",
+    "reviewSubmit": "Send private feedback",
+    "reviewSubmitting": "Sending…",
+    "reviewSubmitted": "Thank you. Your feedback was sent to the business.",
+    "reviewAlreadySubmitted": "Feedback has already been sent from this visit.",
+    "reviewError": "Your feedback could not be sent. Please try again.",
     "you": "You",
     "assistant": "Assistant",
     "questionLabel": "Ask a question",
@@ -172,6 +181,7 @@
     "goalGroups": {
       "help": "Help customers",
       "listen": "Listen and improve",
+      "report": "Report an issue",
       "growth": "Promote and encourage return visits",
       "customer-connection": "Customer connections"
     },
@@ -615,9 +625,12 @@
       "outcomesTitle": "Goal outcomes",
       "legend": "Chart legend",
       "series": {
+        "help_interactions": "Egg interactions",
         "responses": "Poll responses",
         "contacts": "New opted-in contacts",
-        "issues": "Issue reports"
+        "private_reviews": "Private feedback submitted",
+        "issues": "Issue reports",
+        "promotion_clicks": "Promotion link clicks"
       },
       "metrics": {
         "interactions": "Egg opens",
@@ -627,7 +640,8 @@
       },
       "period": "Last 30 days",
       "chartLabel": "Tracked goal outcomes over the last 30 days",
-      "metricNote": "Poll responses, consented email sign-ups, and issue reports are counted from recorded activity. Goals without that data are shown separately.",
+      "metricNote": "Counts come from recorded Egg interactions, poll responses, opted-in email contacts, private feedback submitted through Godwit, issue reports, and promotion link clicks. Clicks do not confirm a purchase, booking, or public review.",
+      "repeatVisitNote": "Repeat visits are not measured because Godwit does not identify returning visitors across separate sessions.",
       "untrackedTitle": "Other goals are not measured here yet",
       "untrackedNote": "Godwit does not yet track the outcome for these goals, so no estimated value is shown.",
       "noTrackedOutcomes": "There are no tracked outcomes for these Egg goals yet.",

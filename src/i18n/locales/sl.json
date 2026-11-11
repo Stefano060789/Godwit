@@ -6,6 +6,15 @@
     "title": "Kako ti lahko pomagamo?",
     "description": "Zastavi vprašanje ali izberi predlog.",
     "privacyHint": "Tvoje sporočilo nam pomaga pri odgovoru. Ne deli občutljivih osebnih podatkov.",
+    "reviewTitle": "Podaj zasebno mnenje podjetju",
+    "reviewDescription": "Mnenje se shrani v Godwitu za podjetje in ni javno objavljeno. Ne deli osebnih ali občutljivih podatkov.",
+    "reviewLabel": "Tvoje mnenje",
+    "reviewPlaceholder": "Opiši svojo izkušnjo podjetju (10–1200 znakov).",
+    "reviewSubmit": "Pošlji zasebno mnenje",
+    "reviewSubmitting": "Pošiljanje …",
+    "reviewSubmitted": "Hvala. Mnenje je bilo poslano podjetju.",
+    "reviewAlreadySubmitted": "Mnenje je bilo med tem obiskom že poslano.",
+    "reviewError": "Mnenja ni bilo mogoče poslati. Poskusi znova.",
     "you": "Ti",
     "assistant": "Pomočnik",
     "questionLabel": "Zastavi vprašanje",
@@ -215,6 +224,7 @@
     "goalGroups": {
       "help": "Pomagati strankam",
       "listen": "Prisluhniti in izboljšati",
+      "report": "Prijaviti težavo",
       "growth": "Promocija in ponovni obiski",
       "customer-connection": "Povezovanje s strankami"
     },
@@ -432,9 +442,12 @@
       "outcomesTitle": "Rezultati ciljev",
       "legend": "Legenda grafikona",
       "series": {
+        "help_interactions": "Interakcije z Eggom",
         "responses": "Odgovori na ankete",
         "contacts": "Novi stiki s privolitvijo",
-        "issues": "Prijave težav"
+        "private_reviews": "Poslana zasebna mnenja",
+        "issues": "Prijave težav",
+        "promotion_clicks": "Kliki na promocijske povezave"
       },
       "metrics": {
         "interactions": "Odprti Eggi",
@@ -444,7 +457,8 @@
       },
       "period": "Zadnjih 30 dni",
       "chartLabel": "Zabeleženi rezultati ciljev v zadnjih 30 dneh",
-      "metricNote": "Odgovori na ankete, prijave na e-pošto s privolitvijo in prijave težav so prešteti na podlagi zabeleženih dejavnosti. Cilji brez teh podatkov so prikazani ločeno.",
+      "metricNote": "Število temelji na zabeleženih interakcijah z Eggom, odgovorih na ankete, stikih z e-poštnim soglasjem, zasebnih mnenjih, poslanih prek Godwita, prijavah težav in klikih na promocijske povezave. Kliki ne potrjujejo nakupa, rezervacije ali javne ocene.",
+      "repeatVisitNote": "Ponovni obiski niso merjeni, ker Godwit obiskovalcev ne prepoznava med ločenimi sejami.",
       "untrackedTitle": "Drugi cilji tukaj še niso merjeni",
       "untrackedNote": "Godwit rezultatov teh ciljev še ne beleži, zato ne prikazuje ocenjenih vrednosti.",
       "noTrackedOutcomes": "Za te cilje Eggov še ni zabeleženih rezultatov.",

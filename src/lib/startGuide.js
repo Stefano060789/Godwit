@@ -6,7 +6,7 @@ export const START_GOALS = [
   { key: "feedback", group: "listen", tab: "goal", action: "egg" },
   { key: "preferences", group: "listen", tab: "goal", action: "egg" },
   { key: "satisfaction", group: "listen", tab: "goal", action: "egg" },
-  { key: "issue-reporting", group: "listen", tab: "goal", action: "egg" },
+  { key: "issue-reporting", group: "report", tab: "goal", action: "egg" },
   { key: "promotion", group: "growth", tab: "goal", action: "egg" },
   { key: "event-interest", group: "growth", tab: "goal", action: "egg" },
   { key: "return-visits", group: "growth", tab: "goal", action: "egg" },
@@ -14,7 +14,7 @@ export const START_GOALS = [
   { key: "reviews", group: "customer-connection", tab: "goal", action: "egg", feature: "publicReviewLinks" }
 ];
 
-export const START_GOAL_GROUPS = ["help", "listen", "growth", "customer-connection"];
+export const START_GOAL_GROUPS = ["help", "listen", "report", "growth", "customer-connection"];
 const LEGACY_GOAL_ALIASES = new Map([
   ["answers", "help-and-guide"],
   ["next-step", "help-and-guide"]
