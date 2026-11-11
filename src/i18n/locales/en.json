@@ -609,9 +609,16 @@
     },
     "goalProgress": {
       "title": "See how your Eggs are performing",
-      "intro": "Follow customer interactions and outcomes over the last 30 days.",
+      "intro": "See measurable outcomes related to your Egg goals over the last 30 days.",
       "allEggs": "All Eggs",
       "measure": "Measure",
+      "outcomesTitle": "Goal outcomes",
+      "legend": "Chart legend",
+      "series": {
+        "responses": "Poll responses",
+        "contacts": "New opted-in contacts",
+        "issues": "Issue reports"
+      },
       "metrics": {
         "interactions": "Egg opens",
         "responses": "Poll responses",
@@ -619,8 +626,11 @@
         "messages": "Private messages"
       },
       "period": "Last 30 days",
-      "chartLabel": "{{count}} {{metric}} over the last 30 days",
-      "metricNote": "Egg opens include QR or NFC visits; responses are poll responses; contacts are consented email sign-ups; messages are private customer messages.",
+      "chartLabel": "Tracked goal outcomes over the last 30 days",
+      "metricNote": "Poll responses, consented email sign-ups, and issue reports are counted from recorded activity. Goals without that data are shown separately.",
+      "untrackedTitle": "Other goals are not measured here yet",
+      "untrackedNote": "Godwit does not yet track the outcome for these goals, so no estimated value is shown.",
+      "noTrackedOutcomes": "There are no tracked outcomes for these Egg goals yet.",
       "loadError": "Progress data could not be loaded. Please try again later.",
       "emptyEggs": "Create an Egg to start tracking progress."
     },

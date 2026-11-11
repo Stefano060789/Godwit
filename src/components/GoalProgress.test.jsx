@@ -1,5 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { buildDailyGoalProgress } from "./GoalProgress";
+import { buildDailyGoalProgress, buildGoalProgressSeries } from "./GoalProgress";
+import de from "../i18n/locales/de.json";
+import en from "../i18n/locales/en.json";
+import itLocale from "../i18n/locales/it.json";
+import sl from "../i18n/locales/sl.json";
+
+const locales = { en, de, it: itLocale, sl };
+const progressCopy = [
+  "intro",
+  "outcomesTitle",
+  "legend",
+  "period",
+  "chartLabel",
+  "metricNote",
+  "untrackedTitle",
+  "untrackedNote",
+  "noTrackedOutcomes",
+  "loadError",
+  "emptyEggs"
+];
 
 describe("goal progress timeline", () => {
   it("fills a 30-day timeline and aggregates the selected metric and Egg", () => {
@@ -23,5 +42,47 @@ describe("goal progress timeline", () => {
     ], "all", "contacts", new Date("2026-11-10T12:00:00Z"));
 
     expect(days.at(-1).count).toBe(3);
+  });
+
+  it("shows color-series only for measurable goals and keeps each Egg's events in scope", () => {
+    const campaigns = [
+      { id: 7, goal_keys: ["feedback", "contacts", "promotion"] },
+      { id: 8, goal_keys: ["issue-reporting", "reviews"] }
+    ];
+    const records = [
+      { campaign_id: 7, activity_date: "2026-11-09", metric: "responses", event_count: 4 },
+      { campaign_id: 7, activity_date: "2026-11-09", metric: "contacts", event_count: 2 },
+      { campaign_id: 8, activity_date: "2026-11-09", metric: "issues", event_count: 3 },
+      { campaign_id: 8, activity_date: "2026-11-09", metric: "responses", event_count: 9 }
+    ];
+
+    const all = buildGoalProgressSeries(records, campaigns, "all", new Date("2026-11-10T12:00:00Z"));
+    expect(all.series.map(({ metric, total }) => [metric, total])).toEqual([
+      ["responses", 4],
+      ["contacts", 2],
+      ["issues", 3]
+    ]);
+    expect(all.untrackedGoals).toEqual(["promotion", "reviews"]);
+
+    const oneEgg = buildGoalProgressSeries(records, campaigns, "7", new Date("2026-11-10T12:00:00Z"));
+    expect(oneEgg.series.map(({ metric, total }) => [metric, total])).toEqual([
+      ["responses", 4],
+      ["contacts", 2]
+    ]);
+    expect(oneEgg.untrackedGoals).toEqual(["promotion"]);
+  });
+
+  it("normalizes legacy goal names when assigning measurable outcomes", () => {
+    const result = buildGoalProgressSeries([
+      { campaign_id: 7, activity_date: "2026-11-10", metric: "responses", event_count: 5 }
+    ], [{ id: 7, goal_keys: ["answers"] }], "all", new Date("2026-11-10T12:00:00Z"));
+    expect(result.series).toEqual([]);
+    expect(result.untrackedGoals).toEqual(["help-and-guide"]);
+  });
+
+  it.each(Object.keys(locales))("provides complete goal-progress labels in %s", (language) => {
+    const copy = locales[language].admin.goalProgress;
+    for (const key of progressCopy) expect(copy[key]).toBeTruthy();
+    for (const key of ["responses", "contacts", "issues"]) expect(copy.series[key]).toBeTruthy();
   });
 });

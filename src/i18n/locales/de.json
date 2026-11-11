@@ -529,9 +529,16 @@
     },
     "goalProgress": {
       "title": "Leistung Ihrer Eggs verfolgen",
-      "intro": "Verfolgen Sie Kundeninteraktionen und Ergebnisse der letzten 30 Tage.",
+      "intro": "Sehen Sie messbare Ergebnisse Ihrer Egg-Ziele der letzten 30 Tage.",
       "allEggs": "Alle Eggs",
       "measure": "Kennzahl",
+      "outcomesTitle": "Zielergebnisse",
+      "legend": "Diagrammlegende",
+      "series": {
+        "responses": "Umfrageantworten",
+        "contacts": "Neue Kontakte mit Einwilligung",
+        "issues": "Problemmeldungen"
+      },
       "metrics": {
         "interactions": "Egg-Aufrufe",
         "responses": "Umfrageantworten",
@@ -539,8 +546,11 @@
         "messages": "Private Nachrichten"
       },
       "period": "Letzte 30 Tage",
-      "chartLabel": "{{count}} {{metric}} in den letzten 30 Tagen",
-      "metricNote": "Egg-Aufrufe umfassen QR- oder NFC-Besuche; Antworten sind Umfrageantworten; Kontakte sind E-Mail-Anmeldungen mit Einwilligung; Nachrichten sind private Kundennachrichten.",
+      "chartLabel": "Erfasste Zielergebnisse der letzten 30 Tage",
+      "metricNote": "Umfrageantworten, E-Mail-Anmeldungen mit Einwilligung und Problemmeldungen werden anhand gespeicherter Aktivitäten gezählt. Ziele ohne diese Daten werden separat angezeigt.",
+      "untrackedTitle": "Andere Ziele werden hier noch nicht gemessen",
+      "untrackedNote": "Godwit erfasst das Ergebnis dieser Ziele noch nicht und zeigt deshalb keinen geschätzten Wert an.",
+      "noTrackedOutcomes": "Für diese Egg-Ziele gibt es noch keine erfassten Ergebnisse.",
       "loadError": "Fortschrittsdaten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
       "emptyEggs": "Erstellen Sie ein Egg, um den Fortschritt zu verfolgen."
     },

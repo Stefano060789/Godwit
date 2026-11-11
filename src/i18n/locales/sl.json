@@ -426,9 +426,16 @@
     },
     "goalProgress": {
       "title": "Spremljajte uspešnost svojih Eggov",
-      "intro": "Spremljajte interakcije s strankami in rezultate v zadnjih 30 dneh.",
+      "intro": "Oglejte si merljive rezultate, povezane s cilji Eggov v zadnjih 30 dneh.",
       "allEggs": "Vsi Eggi",
       "measure": "Meritev",
+      "outcomesTitle": "Rezultati ciljev",
+      "legend": "Legenda grafikona",
+      "series": {
+        "responses": "Odgovori na ankete",
+        "contacts": "Novi stiki s privolitvijo",
+        "issues": "Prijave težav"
+      },
       "metrics": {
         "interactions": "Odprti Eggi",
         "responses": "Odgovori na ankete",
@@ -436,8 +443,11 @@
         "messages": "Zasebna sporočila"
       },
       "period": "Zadnjih 30 dni",
-      "chartLabel": "{{count}}: {{metric}} v zadnjih 30 dneh",
-      "metricNote": "Odprtje vključuje obisk prek QR ali NFC; odgovori so odgovori na ankete; stiki so prijave na e-pošto s privolitvijo; sporočila so zasebna sporočila strank.",
+      "chartLabel": "Zabeleženi rezultati ciljev v zadnjih 30 dneh",
+      "metricNote": "Odgovori na ankete, prijave na e-pošto s privolitvijo in prijave težav so prešteti na podlagi zabeleženih dejavnosti. Cilji brez teh podatkov so prikazani ločeno.",
+      "untrackedTitle": "Drugi cilji tukaj še niso merjeni",
+      "untrackedNote": "Godwit rezultatov teh ciljev še ne beleži, zato ne prikazuje ocenjenih vrednosti.",
+      "noTrackedOutcomes": "Za te cilje Eggov še ni zabeleženih rezultatov.",
       "loadError": "Podatkov o napredku ni bilo mogoče naložiti. Poskusite znova pozneje.",
       "emptyEggs": "Ustvarite Egg za spremljanje napredka."
     },
