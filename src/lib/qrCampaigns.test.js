@@ -17,10 +17,14 @@ describe("goal-led Egg persistence", () => {
       name: "Gallery", placement_label: "Entrance", goal_key: "feedback", business_type: "arts", workspace_id: "workspace-id", poll_id: null, ai_enabled: true
     }));
   });
+  it("normalizes legacy single-goal keys before saving", async () => {
+    await createQrCampaign({ name: "Gallery", goalKey: "next-step" });
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ goal_key: "help-and-guide" }));
+  });
   it("saves multiple goals while keeping the first goal available to legacy readers", async () => {
-    await createQrCampaign({ name: "Gallery", goalKeys: ["feedback", "answers", "feedback"], goalContext: "Improve weekday response rates." });
+    await createQrCampaign({ name: "Gallery", goalKeys: ["feedback", "answers", "help-and-guide", "feedback"], goalContext: "Improve weekday response rates." });
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({
-      goal_keys: ["feedback", "answers"],
+      goal_keys: ["feedback", "help-and-guide"],
       goal_key: "feedback",
       goal_context: "Improve weekday response rates."
     }));

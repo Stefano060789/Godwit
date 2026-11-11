@@ -37,15 +37,21 @@ describe("starting guide navigation", () => {
     expect(START_GOALS.find((goal) => goal.key === "reviews").feature).toBe("publicReviewLinks");
   });
 
-  it("starts every customer interaction goal from an Egg", () => {
-    for (const key of ["answers", "feedback", "information", "next-step", "contacts", "reviews"]) {
+  it("starts every selectable customer goal from an Egg", () => {
+    for (const { key } of START_GOALS) {
       expect(START_GOALS.find((goal) => goal.key === key)).toMatchObject({ tab: "goal", action: "egg" });
     }
   });
 
+  it("normalizes legacy question and next-step goals to the combined goal", () => {
+    expect(getStartSelection("?goal=answers").goal.key).toBe("help-and-guide");
+    expect(getStartSelection("?goal=next-step").goal.key).toBe("help-and-guide");
+  });
+
   it("reads multiple goals and falls back to the legacy single-goal column", () => {
-    expect(getCampaignGoalKeys({ goal_keys: ["feedback", "answers", "feedback", "invalid"] })).toEqual(["feedback", "answers"]);
+    expect(getCampaignGoalKeys({ goal_keys: ["feedback", "answers", "next-step", "feedback", "invalid"] })).toEqual(["feedback", "help-and-guide"]);
     expect(getCampaignGoalKeys({ goal_key: "reviews" })).toEqual(["reviews"]);
+    expect(getCampaignGoalKeys({ goal_key: "answers" })).toEqual(["help-and-guide"]);
     expect(getCampaignGoalKeys({ goal_keys: null, goal_key: null })).toEqual([]);
   });
 

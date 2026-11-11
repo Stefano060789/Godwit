@@ -4,10 +4,17 @@ import InlinePollVote from "./InlinePollVote";
 import { supabase } from "../lib/supabase";
 
 const GOAL_PROMPTS = {
+  "help-and-guide": ["askQuestion", "findNextStep"],
   answers: "askQuestion",
   feedback: "sharePreference",
   information: "findInformation",
   "next-step": "findNextStep",
+  preferences: "sharePreference",
+  satisfaction: "shareFeedback",
+  "issue-reporting": "shareFeedback",
+  promotion: "findNextStep",
+  "event-interest": "sharePreference",
+  "return-visits": "stayInTouch",
   contacts: "stayInTouch",
   reviews: "shareFeedback"
 };
@@ -15,7 +22,10 @@ const DEFAULT_PROMPTS = ["askQuestion", "findInformation", "sharePreference"];
 
 export function buildGuidedPrompts(goalKeys, feedbackTopics, t) {
   const promptKeys = goalKeys.length
-    ? goalKeys.map((goal) => GOAL_PROMPTS[goal]).filter(Boolean)
+    ? goalKeys.flatMap((goal) => {
+      const prompts = GOAL_PROMPTS[goal];
+      return prompts ? (Array.isArray(prompts) ? prompts : [prompts]) : [];
+    })
     : DEFAULT_PROMPTS;
   const goalPrompts = promptKeys.map((key) => ({
     id: key,

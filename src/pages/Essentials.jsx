@@ -2,7 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Layout from "../components/Layout";
 import { PERSONAS } from "../lib/personas";
-import { START_GOALS, buildStartLink, getStartSelection } from "../lib/startGuide";
+import { START_GOALS, START_GOAL_GROUPS, buildStartLink, getStartSelection } from "../lib/startGuide";
 
 export default function Essentials() {
   const { t } = useTranslation();
@@ -61,21 +61,24 @@ export default function Essentials() {
             <span className="goal-step-number" aria-hidden="true">02</span>
             <h2 id="goal-title">{t("quickStart.goalTitle")}</h2>
           </div>
-          <div className="goal-options-grid">
-            {START_GOALS.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                aria-pressed={goal?.key === item.key}
-                onClick={() => select("goal", item.key)}
-                className="goal-choice"
-              >
-                <span className="goal-choice-title">{t(`quickStart.goals.${item.key}.title`)}</span>
-                <span className="goal-choice-detail">{t(`quickStart.goals.${item.key}.example`)}</span>
-                <span className="goal-choice-check" aria-hidden="true">{goal?.key === item.key ? "\u2713" : "+"}</span>
-              </button>
-            ))}
-          </div>
+          {START_GOAL_GROUPS.map((group) => <section className="goal-choice-group" key={group} aria-labelledby={`quick-start-goal-group-${group}`}>
+            <h3 id={`quick-start-goal-group-${group}`}>{t(`quickStart.goalGroups.${group}`)}</h3>
+            <div className="goal-options-grid">
+              {START_GOALS.filter((item) => item.group === group).map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  aria-pressed={goal?.key === item.key}
+                  onClick={() => select("goal", item.key)}
+                  className="goal-choice"
+                >
+                  <span className="goal-choice-title">{t(`quickStart.goals.${item.key}.title`)}</span>
+                  <span className="goal-choice-detail">{t(`quickStart.goals.${item.key}.example`)}</span>
+                  <span className="goal-choice-check" aria-hidden="true">{goal?.key === item.key ? "\u2713" : "+"}</span>
+                </button>
+              ))}
+            </div>
+          </section>)}
         </section>
 
         {goal ? (

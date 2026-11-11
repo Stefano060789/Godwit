@@ -2357,6 +2357,17 @@ textarea {
   gap: 14px;
 }
 
+.goal-choice-group {
+  margin-top: 1.25rem;
+}
+
+.goal-choice-group > h3 {
+  margin: 0 0 0.65rem;
+  color: var(--guide-ink);
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
 .goal-guide .goal-business-grid {
   margin-top: 18px;
 }

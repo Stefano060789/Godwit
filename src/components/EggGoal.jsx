@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { START_GOALS } from "../lib/startGuide";
+import { START_GOALS, START_GOAL_GROUPS } from "../lib/startGuide";
 import { minPlanLabelFor } from "../lib/entitlements";
 import { normalizeEggEmailBenefit } from "../lib/eggBenefits";
 
@@ -14,6 +14,7 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
   const [benefitType, setBenefitType] = useState("none");
   const [benefitValue, setBenefitValue] = useState("");
   const [benefitUrl, setBenefitUrl] = useState("");
+  const promotionSelected = goalKeys.includes("promotion");
   const selectedGoals = START_GOALS.filter((entry) => goalKeys.includes(entry.key));
   const lockedGoals = selectedGoals.filter((entry) => entry.feature && !entitlements[entry.feature]);
 
@@ -29,6 +30,9 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
     setBusy(true);
     setError("");
     try {
+      if (promotionSelected && !goalContext.trim()) {
+        throw new Error(t("admin.goal.promotionDetailsRequired", { defaultValue: "Describe the event, product, or offer you want to promote." }));
+      }
       const emailBenefit = { type: benefitType, value: benefitValue, url: benefitUrl };
       try {
         normalizeEggEmailBenefit(emailBenefit);
@@ -58,15 +62,29 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
         <legend>{t("quickStart.goalTitle")}</legend>
         <p className="goal-multi-hint">{t(`admin.goal.businessGuidance.${businessType}`, { defaultValue: t("admin.goal.businessGuidance.default") })}</p>
         <p className="goal-multi-hint">{t("admin.goal.multipleGoalsHint", { defaultValue: "Choose one or more outcomes that matter for this Egg." })}</p>
-        <div className="goal-options-grid">
-          {START_GOALS.map((entry) => <button type="button" key={entry.key} className="goal-choice" aria-pressed={goalKeys.includes(entry.key)} onClick={() => toggleGoal(entry.key)}>
-            <span className="goal-choice-title">{t(`quickStart.goals.${entry.key}.title`)}</span>
-            <span className="goal-choice-detail">{t(`quickStart.goals.${entry.key}.example`)}</span>
-            <span className="goal-choice-check" aria-hidden="true">{goalKeys.includes(entry.key) ? "\u2713" : "+"}</span>
-          </button>)}
-        </div>
-        <label className="goal-context-field">{t("admin.goal.contextLabel", { defaultValue: "What would success look like for this Egg? (optional)" })}
-          <textarea maxLength={500} rows={3} value={goalContext} onChange={(event) => setGoalContext(event.target.value)} placeholder={t("admin.goal.contextPlaceholder", { defaultValue: "Add a specific outcome or detail to guide the AI and help you interpret progress." })} />
+        {START_GOAL_GROUPS.map((group) => <section className="goal-choice-group" key={group} aria-labelledby={`goal-group-${group}`}>
+          <h3 id={`goal-group-${group}`}>{t(`quickStart.goalGroups.${group}`)}</h3>
+          <div className="goal-options-grid">
+            {START_GOALS.filter((entry) => entry.group === group).map((entry) => <button type="button" key={entry.key} className="goal-choice" aria-pressed={goalKeys.includes(entry.key)} onClick={() => toggleGoal(entry.key)}>
+              <span className="goal-choice-title">{t(`quickStart.goals.${entry.key}.title`)}</span>
+              <span className="goal-choice-detail">{t(`quickStart.goals.${entry.key}.example`)}</span>
+              <span className="goal-choice-check" aria-hidden="true">{goalKeys.includes(entry.key) ? "\u2713" : "+"}</span>
+            </button>)}
+          </div>
+        </section>)}
+        <label className="goal-context-field">{promotionSelected
+          ? t("admin.goal.promotionDetailsLabel", { defaultValue: "What event, product, or offer do you want to promote?" })
+          : t("admin.goal.contextLabel", { defaultValue: "What would success look like for this Egg? (optional)" })}
+          <textarea
+            required={promotionSelected}
+            maxLength={500}
+            rows={3}
+            value={goalContext}
+            onChange={(event) => setGoalContext(event.target.value)}
+            placeholder={promotionSelected
+              ? t("admin.goal.promotionDetailsPlaceholder", { defaultValue: "Describe the event, product, or special offer. Include key details visitors should know." })
+              : t("admin.goal.contextPlaceholder", { defaultValue: "Add a specific outcome or detail to guide the AI and help you interpret progress." })}
+          />
         </label>
       </fieldset>
       <fieldset disabled={!canManage || busy || !businessType}>

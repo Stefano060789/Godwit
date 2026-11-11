@@ -1,20 +1,35 @@
 import { PERSONAS } from "./personas";
 
 export const START_GOALS = [
-  { key: "answers", tab: "goal", action: "egg" },
-  { key: "feedback", tab: "goal", action: "egg" },
-  { key: "information", tab: "goal", action: "egg" },
-  { key: "next-step", tab: "goal", action: "egg" },
-  { key: "contacts", tab: "goal", action: "egg", feature: "leadCapture" },
-  { key: "reviews", tab: "goal", action: "egg", feature: "publicReviewLinks" }
+  { key: "help-and-guide", group: "help", tab: "goal", action: "egg" },
+  { key: "information", group: "help", tab: "goal", action: "egg" },
+  { key: "feedback", group: "listen", tab: "goal", action: "egg" },
+  { key: "preferences", group: "listen", tab: "goal", action: "egg" },
+  { key: "satisfaction", group: "listen", tab: "goal", action: "egg" },
+  { key: "issue-reporting", group: "listen", tab: "goal", action: "egg" },
+  { key: "promotion", group: "growth", tab: "goal", action: "egg" },
+  { key: "event-interest", group: "growth", tab: "goal", action: "egg" },
+  { key: "return-visits", group: "growth", tab: "goal", action: "egg" },
+  { key: "contacts", group: "private-contact", tab: "goal", action: "egg", feature: "leadCapture" },
+  { key: "reviews", group: "public-reviews", tab: "goal", action: "egg", feature: "publicReviewLinks" }
 ];
+
+export const START_GOAL_GROUPS = ["help", "listen", "growth", "private-contact", "public-reviews"];
+const LEGACY_GOAL_ALIASES = new Map([
+  ["answers", "help-and-guide"],
+  ["next-step", "help-and-guide"]
+]);
+
+export function normalizeGoalKey(key) {
+  return LEGACY_GOAL_ALIASES.get(key) || key;
+}
 
 export function getCampaignGoalKeys(campaign) {
   const validKeys = new Set(START_GOALS.map((goal) => goal.key));
   const keys = Array.isArray(campaign?.goal_keys)
     ? campaign.goal_keys
     : campaign?.goal_key ? [campaign.goal_key] : [];
-  return [...new Set(keys.filter((key) => validKeys.has(key)))];
+  return [...new Set(keys.map(normalizeGoalKey).filter((key) => validKeys.has(key)))];
 }
 
 const ADMIN_TABS = ["your-business", "business", "goal", "results", "goal-progress", "polls", "woodpecker", "connection", "engagement", "feedback", "settings"];
@@ -27,14 +42,15 @@ export function getAdminTab(search) {
 
 export function getStartSelection(search) {
   const params = new URLSearchParams(search);
+  const goalKey = normalizeGoalKey(params.get("goal"));
   return {
-    goal: START_GOALS.find((goal) => goal.key === params.get("goal")) || null,
+    goal: START_GOALS.find((goal) => goal.key === goalKey) || null,
     business: PERSONAS.find((business) => business.audienceKey === params.get("business")) || null
   };
 }
 
 export function buildStartLink(goalKey, businessKey) {
-  const goal = START_GOALS.find((item) => item.key === goalKey);
+  const goal = START_GOALS.find((item) => item.key === normalizeGoalKey(goalKey));
   if (!goal) throw new Error(`Unknown starting goal: ${goalKey}`);
   const params = new URLSearchParams({ tab: goal.tab, goal: goal.key });
   if (PERSONAS.some((business) => business.audienceKey === businessKey)) {

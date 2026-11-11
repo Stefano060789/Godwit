@@ -129,7 +129,20 @@
       "events": "Veranstaltungen, Vereine, Gemeinschaften",
       "shops": "Einzelhandel, Studios, lokale Dienstleistungen"
     },
+    "goalGroups": {
+      "help": "Kunden helfen",
+      "listen": "Zuhören und verbessern",
+      "growth": "Angebote teilen und Wiederbesuche fördern",
+      "private-contact": "Private Kontaktaufnahme mit Einwilligung",
+      "public-reviews": "Öffentliche Bewertungen"
+    },
     "goals": {
+      "help-and-guide": {
+        "title": "Fragen beantworten und Kunden weiterführen",
+        "example": "Beantworten Sie Fragen mit verlässlichen Unternehmensinformationen und verlinken Sie hilfreiche nächste Schritte wie Buchung oder Bestellung.",
+        "setup": "Erstellen Sie ein Egg, ergänzen Sie Website oder FAQs, aktivieren Sie den Assistenten und fügen Sie passende Buchungs-, Bestell- oder Kontaktlinks hinzu.",
+        "result": "Testen Sie häufige Kundenfragen und prüfen Sie Egg-Aufrufe sowie die angebotenen Aktionen."
+      },
       "answers": {
         "title": "Kundenfragen beantworten",
         "example": "Verfolgen Sie Egg-Aufrufe, während Kunden Antworten aus Ihren Geschäftsinformationen erhalten.",
@@ -165,6 +178,42 @@
         "example": "Verfolgen Sie Egg-Aufrufe und bieten Sie allen dieselben optionalen Bewertungslinks an.",
         "setup": "Ergänzen Sie Bewertungslinks in den Einstellungen und fügen Sie sie bei der Einrichtung eines Egg hinzu.",
         "result": "Bieten Sie allen dieselben Bewertungslinks an. Öffentliche Bewertungen sind freiwillig und nie mit einer Belohnung verbunden."
+      },
+      "preferences": {
+        "title": "Herausfinden, was Besucher möchten",
+        "example": "Fragen Sie mit einer kurzen, neutralen Umfrage nach den Interessen der Besucher.",
+        "setup": "Ergänzen Sie eine kurze Umfrage mit einer klaren Frage zu den Wünschen der Besucher.",
+        "result": "Nutzen Sie die Umfrageergebnisse, um die Auswahl zu verstehen. Antworten bleiben anonym, sofern Personen nicht separat ihre Kontaktdaten teilen."
+      },
+      "satisfaction": {
+        "title": "Kundenzufriedenheit messen",
+        "example": "Fragen Sie Besucher nach ihrer Zufriedenheit und verfolgen Sie die Antworten im Zeitverlauf.",
+        "setup": "Ergänzen Sie eine neutrale Zufriedenheitsumfrage mit klaren Antwortmöglichkeiten.",
+        "result": "Prüfen Sie Antworten und Trends. Godwit zeigt die erhobenen Antworten und erfindet keine Bewertung."
+      },
+      "issue-reporting": {
+        "title": "Vor Ort ein Problem melden",
+        "example": "Besucher können ein Problem vor Ort mit Kategorie und Beschreibung melden.",
+        "setup": "Die Meldung ist im Besucher-Egg verfügbar. Richten Sie In-App-, E-Mail- oder SMS-Benachrichtigungen in den Einstellungen ein.",
+        "result": "Prüfen Sie Meldungen im Einstellungs-Posteingang und erhalten Sie Benachrichtigungen über aktivierte Kanäle."
+      },
+      "promotion": {
+        "title": "Eine Veranstaltung, ein Produkt oder Angebot bewerben",
+        "example": "Beschreiben Sie das Angebot und teilen Sie die Details über das Egg.",
+        "setup": "Geben Sie beim Erstellen des Eggs die Details ein und ergänzen Sie passende Informationen und Links.",
+        "result": "Besucher sehen die Angaben im Egg. Halten Sie Termine, Preise, Bedingungen und Verfügbarkeit aktuell."
+      },
+      "event-interest": {
+        "title": "Veranstaltungsanmeldungen oder Interesse erfassen",
+        "example": "Eine Umfrage misst Interesse, erstellt aber keine Teilnehmerliste und reserviert keinen Platz.",
+        "setup": "Ergänzen Sie eine Umfrage zum Veranstaltungsinteresse und einen Infokasten. Eine namentliche RSVP-Liste wird noch nicht unterstützt.",
+        "result": "Prüfen Sie die Umfrageantworten. Behandeln Sie sie nicht als bestätigte Anmeldung."
+      },
+      "return-visits": {
+        "title": "Kunden zurückgewinnen",
+        "example": "Fördern Sie Wiederbesuche mit hilfreichen Informationen und Follow-up-E-Mails nach Einwilligung.",
+        "setup": "Richten Sie eine klare E-Mail-Einwilligung ein und konfigurieren Sie eine Rückgewinnungsnachricht für zustimmende Kontakte.",
+        "result": "Prüfen Sie Kontakte mit Einwilligung und Follow-up-Aktivitäten. Marketing-E-Mails gehen nur an Personen, die zugestimmt haben."
       }
     }
   },
@@ -496,12 +545,15 @@
       "loadError": "Fortschrittsdaten konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
       "emptyEggs": "Erstellen Sie ein Egg, um den Fortschritt zu verfolgen."
     },
-    "settingsIntro": "Verwalten Sie Ihre Abrechnung und Links zu Kundenbewertungen.",
+    "settingsIntro": "Verwalten Sie Benachrichtigungen, Abrechnung, Abonnements und Links zu Kundenbewertungen.",
     "goal": {
       "title": "Erstellen Sie ein Egg mit einem klaren Ziel",
       "intro": "Sie erstellen ein neues Egg: Wählen Sie Ziele, Name und Standort und fügen Sie optional ein Dankeschön hinzu. Anschließend verwalten Sie Inhalte sowie QR- und NFC-Zugang unter Eggs.",
       "businessHint": "Wählen Sie die passendste Kategorie. Die Beispiele zeigen, wie ein Egg in verschiedenen Unternehmen und an unterschiedlichen Orten eingesetzt werden kann.",
       "multipleGoalsHint": "Wählen Sie ein oder mehrere Ergebnisse, die für dieses Egg wichtig sind.",
+      "promotionDetailsLabel": "Welche Veranstaltung, welches Produkt oder Angebot möchten Sie bewerben?",
+      "promotionDetailsPlaceholder": "Beschreiben Sie das Angebot und die wichtigsten Details für Besucher.",
+      "promotionDetailsRequired": "Beschreiben Sie die Veranstaltung, das Produkt oder das Angebot, das Sie bewerben möchten.",
       "businessGuidance": {
         "default": "Wählen Sie passende Ergebnisse: Fragen beantworten, hilfreiche Informationen teilen, Feedback sammeln oder den nächsten Schritt erleichtern.",
         "arts": "Für Kunstschaffende, Galerien und Museen: Geschichten oder Ausstellungsdetails teilen, Besucherfragen beantworten, Feedback sammeln oder Anfragen ermöglichen.",

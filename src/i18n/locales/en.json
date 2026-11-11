@@ -169,7 +169,20 @@
       "events": "Events, clubs, community groups",
       "shops": "Retail, studios, local services"
     },
+    "goalGroups": {
+      "help": "Help customers",
+      "listen": "Listen and improve",
+      "growth": "Promote and encourage return visits",
+      "private-contact": "Private follow-up with consent",
+      "public-reviews": "Public reviews"
+    },
     "goals": {
+      "help-and-guide": {
+        "title": "Answer questions and guide customers",
+        "example": "Use trusted business information to answer questions and point customers to useful next steps, such as booking or ordering.",
+        "setup": "Create an Egg, add your website or FAQs, enable the assistant, and include relevant booking, ordering, or contact links.",
+        "result": "Test common customer questions and review Egg visits and the actions you make available."
+      },
       "answers": {
         "title": "Answer customer questions",
         "example": "Track Egg visits while customers get answers from your business information.",
@@ -205,6 +218,42 @@
         "example": "Track Egg visits while offering the same optional review links to every customer.",
         "setup": "Add your review-site links in Settings, then include them when setting up an Egg.",
         "result": "Offer the same review links to everyone. Public reviews are optional and never tied to a reward."
+      },
+      "preferences": {
+        "title": "Find out what visitors want",
+        "example": "Ask a short, neutral poll about what visitors are interested in and review their answers.",
+        "setup": "Add a simple poll to the Egg and ask one clear question about visitor preferences.",
+        "result": "Use poll results to see what visitors chose. Answers are anonymous unless people separately opt in to share contact details."
+      },
+      "satisfaction": {
+        "title": "Measure customer satisfaction",
+        "example": "Ask visitors how satisfied they are and track the responses over time.",
+        "setup": "Add a neutral satisfaction poll with clear answer choices to the Egg.",
+        "result": "Review poll responses and trends. Godwit reports the answers collected; it does not infer a rating that customers did not provide."
+      },
+      "issue-reporting": {
+        "title": "Report an issue while on site",
+        "example": "Let visitors send a categorized report when something at the venue needs attention.",
+        "setup": "Issue reporting is available from the visitor Egg. Configure in-app, email, or SMS alerts in Settings.",
+        "result": "Review reports in the Settings inbox and receive alerts through the channels you enable."
+      },
+      "promotion": {
+        "title": "Promote an event, product, or special offer",
+        "example": "Describe what you want to promote, then share those details through the Egg.",
+        "setup": "Enter the event, product, or offer details when creating the Egg, then add clear information and a relevant link.",
+        "result": "Visitors can see the details from the Egg. Keep dates, prices, terms, and availability up to date."
+      },
+      "event-interest": {
+        "title": "Collect event registrations or interest",
+        "example": "Use a poll to gauge interest. This does not create a named attendee list or reserve a place.",
+        "setup": "Add an event-interest poll and include the event details in an information card. A named RSVP list is not currently supported.",
+        "result": "Review poll responses to measure interest. Do not treat them as confirmed registrations."
+      },
+      "return-visits": {
+        "title": "Bring customers back",
+        "example": "Invite customers to return with relevant information and consent-based email follow-up.",
+        "setup": "Add a clear opt-in for email follow-up, then configure a win-back message for consenting contacts.",
+        "result": "Review consented contacts and follow-up activity. Only people who explicitly opt in receive marketing email."
       }
     }
   },
@@ -576,12 +625,15 @@
       "loadError": "Progress data could not be loaded. Please try again later.",
       "emptyEggs": "Create an Egg to start tracking progress."
     },
-    "settingsIntro": "Manage your billing and customer review links.",
+    "settingsIntro": "Manage issue alerts, billing, subscriptions, and customer review links.",
     "goal": {
       "title": "Create an Egg with a clear goal",
       "intro": "You are creating a new Egg: choose its goals, give it a name and location, and optionally add a customer thank-you. After creation, manage its content and QR or NFC access in Eggs.",
       "businessHint": "Choose the closest fit. The examples help you see how an Egg can work across different businesses and places.",
       "multipleGoalsHint": "Choose one or more outcomes that matter for this Egg.",
+      "promotionDetailsLabel": "What event, product, or offer do you want to promote?",
+      "promotionDetailsPlaceholder": "Describe what you want to promote and the key details visitors should know.",
+      "promotionDetailsRequired": "Describe the event, product, or offer you want to promote.",
       "businessGuidance": {
         "default": "Choose outcomes that fit your customers, from answering questions and sharing useful information to collecting feedback or guiding the next step.",
         "arts": "For artists, galleries, and museums: share stories or exhibit details, answer visitor questions, collect feedback, or invite enquiries.",

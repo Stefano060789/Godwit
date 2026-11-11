@@ -40,7 +40,7 @@ import { loadDonationSettings, saveDonationSettings, startStripeConnectOnboardin
 import { getEntitlements, planLabel, minPlanLabelFor } from "../lib/entitlements";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 import { PERSONAS, findPersona } from "../lib/personas";
-import { getAdminTab, getCampaignGoalKeys, getStartSelection, START_GOALS } from "../lib/startGuide";
+import { getAdminTab, getCampaignGoalKeys, getStartSelection, START_GOALS, START_GOAL_GROUPS } from "../lib/startGuide";
 import Woodpecker from "./Woodpecker";
 import {
   getCurrentUserRole,
@@ -2190,8 +2190,10 @@ export default function Admin() {
                       </label>
                       <fieldset className="egg-edit-goals sm:col-span-2">
                         <legend className="text-xs font-semibold">{t("admin.hub.goal", { defaultValue: "Goal" })}</legend>
-                        <div className="egg-edit-goal-list">
-                          {START_GOALS.map((goal) => {
+                        {START_GOAL_GROUPS.map((group) => <section className="egg-edit-goal-group" key={group}>
+                          <h4>{t(`quickStart.goalGroups.${group}`)}</h4>
+                          <div className="egg-edit-goal-list">
+                          {START_GOALS.filter((goal) => goal.group === group).map((goal) => {
                             const selectedGoal = eggEditGoals.includes(goal.key);
                             const lockedGoal = Boolean(goal.feature && !entitlements[goal.feature]);
                             return <label key={goal.key} className={selectedGoal ? "is-selected" : ""}>
@@ -2206,7 +2208,8 @@ export default function Admin() {
                               <span>{t(`quickStart.goals.${goal.key}.title`)}</span>
                             </label>;
                           })}
-                        </div>
+                          </div>
+                        </section>)}
                         {eggEditGoals.length > 0 && <button type="button" className="egg-edit-clear-goals" onClick={() => setEggEditGoals([])}>
                           {t("admin.eggResults.noGoal", { defaultValue: "No target set" })}
                         </button>}
@@ -2489,8 +2492,8 @@ export default function Admin() {
         <h2>{t("admin.hub.settings", { defaultValue: "Settings" })}</h2>
         <p>{t("admin.settingsIntro", { defaultValue: "Manage your customer review links." })}</p>
       </header>
-      <BillingSettings onUsageChange={setInteractionUsage} />
       {workspaceUserId && permission.canManageWorkspace && <IssueAlertSettings workspaceId={workspaceUserId} canManage />}
+      <BillingSettings onUsageChange={setInteractionUsage} />
       {DONATION_FEATURE_ENABLED && <details id="donation-settings" className="mb-6 border rounded bg-gray-900">
         <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.engagement.donations.title")}</summary>
         <div className="px-4 pb-4 space-y-3">

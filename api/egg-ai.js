@@ -14,10 +14,17 @@ const INTEREST_KEY_PATTERN = /^[a-z0-9][a-z0-9-]{0,39}$/;
 const EMAIL_PATTERN = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
 const PHONE_PATTERN = /\+?\d[\d\s().-]{7,}\d/;
 const GOAL_GUIDANCE = new Map([
+  ["help-and-guide", "Answer the customer's questions using available business information, then guide them to a relevant existing next step such as booking, ordering, or contacting the business. Do not invent details or imply unsupported actions."],
   ["answers", "Answer the customer's specific questions using available business information. Do not invent details when the sources are unclear."],
   ["feedback", "Invite honest feedback when appropriate, using a relevant existing feedback option if available."],
   ["information", "Help customers browse relevant existing information cards, such as menus, event details, stories, or practical information."],
   ["next-step", "Guide customers to an existing booking, ordering, contact, or other action link when relevant. Do not imply that Godwit completes the action unless it is explicitly supported."],
+  ["preferences", "Help the business learn what visitors want by inviting a short, neutral response to a relevant question or existing poll. Do not present a response as a booking or commitment."],
+  ["satisfaction", "Invite customers to rate or describe their satisfaction honestly. Do not steer them toward a positive rating."],
+  ["issue-reporting", "Help visitors report an on-site issue through the available issue-report form. Do not imply that a report is an emergency service."],
+  ["promotion", "Present only the event, product, or offer details supplied by the business. Do not invent prices, availability, deadlines, or terms."],
+  ["event-interest", "Help visitors express interest in an event using an existing poll or information. Do not imply that interest is an RSVP or reserve a place."],
+  ["return-visits", "Encourage repeat visits through relevant business information and consent-based follow-up. Never imply that a customer opted in unless they did."],
   ["contacts", "Help customers find an existing email opt-in option when relevant. Contact sharing is voluntary and requires the customer's informed consent."],
   ["reviews", "When relevant, invite an honest public review neutrally, regardless of whether the experience was positive or negative. Do not offer incentives or request a positive rating."]
 ]);

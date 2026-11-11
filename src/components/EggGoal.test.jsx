@@ -48,6 +48,13 @@ describe("Egg goal setup", () => {
     expect(goalStep).toContain("collect 20 poll responses this month");
     expect(detailsStep).not.toContain("Add a specific goal or success detail");
   });
+  it("requires promotion details only when the promotion goal is selected", () => {
+    const markup = render({ initialSelection: getStartSelection("?business=arts&goal=promotion") });
+    expect(markup).toContain("What event, product, or offer do you want to promote?");
+    expect(markup).toContain("Describe what you want to promote and the key details visitors should know.");
+    expect(markup).toContain('required=""');
+    expect(render()).toContain("Add a specific goal or success detail (optional)");
+  });
   it("disables the form for viewers", () => {
     expect(render({ canManage: false }).match(/<fieldset disabled=""/g)).toHaveLength(2);
   });
@@ -69,10 +76,15 @@ describe("Egg goal setup", () => {
   });
   it("presents distinct customer outcomes and explicitly includes cafes and pubs", () => {
     const markup = render();
-    expect(markup).toContain("Answer customer questions");
+    expect(markup).toContain("Answer questions and guide customers");
     expect(markup).toContain("Show menus, stories &amp; details");
     expect(markup).toContain("Collect feedback responses");
-    expect(markup).toContain("Guide customers to a next step");
+    expect(markup).toContain("Find out what visitors want");
+    expect(markup).toContain("Measure customer satisfaction");
+    expect(markup).toContain("Report an issue while on site");
+    expect(markup).toContain("Promote an event, product, or special offer");
+    expect(markup).toContain("Collect event registrations or interest");
+    expect(markup).toContain("Bring customers back");
     expect(markup).toContain("Collect opted-in contacts");
     expect(markup).toContain("Invite honest reviews");
   });

@@ -212,7 +212,20 @@
       "events": "Dogodki, društva, skupnosti",
       "shops": "Trgovine, studii, lokalne storitve"
     },
+    "goalGroups": {
+      "help": "Pomagati strankam",
+      "listen": "Prisluhniti in izboljšati",
+      "growth": "Promocija in ponovni obiski",
+      "private-contact": "Zasebni stiki s privolitvijo",
+      "public-reviews": "Javne ocene"
+    },
     "goals": {
+      "help-and-guide": {
+        "title": "Odgovarjanje na vprašanja in usmerjanje strank",
+        "example": "Z zanesljivimi informacijami odgovorite na vprašanja in stranke usmerite do naslednjih korakov, kot sta rezervacija ali naročilo.",
+        "setup": "Ustvarite Egg, dodajte spletno stran ali pogosta vprašanja, omogočite pomočnika in dodajte ustrezne povezave.",
+        "result": "Preizkusite pogosta vprašanja ter preglejte odprtja Egga in ponujena dejanja."
+      },
       "answers": {
         "title": "Odgovarjanje na vprašanja strank",
         "example": "Spremljajte odprtja Eggov, ko stranke iščejo odgovore v informacijah o vašem podjetju.",
@@ -248,6 +261,42 @@
         "example": "Spremljajte odprtja Eggov in vsem ponudite enake neobvezne povezave do ocen.",
         "setup": "V nastavitvah dodajte povezave do ocen in jih vključite pri nastavitvi Egg.",
         "result": "Vsem ponudite iste povezave. Javne ocene so neobvezne in nikoli povezane z nagrado."
+      },
+      "preferences": {
+        "title": "Ugotoviti, kaj si obiskovalci želijo",
+        "example": "S kratko in nevtralno anketo vprašajte obiskovalce o njihovih zanimanjih.",
+        "setup": "Dodajte kratko anketo z jasnim vprašanjem o željah obiskovalcev.",
+        "result": "Z odgovori ugotovite, kaj so obiskovalci izbrali. Odgovori so anonimni, razen če ločeno privolijo v deljenje stikov."
+      },
+      "satisfaction": {
+        "title": "Meriti zadovoljstvo strank",
+        "example": "Vprašajte obiskovalce, kako zadovoljni so, in spremljajte odgovore skozi čas.",
+        "setup": "V Egg dodajte nevtralno anketo o zadovoljstvu z jasnimi možnostmi odgovorov.",
+        "result": "Preglejte odgovore in trende. Godwit prikaže zbrane odgovore in ne izmišlja ocen."
+      },
+      "issue-reporting": {
+        "title": "Prijaviti težavo na lokaciji",
+        "example": "Obiskovalci lahko kategorizirano prijavijo težavo na kraju samem.",
+        "setup": "Prijava je na voljo v Eggu za obiskovalce. V nastavitvah uredite obvestila v aplikaciji, po e-pošti ali SMS-u.",
+        "result": "Prijave preglejte v nabiralniku nastavitev in prejemajte obvestila po vključenih kanalih."
+      },
+      "promotion": {
+        "title": "Promovirati dogodek, izdelek ali posebno ponudbo",
+        "example": "Opišite, kaj želite promovirati, in podrobnosti delite prek Egga.",
+        "setup": "Ob ustvarjanju Egga vnesite podrobnosti ter dodajte ustrezne informacije in povezave.",
+        "result": "Obiskovalci podrobnosti vidijo v Eggu. Posodabljajte datume, cene, pogoje in razpoložljivost."
+      },
+      "event-interest": {
+        "title": "Zbirati prijave ali zanimanje za dogodek",
+        "example": "Anketa meri zanimanje, ne ustvari seznama udeležencev in ne rezervira mesta.",
+        "setup": "Dodajte anketo o zanimanju in informacijsko kartico s podrobnostmi. Imenovane prijave še niso podprte.",
+        "result": "Preglejte odgovore in izmerite zanimanje. Ne obravnavajte jih kot potrjene prijave."
+      },
+      "return-visits": {
+        "title": "Spodbuditi stranke k ponovnemu obisku",
+        "example": "Ponovne obiske spodbujajte s koristnimi informacijami in e-pošto po privolitvi.",
+        "setup": "Nastavite jasno privolitev za e-pošto in sporočilo za ponovno aktivacijo soglašajočih stikov.",
+        "result": "Preglejte stike s privolitvijo in nadaljnje dejavnosti. Promocijska e-pošta je poslana samo tistim, ki so privolili."
       }
     }
   },
@@ -393,12 +442,15 @@
       "loadError": "Podatkov o napredku ni bilo mogoče naložiti. Poskusite znova pozneje.",
       "emptyEggs": "Ustvarite Egg za spremljanje napredka."
     },
-    "settingsIntro": "Upravljajte obračunavanje in povezave do ocen strank.",
+    "settingsIntro": "Upravljajte opozorila, obračunavanje, naročnine in povezave do ocen strank.",
     "goal": {
       "title": "Ustvarite Egg z jasnim ciljem",
       "intro": "Ustvarjate nov Egg: izberite cilje, ime in lokacijo ter po želji dodajte zahvalo strankam. Po ustvarjanju upravljajte vsebino ter dostop QR ali NFC v razdelku Eggs.",
       "businessHint": "Izberite najprimernejšo kategorijo. Primeri prikazujejo, kako lahko Egg uporabljate v različnih podjetjih in krajih.",
       "multipleGoalsHint": "Izberite enega ali več rezultatov, ki so pomembni za ta Egg.",
+      "promotionDetailsLabel": "Kateri dogodek, izdelek ali ponudbo želite promovirati?",
+      "promotionDetailsPlaceholder": "Opišite, kaj želite promovirati, in pomembne podrobnosti za obiskovalce.",
+      "promotionDetailsRequired": "Opišite dogodek, izdelek ali ponudbo, ki jo želite promovirati.",
       "businessGuidance": {
         "default": "Izberite rezultate za svoje stranke: odgovarjanje na vprašanja, deljenje koristnih informacij, zbiranje mnenj ali usmerjanje k naslednjemu koraku.",
         "arts": "Za umetnike, galerije in muzeje: delite zgodbe ali podrobnosti razstav, odgovarjajte na vprašanja obiskovalcev, zbirajte mnenja ali povabila k povpraševanju.",

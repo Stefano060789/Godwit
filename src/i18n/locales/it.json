@@ -129,7 +129,20 @@
       "events": "Eventi, associazioni, comunità",
       "shops": "Negozi, studi, servizi locali"
     },
+    "goalGroups": {
+      "help": "Aiutare i clienti",
+      "listen": "Ascoltare e migliorare",
+      "growth": "Promuovere e favorire il ritorno",
+      "private-contact": "Contatti privati con consenso",
+      "public-reviews": "Recensioni pubbliche"
+    },
     "goals": {
+      "help-and-guide": {
+        "title": "Rispondere alle domande e guidare i clienti",
+        "example": "Usa informazioni affidabili per rispondere e indirizzare i clienti verso passi utili, come prenotare o ordinare.",
+        "setup": "Crea un Egg, aggiungi il sito o le FAQ, attiva l'assistente e inserisci link pertinenti per prenotazioni, ordini o contatti.",
+        "result": "Prova le domande frequenti e consulta le aperture dell'Egg e le azioni rese disponibili."
+      },
       "answers": {
         "title": "Rispondere alle domande dei clienti",
         "example": "Monitora le aperture dell'Egg mentre i clienti ricevono risposte dalle informazioni della tua attività.",
@@ -165,6 +178,42 @@
         "example": "Monitora le aperture dell'Egg offrendo a tutti gli stessi link facoltativi per le recensioni.",
         "setup": "Aggiungi i link alle recensioni in Impostazioni, poi includili nella configurazione dell'Egg.",
         "result": "Mostra gli stessi link a tutti. Le recensioni pubbliche sono facoltative e mai legate a un premio."
+      },
+      "preferences": {
+        "title": "Scoprire cosa desiderano i visitatori",
+        "example": "Fai una domanda breve e neutrale per capire gli interessi dei visitatori.",
+        "setup": "Aggiungi un breve sondaggio con una domanda chiara sulle preferenze dei visitatori.",
+        "result": "Usa i risultati per capire le scelte. Le risposte sono anonime, salvo consenso separato alla condivisione dei contatti."
+      },
+      "satisfaction": {
+        "title": "Misurare la soddisfazione dei clienti",
+        "example": "Chiedi ai visitatori quanto sono soddisfatti e monitora le risposte nel tempo.",
+        "setup": "Aggiungi un sondaggio neutrale sulla soddisfazione con risposte chiare.",
+        "result": "Consulta risposte e tendenze. Godwit mostra i dati raccolti senza inventare valutazioni."
+      },
+      "issue-reporting": {
+        "title": "Segnalare un problema sul posto",
+        "example": "I visitatori possono inviare una segnalazione categorizzata su un problema del luogo.",
+        "setup": "La segnalazione è disponibile nell'Egg per i visitatori. Configura gli avvisi in-app, email o SMS nelle Impostazioni.",
+        "result": "Consulta le segnalazioni nella casella delle Impostazioni e ricevi avvisi tramite i canali attivati."
+      },
+      "promotion": {
+        "title": "Promuovere un evento, prodotto o offerta speciale",
+        "example": "Descrivi cosa vuoi promuovere e condividi i dettagli tramite l'Egg.",
+        "setup": "Inserisci i dettagli durante la creazione dell'Egg, poi aggiungi informazioni e link pertinenti.",
+        "result": "I visitatori vedono i dettagli nell'Egg. Mantieni aggiornati date, prezzi, condizioni e disponibilità."
+      },
+      "event-interest": {
+        "title": "Raccogliere iscrizioni o interesse per un evento",
+        "example": "Un sondaggio misura l'interesse, ma non crea un elenco nominativo né riserva un posto.",
+        "setup": "Aggiungi un sondaggio sull'interesse e una scheda con i dettagli dell'evento. Le iscrizioni nominative non sono ancora supportate.",
+        "result": "Consulta le risposte per misurare l'interesse. Non considerarle iscrizioni confermate."
+      },
+      "return-visits": {
+        "title": "Far tornare i clienti",
+        "example": "Incoraggia nuove visite con informazioni utili e email inviate solo dopo il consenso.",
+        "setup": "Configura un consenso email chiaro e un messaggio di recupero per i contatti consenzienti.",
+        "result": "Consulta i contatti consenzienti e le attività di follow-up. Le email promozionali raggiungono solo chi ha acconsentito."
       }
     }
   },
@@ -496,12 +545,15 @@
       "loadError": "Impossibile caricare i dati di progresso. Riprova più tardi.",
       "emptyEggs": "Crea un Egg per iniziare a monitorare i progressi."
     },
-    "settingsIntro": "Gestisci la fatturazione e i link alle recensioni dei clienti.",
+    "settingsIntro": "Gestisci avvisi, fatturazione, abbonamenti e link alle recensioni dei clienti.",
     "goal": {
       "title": "Crea un Egg con un obiettivo chiaro",
       "intro": "Stai creando un nuovo Egg: scegli gli obiettivi, assegna un nome e una posizione e aggiungi un ringraziamento facoltativo. Dopo la creazione, gestisci contenuti e accesso QR o NFC nella sezione Eggs.",
       "businessHint": "Scegli la categoria più adatta. Gli esempi mostrano come usare Egg in attività e luoghi diversi.",
       "multipleGoalsHint": "Scegli uno o più risultati importanti per questo Egg.",
+      "promotionDetailsLabel": "Quale evento, prodotto o offerta vuoi promuovere?",
+      "promotionDetailsPlaceholder": "Descrivi cosa vuoi promuovere e i dettagli importanti per i visitatori.",
+      "promotionDetailsRequired": "Descrivi l'evento, il prodotto o l'offerta che vuoi promuovere.",
       "businessGuidance": {
         "default": "Scegli risultati adatti ai tuoi clienti: rispondere alle domande, condividere informazioni utili, raccogliere feedback o suggerire il passo successivo.",
         "arts": "Per artisti, gallerie e musei: condividi storie o dettagli delle mostre, rispondi alle domande dei visitatori, raccogli feedback o inviti a contattarti.",

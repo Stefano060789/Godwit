@@ -186,6 +186,8 @@
   color: var(--hub-ink);
 }
 .egg-edit-goals { min-width: 0; }
+.egg-edit-goal-group { margin-top: .75rem; }
+.egg-edit-goal-group h4 { margin-bottom: .35rem; color: var(--hub-muted); font-size: .75rem; font-weight: 750; }
 .egg-edit-goal-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-top: .5rem; }
 .egg-edit-goal-list label { display: flex; align-items: center; gap: .5rem; padding: .6rem; border: 1px solid var(--hub-line); border-radius: .6rem; color: var(--hub-ink); background: var(--hub-surface); font-size: .8rem; }
 .egg-edit-goal-list input { width: auto !important; accent-color: var(--hub-accent); }
