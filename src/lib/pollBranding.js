@@ -19,6 +19,30 @@ export function getContrastingTextColor(backgroundColor) {
   return luminance > 0.179 ? "#172b2b" : "#fff8e9";
 }
 
+function parseHex(color) {
+  const match = /^#?([\da-f]{3}|[\da-f]{6})$/i.exec(typeof color === "string" ? color.trim() : "");
+  if (!match) return null;
+  const digits = match[1].length === 3 ? [...match[1]].map((digit) => digit + digit).join("") : match[1];
+  return [0, 2, 4].map((index) => Number.parseInt(digits.slice(index, index + 2), 16));
+}
+
+function relativeLuminance(rgb) {
+  const [red, green, blue] = rgb.map((channel) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+// Darkens a brand colour until it is readable as text or a border on a white surface.
+export function getReadableBrandColor(color, fallback = DEFAULT_PRIMARY_COLOR) {
+  let rgb = parseHex(color) || parseHex(fallback);
+  for (let step = 0; step < 20 && 1.05 / (relativeLuminance(rgb) + 0.05) < 4.5; step += 1) {
+    rgb = rgb.map((channel) => Math.round(channel * 0.88));
+  }
+  return `#${rgb.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
+}
+
 export function getPollBranding(poll) {
   const pollMeta = readPollMeta(poll?.id);
   return {

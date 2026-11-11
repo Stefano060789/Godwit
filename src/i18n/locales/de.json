@@ -25,16 +25,38 @@
     "usageLimit": "Das KI-Kontingent für dieses Egg ist aufgebraucht. Sie können weiterhin die Informationen und Umfragen unten nutzen.",
     "guidedPromptLabel": "Oder wählen Sie einen Einstieg",
     "guidedPrompts": {
-      "askQuestion": { "label": "Fragen zu diesem Ort", "prompt": "Was sollte ich vor meinem Besuch wissen?" },
-      "sharePreference": { "label": "Vorliebe mitteilen", "prompt": "Ich möchte mitteilen, was mir wichtig ist." },
-      "findInformation": { "label": "Nützliche Informationen finden", "prompt": "Zeigen Sie mir die wichtigsten Informationen für meinen Besuch." },
-      "findNextStep": { "label": "Nächsten Schritt finden", "prompt": "Was kann ich hier tun oder buchen?" },
-      "stayInTouch": { "label": "In Kontakt bleiben", "prompt": "Wie kann ich selbst entscheiden, ob ich Neuigkeiten erhalte?" },
-      "shareFeedback": { "label": "Ehrliches Feedback geben", "prompt": "Wie kann ich ehrliches Feedback zu meinem Besuch geben?" }
+      "askQuestion": {
+        "label": "Fragen zu diesem Ort",
+        "prompt": "Was sollte ich vor meinem Besuch wissen?"
+      },
+      "sharePreference": {
+        "label": "Vorliebe mitteilen",
+        "prompt": "Ich möchte mitteilen, was mir wichtig ist."
+      },
+      "findInformation": {
+        "label": "Nützliche Informationen finden",
+        "prompt": "Zeigen Sie mir die wichtigsten Informationen für meinen Besuch."
+      },
+      "findNextStep": {
+        "label": "Nächsten Schritt finden",
+        "prompt": "Was kann ich hier tun oder buchen?"
+      },
+      "stayInTouch": {
+        "label": "In Kontakt bleiben",
+        "prompt": "Wie kann ich selbst entscheiden, ob ich Neuigkeiten erhalte?"
+      },
+      "shareFeedback": {
+        "label": "Ehrliches Feedback geben",
+        "prompt": "Wie kann ich ehrliches Feedback zu meinem Besuch geben?"
+      }
     },
     "suggestedOptions": "Hier können Sie weitermachen:",
     "pollUnavailable": "Ich kann in diesem Chat gerade keine neue Umfrage hinzufügen. Sie können aber die vorhandenen Umfragen nutzen.",
-    "optionTypes": { "poll": "Feedback geben", "info": "Informationen ansehen", "task": "Aktion öffnen" },
+    "optionTypes": {
+      "poll": "Feedback geben",
+      "info": "Informationen ansehen",
+      "task": "Aktion öffnen"
+    },
     "topicPrompts": {
       "service": "Ich möchte Feedback zum Service geben.",
       "quality": "Ich möchte Feedback zur Produkt- oder Essensqualität geben.",
@@ -91,11 +113,28 @@
     "tabsLabel": "Bereiche der Dashboard-Demo",
     "metricsLabel": "Beispielkennzahlen",
     "samplePeriod": "Beispiel · letzte 30 Tage",
-    "tabs": { "overview": "Übersicht", "eggs": "Eggs", "results": "Ergebnisse", "goalProgress": "Zielverlauf" },
-    "metrics": { "interactions": "Kundeninteraktionen", "feedback": "Feedback-Antworten", "responseRate": "Antwortquote" },
+    "tabs": {
+      "overview": "Übersicht",
+      "eggs": "Eggs",
+      "results": "Ergebnisse",
+      "goalProgress": "Zielverlauf"
+    },
+    "metrics": {
+      "interactions": "Kundeninteraktionen",
+      "feedback": "Feedback-Antworten",
+      "responseRate": "Antwortquote"
+    },
     "chartTitle": "Kundeninteraktionen",
     "chartDescription": "Beispielhafte Egg-Sitzungen pro Tag in der letzten Woche",
-    "days": ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+    "days": [
+      "Mo",
+      "Di",
+      "Mi",
+      "Do",
+      "Fr",
+      "Sa",
+      "So"
+    ],
     "goalTitle": "Beispielziel",
     "goalDescription": "Mehr Kundenanfragen über ein wiederverwendbares Egg.",
     "goalProgress": "68 % des Beispielziels",
@@ -635,16 +674,46 @@
       "selectWorkspace": "Wählen Sie zuerst einen Arbeitsbereich.",
       "managerOnly": "Nur Eigentümer oder Bearbeiter können dieses Profil ändern.",
       "types": {
-        "other": { "title": "Anderes Unternehmen oder Organisation", "description": "Beschreiben Sie Ihr Unternehmen, wenn keine Kategorie passt." },
-        "cafe-pub": { "title": "Café oder Pub", "description": "Café, Kaffeeladen, Pub, Bar oder lokaler Treffpunkt." },
-        "restaurant-food": { "title": "Restaurant oder Gastronomie", "description": "Restaurant, Bäckerei, Food Hall, Imbiss oder anderes Gastronomieunternehmen." },
-        "accommodation": { "title": "Hotel oder Unterkunft", "description": "Hotel, Pension, Ferienunterkunft, Campingplatz oder andere Unterkunft." },
-        "arts-culture": { "title": "Kunst, Kultur oder Museum", "description": "Museum, Galerie, Atelier, Kulturdenkmal oder Kulturorganisation." },
-        "visitor-attraction": { "title": "Sehenswürdigkeit oder Reiseziel", "description": "Attraktion, Wahrzeichen, Reiseziel oder Tourismusorganisation." },
-        "event-venue": { "title": "Veranstaltung oder Veranstaltungsort", "description": "Festival, Konferenz, Veranstaltungsort, Club oder Gemeinschaftsevent." },
-        "retail-market": { "title": "Geschäft oder Markt", "description": "Einzelhandelsgeschäft, Marktstand, Kunsthandwerk oder Produktunternehmen." },
-        "local-service": { "title": "Lokaler oder terminbasierter Dienst", "description": "Salon, Reparaturbetrieb, Praxis oder terminbasierter Dienstleister." },
-        "community-space": { "title": "Gemeinschafts- oder öffentlicher Ort", "description": "Gemeinschaftszentrum, Bibliothek, öffentlicher Ort, gemeinnützige oder kommunale Einrichtung." }
+        "other": {
+          "title": "Anderes Unternehmen oder Organisation",
+          "description": "Beschreiben Sie Ihr Unternehmen, wenn keine Kategorie passt."
+        },
+        "cafe-pub": {
+          "title": "Café oder Pub",
+          "description": "Café, Kaffeeladen, Pub, Bar oder lokaler Treffpunkt."
+        },
+        "restaurant-food": {
+          "title": "Restaurant oder Gastronomie",
+          "description": "Restaurant, Bäckerei, Food Hall, Imbiss oder anderes Gastronomieunternehmen."
+        },
+        "accommodation": {
+          "title": "Hotel oder Unterkunft",
+          "description": "Hotel, Pension, Ferienunterkunft, Campingplatz oder andere Unterkunft."
+        },
+        "arts-culture": {
+          "title": "Kunst, Kultur oder Museum",
+          "description": "Museum, Galerie, Atelier, Kulturdenkmal oder Kulturorganisation."
+        },
+        "visitor-attraction": {
+          "title": "Sehenswürdigkeit oder Reiseziel",
+          "description": "Attraktion, Wahrzeichen, Reiseziel oder Tourismusorganisation."
+        },
+        "event-venue": {
+          "title": "Veranstaltung oder Veranstaltungsort",
+          "description": "Festival, Konferenz, Veranstaltungsort, Club oder Gemeinschaftsevent."
+        },
+        "retail-market": {
+          "title": "Geschäft oder Markt",
+          "description": "Einzelhandelsgeschäft, Marktstand, Kunsthandwerk oder Produktunternehmen."
+        },
+        "local-service": {
+          "title": "Lokaler oder terminbasierter Dienst",
+          "description": "Salon, Reparaturbetrieb, Praxis oder terminbasierter Dienstleister."
+        },
+        "community-space": {
+          "title": "Gemeinschafts- oder öffentlicher Ort",
+          "description": "Gemeinschaftszentrum, Bibliothek, öffentlicher Ort, gemeinnützige oder kommunale Einrichtung."
+        }
       }
     },
     "businessData": {
@@ -1027,10 +1096,10 @@
         "printPreview": "Druckvorschau",
         "paperSize": "Papierformat",
         "artworkSize": "Gedrucktes Egg",
-        "qrSize": "QR-Fl\u00e4che (mit Ruhezone)",
-        "printScale": "Mit 100 % / Originalgr\u00f6\u00dfe drucken. Kopf- und Fu\u00dfzeilen im Browser ausschalten. Die Ma\u00dfe enthalten die wei\u00dfe QR-Ruhezone.",
+        "qrSize": "QR-Fläche (mit Ruhezone)",
+        "printScale": "Mit 100 % / Originalgröße drucken. Kopf- und Fußzeilen im Browser ausschalten. Die Maße enthalten die weiße QR-Ruhezone.",
         "simplePrintHint": "Ein großer QR-Code, ein schlichter Egg-Rahmen und ein gut sichtbares Godwit-Logo. Vorschau, Download und Druck stimmen überein.",
-        "popupBlocked": "Erlauben Sie Pop-ups, um die Druckvorschau zu \u00f6ffnen.",
+        "popupBlocked": "Erlauben Sie Pop-ups, um die Druckvorschau zu öffnen.",
         "printTitle": "Egg-QR-Code drucken",
         "printerHint": "„Drucken“ öffnet den Druckdialog Ihres Geräts. Wählen Sie dort einen Drucker oder speichern Sie die Datei als PDF.",
         "printAction": "Drucken / Drucker wählen",
@@ -1255,5 +1324,48 @@
         "lockedDescription": "Ein vollständiger Verantwortlichkeitsverlauf aller administrativen Aktionen in Ihrem Arbeitsbereich."
       }
     }
+  },
+  "eggGuide": {
+    "intents": {
+      "ask": {
+        "title": "Frage stellen",
+        "hint": "Sofortige Antwort von unserem KI-Guide"
+      },
+      "poll": {
+        "title": "Kurzes Feedback",
+        "hint": "Beantworte eine kurze Frage"
+      },
+      "info": {
+        "title": "Informationen ansehen",
+        "hint": "Nützliche Details für deinen Besuch"
+      },
+      "offer": {
+        "title": "Sonderangebot",
+        "hint": "Etwas, das dir gefallen könnte"
+      },
+      "report": {
+        "title": "Problem melden",
+        "hint": "Sag uns, wenn etwas Aufmerksamkeit braucht"
+      },
+      "review": {
+        "title": "Erfahrung teilen",
+        "hint": "Bewertung in einer Minute"
+      },
+      "donate": {
+        "title": "Uns unterstützen",
+        "hint": "Einen Beitrag leisten"
+      }
+    },
+    "openLink": "Link öffnen",
+    "progress": "Dein Fortschritt",
+    "kicker": "Eine kleine Hilfe von Godwit",
+    "thanksKicker": "Danke — das hilft.",
+    "welcome": "Willkommen. Was führt dich her?",
+    "whatNext": "Was möchtest du als Nächstes tun?",
+    "allDone": "Alles erledigt. Danke!",
+    "suggested": "Empfohlen",
+    "back": "Zurück",
+    "continueDone": "Fertig — wie geht's weiter?",
+    "continueSkip": "Überspringen — andere Optionen"
   }
 }

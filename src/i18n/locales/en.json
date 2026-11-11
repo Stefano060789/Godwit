@@ -51,7 +51,15 @@
     },
     "chartTitle": "Customer interactions",
     "chartDescription": "Sample Egg sessions by day over the last week",
-    "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "days": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun"
+    ],
     "goalTitle": "Example goal",
     "goalDescription": "Increase customer enquiries through a reusable Egg.",
     "goalProgress": "68% of the example target",
@@ -93,12 +101,30 @@
     "feedbackPrompt": "What would you like to focus on?",
     "guidedPromptLabel": "Or choose a quick start",
     "guidedPrompts": {
-      "askQuestion": { "label": "Ask about this place", "prompt": "What should I know before I visit?" },
-      "sharePreference": { "label": "Share a preference", "prompt": "I'd like to share what matters most to me." },
-      "findInformation": { "label": "Find useful information", "prompt": "Show me the most useful information for my visit." },
-      "findNextStep": { "label": "Find a next step", "prompt": "What can I do or book here?" },
-      "stayInTouch": { "label": "Stay in touch", "prompt": "How can I choose to hear from this business?" },
-      "shareFeedback": { "label": "Share honest feedback", "prompt": "How can I share honest feedback about my visit?" }
+      "askQuestion": {
+        "label": "Ask about this place",
+        "prompt": "What should I know before I visit?"
+      },
+      "sharePreference": {
+        "label": "Share a preference",
+        "prompt": "I'd like to share what matters most to me."
+      },
+      "findInformation": {
+        "label": "Find useful information",
+        "prompt": "Show me the most useful information for my visit."
+      },
+      "findNextStep": {
+        "label": "Find a next step",
+        "prompt": "What can I do or book here?"
+      },
+      "stayInTouch": {
+        "label": "Stay in touch",
+        "prompt": "How can I choose to hear from this business?"
+      },
+      "shareFeedback": {
+        "label": "Share honest feedback",
+        "prompt": "How can I share honest feedback about my visit?"
+      }
     },
     "topicPrompts": {
       "service": "I'd like to give feedback about the service.",
@@ -536,9 +562,18 @@
       "statusNote": "Existing plan features and limits remain in effect. Paid-package pricing and counting, top-ups, and Stripe checkout will need a separate implementation before this proposal can be purchased."
     },
     "plans": {
-      "free": { "name": "Free", "description": "Start with one active Egg, three active polls, and the essential feedback loop." },
-      "starter": { "name": "Starter", "description": "Add email-sharing benefits, public review invitations, exports, reports, and professional feedback tools." },
-      "growth": { "name": "Growth", "description": "Scale with more polls and Eggs, prize draws, automation, reputation monitoring, webhooks, and API access." }
+      "free": {
+        "name": "Free",
+        "description": "Start with one active Egg, three active polls, and the essential feedback loop."
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "Add email-sharing benefits, public review invitations, exports, reports, and professional feedback tools."
+      },
+      "growth": {
+        "name": "Growth",
+        "description": "Scale with more polls and Eggs, prize draws, automation, reputation monitoring, webhooks, and API access."
+      }
     },
     "rows": {
       "pollLimit": "Active poll limit",
@@ -919,13 +954,34 @@
       "settings": "Brand, team access, developer API, and recent activity."
     },
     "quickActions": {
-      "polls": { "label": "Polls", "description": "Create a new poll, then search, filter, and see how each one performs." },
-      "woodpecker": { "label": "Tasks", "description": "Attach Tasks to Eggs, track progress, and let a QR scan complete them automatically." },
-      "engagement": { "label": "Create an Egg", "description": "Combine polls, information, tasks, and optional AI guidance in a reusable destination opened by QR or NFC." },
-      "connection": { "label": "Customer connection", "description": "Collect emails, invite honest reviews, and manage rewards." },
-      "analytics": { "label": "View analytics", "description": "See trends across every poll and location." },
-      "feedback": { "label": "Review feedback", "description": "Read voter messages and approve pending review claims." },
-      "settings": { "label": "Workspace settings", "description": "Manage your brand, team access, and billing." }
+      "polls": {
+        "label": "Polls",
+        "description": "Create a new poll, then search, filter, and see how each one performs."
+      },
+      "woodpecker": {
+        "label": "Tasks",
+        "description": "Attach Tasks to Eggs, track progress, and let a QR scan complete them automatically."
+      },
+      "engagement": {
+        "label": "Create an Egg",
+        "description": "Combine polls, information, tasks, and optional AI guidance in a reusable destination opened by QR or NFC."
+      },
+      "connection": {
+        "label": "Customer connection",
+        "description": "Collect emails, invite honest reviews, and manage rewards."
+      },
+      "analytics": {
+        "label": "View analytics",
+        "description": "See trends across every poll and location."
+      },
+      "feedback": {
+        "label": "Review feedback",
+        "description": "Read voter messages and approve pending review claims."
+      },
+      "settings": {
+        "label": "Workspace settings",
+        "description": "Manage your brand, team access, and billing."
+      }
     },
     "overview": {
       "stats": {
@@ -1218,8 +1274,8 @@
         "suggestedAmount": "Suggested amount (optional)",
         "messagePlaceholder": "Optional message shown with the support-payment option",
         "saveButton": "Save venue-support settings",
-        "feeNote": "Stripe processes the payment. This is a voluntary payment to the venue, not a charitable donation and not tax-deductible. Godwit never sees or stores card details. Of each payment, 9% is a Godwit platform fee and 91% transfers to your connected Stripe account."
-        ,"categoryTitle": "Choose the payment category",
+        "feeNote": "Stripe processes the payment. This is a voluntary payment to the venue, not a charitable donation and not tax-deductible. Godwit never sees or stores card details. Of each payment, 9% is a Godwit platform fee and 91% transfers to your connected Stripe account.",
+        "categoryTitle": "Choose the payment category",
         "categoryHelp": "Select the wording that best matches your legal and commercial situation. Godwit does not determine the legal classification.",
         "categoryLabel": "Shown to visitors",
         "categoryTip": "Tip",
@@ -1506,7 +1562,7 @@
         "answerTrigger": "Answer trigger",
         "addAlertRule": "Add alert rule",
         "scoreAtOrBelowValue": "score at or below {{value}}",
-        "answerMatchValue": "answer \u201c{{value}}\u201d",
+        "answerMatchValue": "answer “{{value}}”",
         "noRulesYet": "No feedback alert rules yet.",
         "taskHint": "Turn an alert into a recovery task and track completion.",
         "taskPlaceholder": "Call customer, review service issue",
@@ -1612,5 +1668,48 @@
         "lockedDescription": "A full accountability trail of administrative actions taken in your workspace."
       }
     }
+  },
+  "eggGuide": {
+    "intents": {
+      "ask": {
+        "title": "Ask a question",
+        "hint": "Get an instant answer from our AI guide"
+      },
+      "poll": {
+        "title": "Give quick feedback",
+        "hint": "Answer a short question"
+      },
+      "info": {
+        "title": "See information",
+        "hint": "Useful details for your visit"
+      },
+      "offer": {
+        "title": "Special offer",
+        "hint": "Something we think you'll like"
+      },
+      "report": {
+        "title": "Report an issue",
+        "hint": "Tell us if something needs attention"
+      },
+      "review": {
+        "title": "Share your experience",
+        "hint": "Leave a review in a minute"
+      },
+      "donate": {
+        "title": "Support us",
+        "hint": "Make a contribution"
+      }
+    },
+    "openLink": "Open link",
+    "progress": "Your progress",
+    "kicker": "A little help from Godwit",
+    "thanksKicker": "Thanks — that helps.",
+    "welcome": "Welcome. What brings you here?",
+    "whatNext": "What would you like to do next?",
+    "allDone": "You're all set. Thank you!",
+    "suggested": "Suggested",
+    "back": "Back",
+    "continueDone": "Done — what's next?",
+    "continueSkip": "Skip — show other options"
   }
 }

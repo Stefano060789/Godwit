@@ -3,16 +3,12 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { supabase } from "../lib/supabase";
 import { getPollBranding } from "../lib/pollBranding";
 import { reassignManagedCampaignPoll, resolveManagedQrToken } from "../lib/qrManage";
-import DonationCard from "../components/DonationCard";
-import InlinePollVote from "../components/InlinePollVote";
-import EggAiAssistant from "../components/EggAiAssistant";
-import { accessibilityTagIcon, accessibilityTagLabel } from "../lib/accessibilityTags";
+import EggGuide from "../components/EggGuide";
 import { DONATION_FEATURE_ENABLED } from "../../lib/donationFeature.js";
 import { normalizeEggAccessMethod } from "../lib/eggs";
 import { getEggTrialSessionId } from "../lib/eggTrial";
 import { useTranslation } from "react-i18next";
 import VisitorPreviewBar from "../components/VisitorPreviewBar";
-import IssueReportForm from "../components/IssueReportForm";
 import { recordEggPromotionLinkClick } from "../lib/goalProgress";
 
 export default function QrRedirect() {
@@ -34,6 +30,7 @@ function QrRedirectContent() {
   const isManageMode = searchParams.get("manage") === "1";
   const accessMethod = normalizeEggAccessMethod(searchParams.get("via"));
   const [menu, setMenu] = useState(null);
+  const [guideGoalKeys, setGuideGoalKeys] = useState([]);
   const [manage, setManage] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -116,7 +113,9 @@ function QrRedirectContent() {
           body: JSON.stringify({ action: "config", token })
         });
         if (!aiConfigResponse.ok) throw new Error(`Egg AI settings request failed (${aiConfigResponse.status}).`);
-        eggAiEnabled = (await aiConfigResponse.json()).enabled === true;
+        const aiConfig = await aiConfigResponse.json();
+        eggAiEnabled = aiConfig.enabled === true;
+        if (Array.isArray(aiConfig.goalKeys)) setGuideGoalKeys(aiConfig.goalKeys);
       } catch (aiConfigError) {
         console.error("Unable to load Egg AI settings:", aiConfigError);
       }
@@ -291,103 +290,13 @@ function QrRedirectContent() {
   }
 
   if (menu) {
-    const { portalTitle, portalMessage, items, branding, aiEnabled, trialSessionId } = menu;
+    const { trialSessionId } = menu;
     const trackPromotionClick = (itemId) => {
       if (isPreview || !menu.campaignId || !trialSessionId) return;
       void recordEggPromotionLinkClick(menu.campaignId, itemId, trialSessionId)
         .catch((failure) => console.error("Unable to record promotion link click:", failure));
     };
-    return (
-      <main className="qr-portal" style={{ backgroundColor: branding.accentColor }}>
-        <section className="qr-portal-card qr-portal-menu">
-          {branding.logoUrl && <img src={branding.logoUrl} alt={`${branding.brandName || "Venue"} logo`} className="qr-portal-logo" />}
-          <p className="qr-portal-brand" style={{ color: branding.primaryColor }}>{branding.brandName || "Godwit"}</p>
-          <h1>{portalTitle || (items.length === 0 && (aiEnabled || menu.aiPreview) ? t("eggAi.welcome", { defaultValue: "Welcome. How can I help?" }) : items.length === 0 ? t("issueReport.eggWelcome", { defaultValue: "Welcome" }) : "Welcome! Choose an option below.")}</h1>
-          {portalMessage && <p>{portalMessage}</p>}
-          <div className="qr-portal-menu-list">
-            {(aiEnabled || menu.aiPreview) && (
-              <EggAiAssistant
-                token={token}
-                campaignId={menu.campaignId}
-                trialSessionId={trialSessionId}
-                branding={branding}
-                preview={menu.aiPreview}
-              />
-            )}
-            {items.map((item) => {
-              if (item.item_type === "poll") {
-                return (
-                  <div key={item.item_id} id={`egg-option-${item.item_id}`}>
-                    <InlinePollVote item={item} branding={branding} preview={isPreview} />
-                  </div>
-                );
-              }
-              if (item.item_type === "donation") {
-                return (
-                  <div key={item.item_id} id={`egg-option-${item.item_id}`}>
-                    <DonationCard item={item} campaignToken={token} />
-                  </div>
-                );
-              }
-              if (item.item_type === "reward") {
-                return (
-                  <div key={item.item_id} id={`egg-option-${item.item_id}`} className="qr-portal-menu-item qr-portal-menu-reward">
-                    <span className="qr-portal-menu-item-title">🎁 {item.title}</span>
-                    {item.body && <p className="qr-portal-menu-item-body">{item.body}</p>}
-                    {item.reward_code && (
-                      <p className="qr-portal-menu-item-reward-code">{item.reward_code}</p>
-                    )}
-                    {item.link_url && (
-                      <a
-                        href={item.link_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={() => trackPromotionClick(item.item_id)}
-                        className="qr-portal-menu-item-cta"
-                        style={{ color: branding.primaryColor }}
-                      >
-                        {item.link_label || "Open link"} →
-                      </a>
-                    )}
-                  </div>
-                );
-              }
-              return (
-                <div key={item.item_id} id={`egg-option-${item.item_id}`} className="qr-portal-menu-item qr-portal-menu-info">
-                  {item.image_url && (
-                    <img src={item.image_url} alt={item.title || ""} className="qr-portal-menu-item-image" />
-                  )}
-                  <span className="qr-portal-menu-item-title">{item.title}</span>
-                  {item.accessibility_tags?.length > 0 && (
-                    <span className="qr-portal-menu-item-tags" aria-label={`Accessibility: ${item.accessibility_tags.map((tag) => accessibilityTagLabel(tag)).join(", ")}`}>
-                      {item.accessibility_tags.map((tag) => (
-                        <span key={tag} className="qr-portal-menu-item-tag" title={accessibilityTagLabel(tag)}>
-                          {accessibilityTagIcon(tag)}
-                        </span>
-                      ))}
-                    </span>
-                  )}
-                  {item.body && <p className="qr-portal-menu-item-body">{item.body}</p>}
-                  {item.link_url && (
-                    <a
-                      href={item.link_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={() => trackPromotionClick(item.item_id)}
-                      className="qr-portal-menu-item-cta"
-                      style={{ color: branding.primaryColor }}
-                    >
-                      {item.link_label || "Open link"} →
-                    </a>
-                  )}
-                </div>
-              );
-            })}
-            {menu.campaignId && <IssueReportForm campaignId={menu.campaignId} preview={isPreview} branding={branding} />}
-          </div>
-        </section>
-      </main>
-    );
+    return <EggGuide token={token} menu={menu} goalKeys={guideGoalKeys} preview={isPreview} onLinkClick={trackPromotionClick} />;
   }
 
   if (errorMessage) return <main className="p-6 text-center" role="alert">{errorMessage}</main>;

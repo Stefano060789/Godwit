@@ -57,7 +57,7 @@ function createSessionId() {
   }
 }
 
-export default function EggAiAssistant({ token, campaignId, trialSessionId, branding, preview = false, initiallyExpanded = true }) {
+export default function EggAiAssistant({ token, campaignId, trialSessionId, branding, preview = false, initiallyExpanded = true, onAnswered }) {
   const { t } = useTranslation("translation", { keyPrefix: "eggAi" });
   const [enabled, setEnabled] = useState(preview);
   const [expanded, setExpanded] = useState(initiallyExpanded);
@@ -142,6 +142,7 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
           pollUnavailable: result.pollUnavailable === true
         }
       ]);
+      onAnswered?.();
     } catch (sendError) {
       setInput(message);
       setError(sendError.message || t("assistantError"));

@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getEggTrialSessionId } from "../lib/eggTrial";
 import { submitEggIssue } from "../lib/issueReports";
+import { getReadableBrandColor } from "../lib/pollBranding";
 
 const CATEGORIES = ["service", "cleanliness", "accessibility", "safety", "other"];
 
-export default function IssueReportForm({ campaignId, preview = false, branding }) {
+export default function IssueReportForm({ campaignId, preview = false, branding, onSubmitted }) {
   const { t } = useTranslation();
   const [category, setCategory] = useState("service");
   const [description, setDescription] = useState("");
@@ -34,6 +35,7 @@ export default function IssueReportForm({ campaignId, preview = false, branding 
         }));
       }
       setDescription("");
+      onSubmitted?.();
     } catch (failure) {
       console.error("Unable to submit on-site issue report", failure);
       setError(failure.message || t("issueReport.submitError", { defaultValue: "Your report could not be sent. Please try again." }));
@@ -73,7 +75,7 @@ export default function IssueReportForm({ campaignId, preview = false, branding 
             placeholder={t("issueReport.detailsPlaceholder", { defaultValue: "Please share enough detail for the business to respond." })}
           />
         </label>
-        <button type="submit" disabled={busy || description.trim().length < 8} style={{ backgroundColor: branding?.primaryColor || undefined }}>
+        <button type="submit" disabled={busy || description.trim().length < 8} style={{ backgroundColor: getReadableBrandColor(branding?.primaryColor), color: "#fff" }}>
           {busy ? t("issueReport.sending", { defaultValue: "Sending…" }) : t("issueReport.submit", { defaultValue: "Send issue report" })}
         </button>
       </form>}

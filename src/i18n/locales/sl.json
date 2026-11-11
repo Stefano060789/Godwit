@@ -25,16 +25,38 @@
     "usageLimit": "AI-kvota za ta Egg je dosežena. Še vedno lahko uporabiš spodnje informacije in ankete.",
     "guidedPromptLabel": "Ali izberi začetek",
     "guidedPrompts": {
-      "askQuestion": { "label": "Vprašaj o tem kraju", "prompt": "Kaj moram vedeti pred obiskom?" },
-      "sharePreference": { "label": "Deli željo", "prompt": "Rad bi povedal, kaj mi je najpomembnejše." },
-      "findInformation": { "label": "Poišči koristne informacije", "prompt": "Pokaži mi najbolj koristne informacije za moj obisk." },
-      "findNextStep": { "label": "Poišči naslednji korak", "prompt": "Kaj lahko tukaj počnem ali rezerviram?" },
-      "stayInTouch": { "label": "Ostani v stiku", "prompt": "Kako lahko sam izberem, ali želim prejemati novice?" },
-      "shareFeedback": { "label": "Deli iskreno mnenje", "prompt": "Kako lahko iskreno ocenim svoj obisk?" }
+      "askQuestion": {
+        "label": "Vprašaj o tem kraju",
+        "prompt": "Kaj moram vedeti pred obiskom?"
+      },
+      "sharePreference": {
+        "label": "Deli željo",
+        "prompt": "Rad bi povedal, kaj mi je najpomembnejše."
+      },
+      "findInformation": {
+        "label": "Poišči koristne informacije",
+        "prompt": "Pokaži mi najbolj koristne informacije za moj obisk."
+      },
+      "findNextStep": {
+        "label": "Poišči naslednji korak",
+        "prompt": "Kaj lahko tukaj počnem ali rezerviram?"
+      },
+      "stayInTouch": {
+        "label": "Ostani v stiku",
+        "prompt": "Kako lahko sam izberem, ali želim prejemati novice?"
+      },
+      "shareFeedback": {
+        "label": "Deli iskreno mnenje",
+        "prompt": "Kako lahko iskreno ocenim svoj obisk?"
+      }
     },
     "suggestedOptions": "Nadaljuješ lahko tukaj:",
     "pollUnavailable": "V tem klepetu trenutno ne morem dodati nove ankete, lahko pa uporabiš že razpoložljive možnosti.",
-    "optionTypes": { "poll": "Oddaj mnenje", "info": "Poglej informacije", "task": "Odpri opravilo" },
+    "optionTypes": {
+      "poll": "Oddaj mnenje",
+      "info": "Poglej informacije",
+      "task": "Odpri opravilo"
+    },
     "topicPrompts": {
       "service": "Rad bi podal mnenje o storitvi.",
       "quality": "Rad bi podal mnenje o kakovosti izdelka ali hrane.",
@@ -92,11 +114,28 @@
     "tabsLabel": "Razdelki predstavitve nadzorne plošče",
     "metricsLabel": "Vzorčni kazalniki",
     "samplePeriod": "Primer · zadnjih 30 dni",
-    "tabs": { "overview": "Pregled", "eggs": "Eggi", "results": "Rezultati", "goalProgress": "Napredek cilja" },
-    "metrics": { "interactions": "Uporabniške seje Eggov", "feedback": "Odgovori s povratnimi informacijami", "responseRate": "Stopnja odziva" },
+    "tabs": {
+      "overview": "Pregled",
+      "eggs": "Eggi",
+      "results": "Rezultati",
+      "goalProgress": "Napredek cilja"
+    },
+    "metrics": {
+      "interactions": "Uporabniške seje Eggov",
+      "feedback": "Odgovori s povratnimi informacijami",
+      "responseRate": "Stopnja odziva"
+    },
     "chartTitle": "Interakcije s strankami",
     "chartDescription": "Vzorčne seje Eggov po dnevih v zadnjem tednu",
-    "days": ["Pon", "Tor", "Sre", "Čet", "Pet", "Sob", "Ned"],
+    "days": [
+      "Pon",
+      "Tor",
+      "Sre",
+      "Čet",
+      "Pet",
+      "Sob",
+      "Ned"
+    ],
     "goalTitle": "Primer cilja",
     "goalDescription": "Povečajte povpraševanja strank prek ponovno uporabnega Egga.",
     "goalProgress": "68 % vzorčnega cilja",
@@ -409,8 +448,8 @@
         "printPreview": "Predogled tiskanja",
         "paperSize": "Velikost papirja",
         "artworkSize": "Natisnjeno jajce",
-        "qrSize": "Obmo\u010dje QR (z belim robom)",
-        "printScale": "Tiskajte pri 100 % / dejanski velikosti. Izklopite glave in noge brskalnika. Mere vklju\u010dujejo beli rob QR.",
+        "qrSize": "Območje QR (z belim robom)",
+        "printScale": "Tiskajte pri 100 % / dejanski velikosti. Izklopite glave in noge brskalnika. Mere vključujejo beli rob QR.",
         "simplePrintHint": "Velik QR, preprost okvir jajca in dobro viden logotip Godwit. Predogled se ujema s prenosom in tiskom.",
         "popupBlocked": "Dovolite pojavna okna za predogled tiskanja.",
         "scanToView": "Skenirajte za ogled",
@@ -532,16 +571,46 @@
       "selectWorkspace": "Najprej izberite delovni prostor.",
       "managerOnly": "Profil lahko posodobita lastnik ali urednik delovnega prostora.",
       "types": {
-        "other": { "title": "Drugo podjetje ali organizacija", "description": "Opišite jo, če nobena od zgornjih kategorij ne ustreza." },
-        "cafe-pub": { "title": "Kavarna ali pub", "description": "Kavarna, čajnica, pub, bar ali lokalno zbirališče." },
-        "restaurant-food": { "title": "Restavracija ali gostinski lokal", "description": "Restavracija, pekarna, tržnica s hrano, okrepčevalnica ali druga gostinska dejavnost." },
-        "accommodation": { "title": "Hotel ali nastanitev", "description": "Hotel, gostišče, počitniška nastanitev, kamp ali druga nastanitev." },
-        "arts-culture": { "title": "Umetnost, kultura ali muzej", "description": "Muzej, galerija, atelje, dediščinska lokacija ali kulturna organizacija." },
-        "visitor-attraction": { "title": "Turistična znamenitost ali destinacija", "description": "Znamenitost, kraj, destinacija ali turistična organizacija." },
-        "event-venue": { "title": "Dogodek ali prizorišče", "description": "Festival, konferenca, prizorišče, klub ali skupnostni dogodek." },
-        "retail-market": { "title": "Trgovina ali tržnica", "description": "Trgovina, tržna stojnica, rokodelska trgovina ali prodaja izdelkov." },
-        "local-service": { "title": "Lokalna storitev ali storitev po dogovoru", "description": "Salon, servis, strokovna praksa ali storitev po dogovoru." },
-        "community-space": { "title": "Skupnostni ali javni prostor", "description": "Skupnostni center, knjižnica, javni prostor, neprofitna ali javna služba." }
+        "other": {
+          "title": "Drugo podjetje ali organizacija",
+          "description": "Opišite jo, če nobena od zgornjih kategorij ne ustreza."
+        },
+        "cafe-pub": {
+          "title": "Kavarna ali pub",
+          "description": "Kavarna, čajnica, pub, bar ali lokalno zbirališče."
+        },
+        "restaurant-food": {
+          "title": "Restavracija ali gostinski lokal",
+          "description": "Restavracija, pekarna, tržnica s hrano, okrepčevalnica ali druga gostinska dejavnost."
+        },
+        "accommodation": {
+          "title": "Hotel ali nastanitev",
+          "description": "Hotel, gostišče, počitniška nastanitev, kamp ali druga nastanitev."
+        },
+        "arts-culture": {
+          "title": "Umetnost, kultura ali muzej",
+          "description": "Muzej, galerija, atelje, dediščinska lokacija ali kulturna organizacija."
+        },
+        "visitor-attraction": {
+          "title": "Turistična znamenitost ali destinacija",
+          "description": "Znamenitost, kraj, destinacija ali turistična organizacija."
+        },
+        "event-venue": {
+          "title": "Dogodek ali prizorišče",
+          "description": "Festival, konferenca, prizorišče, klub ali skupnostni dogodek."
+        },
+        "retail-market": {
+          "title": "Trgovina ali tržnica",
+          "description": "Trgovina, tržna stojnica, rokodelska trgovina ali prodaja izdelkov."
+        },
+        "local-service": {
+          "title": "Lokalna storitev ali storitev po dogovoru",
+          "description": "Salon, servis, strokovna praksa ali storitev po dogovoru."
+        },
+        "community-space": {
+          "title": "Skupnostni ali javni prostor",
+          "description": "Skupnostni center, knjižnica, javni prostor, neprofitna ali javna služba."
+        }
       }
     },
     "businessData": {
@@ -625,5 +694,48 @@
     "translating": "Prevajanje vsebine ankete...",
     "submitAnswer": "Pošlji odgovor",
     "submitVote": "Oddaj glas"
+  },
+  "eggGuide": {
+    "intents": {
+      "ask": {
+        "title": "Postavi vprašanje",
+        "hint": "Takojšen odgovor našega AI vodnika"
+      },
+      "poll": {
+        "title": "Hiter odziv",
+        "hint": "Odgovori na kratko vprašanje"
+      },
+      "info": {
+        "title": "Poglej informacije",
+        "hint": "Uporabne podrobnosti za vaš obisk"
+      },
+      "offer": {
+        "title": "Posebna ponudba",
+        "hint": "Nekaj, kar vam bo morda všeč"
+      },
+      "report": {
+        "title": "Prijavi težavo",
+        "hint": "Sporoči nam, če kaj potrebuje pozornost"
+      },
+      "review": {
+        "title": "Deli svojo izkušnjo",
+        "hint": "Oceni v eni minuti"
+      },
+      "donate": {
+        "title": "Podpri nas",
+        "hint": "Prispevaj"
+      }
+    },
+    "openLink": "Odpri povezavo",
+    "progress": "Tvoj napredek",
+    "kicker": "Majhna pomoč Godwit",
+    "thanksKicker": "Hvala — to pomaga.",
+    "welcome": "Dobrodošli. Kaj vas vodi sem?",
+    "whatNext": "Kaj želite storiti naprej?",
+    "allDone": "Vse je opravljeno. Hvala!",
+    "suggested": "Priporočeno",
+    "back": "Nazaj",
+    "continueDone": "Končano — kaj sledi?",
+    "continueSkip": "Preskoči — pokaži druge možnosti"
   }
 }

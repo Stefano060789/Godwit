@@ -25,16 +25,38 @@
     "usageLimit": "Il limite AI per questo Egg è stato raggiunto. Puoi comunque usare le informazioni e i sondaggi qui sotto.",
     "guidedPromptLabel": "Oppure scegli da dove iniziare",
     "guidedPrompts": {
-      "askQuestion": { "label": "Chiedi informazioni sul luogo", "prompt": "Cosa dovrei sapere prima di venire?" },
-      "sharePreference": { "label": "Condividi una preferenza", "prompt": "Vorrei condividere ciò che conta di più per me." },
-      "findInformation": { "label": "Trova informazioni utili", "prompt": "Mostrami le informazioni più utili per la mia visita." },
-      "findNextStep": { "label": "Scopri il prossimo passo", "prompt": "Cosa posso fare o prenotare qui?" },
-      "stayInTouch": { "label": "Resta in contatto", "prompt": "Come posso scegliere di ricevere aggiornamenti da questa attività?" },
-      "shareFeedback": { "label": "Condividi un feedback sincero", "prompt": "Come posso condividere un feedback sincero sulla mia visita?" }
+      "askQuestion": {
+        "label": "Chiedi informazioni sul luogo",
+        "prompt": "Cosa dovrei sapere prima di venire?"
+      },
+      "sharePreference": {
+        "label": "Condividi una preferenza",
+        "prompt": "Vorrei condividere ciò che conta di più per me."
+      },
+      "findInformation": {
+        "label": "Trova informazioni utili",
+        "prompt": "Mostrami le informazioni più utili per la mia visita."
+      },
+      "findNextStep": {
+        "label": "Scopri il prossimo passo",
+        "prompt": "Cosa posso fare o prenotare qui?"
+      },
+      "stayInTouch": {
+        "label": "Resta in contatto",
+        "prompt": "Come posso scegliere di ricevere aggiornamenti da questa attività?"
+      },
+      "shareFeedback": {
+        "label": "Condividi un feedback sincero",
+        "prompt": "Come posso condividere un feedback sincero sulla mia visita?"
+      }
     },
     "suggestedOptions": "Puoi continuare qui:",
     "pollUnavailable": "Al momento non posso aggiungere un sondaggio in questa chat, ma puoi usare quelli già disponibili.",
-    "optionTypes": { "poll": "Lascia un feedback", "info": "Vedi informazioni", "task": "Apri attività" },
+    "optionTypes": {
+      "poll": "Lascia un feedback",
+      "info": "Vedi informazioni",
+      "task": "Apri attività"
+    },
     "topicPrompts": {
       "service": "Vorrei lasciare un feedback sul servizio.",
       "quality": "Vorrei lasciare un feedback sulla qualità del prodotto o del cibo.",
@@ -91,11 +113,28 @@
     "tabsLabel": "Sezioni della demo dashboard",
     "metricsLabel": "Metriche di esempio",
     "samplePeriod": "Esempio · ultimi 30 giorni",
-    "tabs": { "overview": "Panoramica", "eggs": "Egg", "results": "Risultati", "goalProgress": "Progressi obiettivo" },
-    "metrics": { "interactions": "Sessioni cliente Egg", "feedback": "Risposte di feedback", "responseRate": "Tasso di risposta" },
+    "tabs": {
+      "overview": "Panoramica",
+      "eggs": "Egg",
+      "results": "Risultati",
+      "goalProgress": "Progressi obiettivo"
+    },
+    "metrics": {
+      "interactions": "Sessioni cliente Egg",
+      "feedback": "Risposte di feedback",
+      "responseRate": "Tasso di risposta"
+    },
     "chartTitle": "Interazioni con i clienti",
     "chartDescription": "Sessioni Egg di esempio per giorno nell'ultima settimana",
-    "days": ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"],
+    "days": [
+      "Lun",
+      "Mar",
+      "Mer",
+      "Gio",
+      "Ven",
+      "Sab",
+      "Dom"
+    ],
     "goalTitle": "Obiettivo di esempio",
     "goalDescription": "Aumentare le richieste dei clienti tramite un Egg riutilizzabile.",
     "goalProgress": "68% dell'obiettivo di esempio",
@@ -635,16 +674,46 @@
       "selectWorkspace": "Seleziona prima uno spazio di lavoro.",
       "managerOnly": "Solo il proprietario o un editor può aggiornare questo profilo.",
       "types": {
-        "other": { "title": "Altra attività o organizzazione", "description": "Descrivila se nessuna delle categorie precedenti è adatta." },
-        "cafe-pub": { "title": "Caffè o pub", "description": "Caffetteria, bar, pub o luogo di ritrovo di quartiere." },
-        "restaurant-food": { "title": "Ristorante o locale", "description": "Ristorante, panificio, food hall, takeaway o altra attività di ristorazione." },
-        "accommodation": { "title": "Hotel o alloggio", "description": "Hotel, pensione, casa vacanze, campeggio o altra struttura ricettiva." },
-        "arts-culture": { "title": "Arte, cultura o museo", "description": "Museo, galleria, studio, sito storico o organizzazione culturale." },
-        "visitor-attraction": { "title": "Attrazione o destinazione turistica", "description": "Attrazione, monumento, destinazione o organizzazione turistica." },
-        "event-venue": { "title": "Evento o location", "description": "Festival, conferenza, spazio per spettacoli, club o evento comunitario." },
-        "retail-market": { "title": "Negozio o mercato", "description": "Negozio, banco al mercato, bottega artigiana o attività con prodotti." },
-        "local-service": { "title": "Servizio locale o su appuntamento", "description": "Salone, riparazioni, studio professionale o attività su appuntamento." },
-        "community-space": { "title": "Spazio comunitario o pubblico", "description": "Centro comunitario, biblioteca, spazio pubblico, organizzazione non profit o servizio civico." }
+        "other": {
+          "title": "Altra attività o organizzazione",
+          "description": "Descrivila se nessuna delle categorie precedenti è adatta."
+        },
+        "cafe-pub": {
+          "title": "Caffè o pub",
+          "description": "Caffetteria, bar, pub o luogo di ritrovo di quartiere."
+        },
+        "restaurant-food": {
+          "title": "Ristorante o locale",
+          "description": "Ristorante, panificio, food hall, takeaway o altra attività di ristorazione."
+        },
+        "accommodation": {
+          "title": "Hotel o alloggio",
+          "description": "Hotel, pensione, casa vacanze, campeggio o altra struttura ricettiva."
+        },
+        "arts-culture": {
+          "title": "Arte, cultura o museo",
+          "description": "Museo, galleria, studio, sito storico o organizzazione culturale."
+        },
+        "visitor-attraction": {
+          "title": "Attrazione o destinazione turistica",
+          "description": "Attrazione, monumento, destinazione o organizzazione turistica."
+        },
+        "event-venue": {
+          "title": "Evento o location",
+          "description": "Festival, conferenza, spazio per spettacoli, club o evento comunitario."
+        },
+        "retail-market": {
+          "title": "Negozio o mercato",
+          "description": "Negozio, banco al mercato, bottega artigiana o attività con prodotti."
+        },
+        "local-service": {
+          "title": "Servizio locale o su appuntamento",
+          "description": "Salone, riparazioni, studio professionale o attività su appuntamento."
+        },
+        "community-space": {
+          "title": "Spazio comunitario o pubblico",
+          "description": "Centro comunitario, biblioteca, spazio pubblico, organizzazione non profit o servizio civico."
+        }
       }
     },
     "businessData": {
@@ -1028,7 +1097,7 @@
         "paperSize": "Formato carta",
         "artworkSize": "Egg stampato",
         "qrSize": "Area QR (incluso margine bianco)",
-        "printScale": "Stampa al 100% / dimensioni reali. Disattiva intestazioni e pi\u00e8 di pagina del browser. Le misure includono il margine bianco del QR.",
+        "printScale": "Stampa al 100% / dimensioni reali. Disattiva intestazioni e piè di pagina del browser. Le misure includono il margine bianco del QR.",
         "simplePrintHint": "Un QR grande, una semplice cornice Egg e un logo Godwit ben visibile. L'anteprima corrisponde al download e alla stampa.",
         "popupBlocked": "Consenti i pop-up per aprire l'anteprima di stampa.",
         "printTitle": "Stampa il QR del tuo Egg",
@@ -1255,5 +1324,48 @@
         "lockedDescription": "Una cronologia completa delle responsabilità per le azioni amministrative eseguite nel tuo spazio di lavoro."
       }
     }
+  },
+  "eggGuide": {
+    "intents": {
+      "ask": {
+        "title": "Fai una domanda",
+        "hint": "Risposta immediata dalla nostra guida AI"
+      },
+      "poll": {
+        "title": "Lascia un feedback",
+        "hint": "Rispondi a una breve domanda"
+      },
+      "info": {
+        "title": "Vedi le informazioni",
+        "hint": "Dettagli utili per la tua visita"
+      },
+      "offer": {
+        "title": "Offerta speciale",
+        "hint": "Qualcosa che potrebbe piacerti"
+      },
+      "report": {
+        "title": "Segnala un problema",
+        "hint": "Dicci se qualcosa richiede attenzione"
+      },
+      "review": {
+        "title": "Condividi la tua esperienza",
+        "hint": "Lascia una recensione in un minuto"
+      },
+      "donate": {
+        "title": "Sostienici",
+        "hint": "Fai un contributo"
+      }
+    },
+    "openLink": "Apri il link",
+    "progress": "I tuoi progressi",
+    "kicker": "Un piccolo aiuto da Godwit",
+    "thanksKicker": "Grazie — è utile.",
+    "welcome": "Benvenuto. Cosa ti porta qui?",
+    "whatNext": "Cosa vuoi fare ora?",
+    "allDone": "Tutto fatto. Grazie!",
+    "suggested": "Consigliato",
+    "back": "Indietro",
+    "continueDone": "Fatto — e ora?",
+    "continueSkip": "Salta — mostra altre opzioni"
   }
 }
