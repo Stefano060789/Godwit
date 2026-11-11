@@ -27,10 +27,10 @@ export async function createEggQrArtwork(url, { caption, logoDataUrl }) {
   const qrData = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(qr)}`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1440" viewBox="0 0 400 480">
     <path d="M200 8C90 8 8 110 8 260C8 400 80 472 200 472C320 472 392 400 392 260C392 110 310 8 200 8Z" fill="#fffdf7" stroke="#ba985f" stroke-width="2"/>
-    <image href="${escape(logoDataUrl)}" x="181" y="25" width="38" height="38"/>
+    <image href="${escape(logoDataUrl)}" x="171" y="15" width="58" height="58"/>
     <image href="${escape(qrData)}" x="50" y="115" width="300" height="300"/>
-    <text x="200" y="439" text-anchor="middle" fill="#284542" font-family="Arial,sans-serif" font-size="18" font-weight="700">${escape(caption)}</text>
-    <text x="200" y="464" text-anchor="middle" fill="#725326" font-family="Arial,sans-serif" font-size="16" font-weight="700">hellogodwit.com</text>
+    <text x="200" y="432" text-anchor="middle" fill="#284542" font-family="Arial,sans-serif" font-size="18" font-weight="700">${escape(caption)}</text>
+    <text x="200" y="454" text-anchor="middle" fill="#725326" font-family="Arial,sans-serif" font-size="13" font-weight="700">hellogodwit.com</text>
   </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
