@@ -35,6 +35,8 @@ describe("starting guide navigation", () => {
   it("respects existing plan requirements for contact and review goals", () => {
     expect(START_GOALS.find((goal) => goal.key === "contacts").feature).toBe("leadCapture");
     expect(START_GOALS.find((goal) => goal.key === "reviews").feature).toBe("publicReviewLinks");
+    expect(START_GOALS.find((goal) => goal.key === "contacts").group)
+      .toBe(START_GOALS.find((goal) => goal.key === "reviews").group);
   });
 
   it("starts every selectable customer goal from an Egg", () => {

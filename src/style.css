@@ -2359,13 +2359,21 @@ textarea {
 
 .goal-choice-group {
   margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--control-line);
+  border-left: 4px solid var(--link);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--teal-soft) 38%, var(--surface));
 }
 
 .goal-choice-group > h3 {
-  margin: 0 0 0.65rem;
-  color: var(--guide-ink);
-  font-size: 0.9rem;
-  font-weight: 750;
+  margin: 0 0 0.85rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--control-line);
+  color: var(--link);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 .goal-guide .goal-business-grid {
