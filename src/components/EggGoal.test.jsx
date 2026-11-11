@@ -50,9 +50,12 @@ describe("Egg goal setup", () => {
   });
   it("requires promotion details only when the promotion goal is selected", () => {
     const markup = render({ initialSelection: getStartSelection("?business=arts&goal=promotion") });
-    expect(markup).toContain("What event, product, or offer do you want to promote?");
-    expect(markup).toContain("Describe what you want to promote and the key details visitors should know.");
-    expect(markup).toContain('required=""');
+    const promotionChoice = markup.match(/<div class="goal-choice-item goal-choice-item-promotion">([\s\S]*?)<\/div><\/div><\/section>/)?.[1];
+    expect(promotionChoice).toContain("Promote an event, product, or special offer");
+    expect(promotionChoice).toContain("What event, product, or offer do you want to promote?");
+    expect(promotionChoice).toContain("Describe what you want to promote and the key details visitors should know.");
+    expect(promotionChoice).toContain('required=""');
+    expect(markup).not.toContain("Add a specific goal or success detail (optional)");
     expect(render()).toContain("Add a specific goal or success detail (optional)");
   });
   it("disables the form for viewers", () => {

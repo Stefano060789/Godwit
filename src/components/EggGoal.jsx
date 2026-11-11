@@ -65,27 +65,36 @@ export default function EggGoal({ businessType, initialSelection, canManage, ent
         {START_GOAL_GROUPS.map((group) => <section className="goal-choice-group" key={group} aria-labelledby={`goal-group-${group}`}>
           <h3 id={`goal-group-${group}`}>{t(`quickStart.goalGroups.${group}`)}</h3>
           <div className="goal-options-grid">
-            {START_GOALS.filter((entry) => entry.group === group).map((entry) => <button type="button" key={entry.key} className="goal-choice" aria-pressed={goalKeys.includes(entry.key)} onClick={() => toggleGoal(entry.key)}>
-              <span className="goal-choice-title">{t(`quickStart.goals.${entry.key}.title`)}</span>
-              <span className="goal-choice-detail">{t(`quickStart.goals.${entry.key}.example`)}</span>
-              <span className="goal-choice-check" aria-hidden="true">{goalKeys.includes(entry.key) ? "\u2713" : "+"}</span>
-            </button>)}
+            {START_GOALS.filter((entry) => entry.group === group).map((entry) => <div className={`goal-choice-item goal-choice-item-${entry.key}`} key={entry.key}>
+              <button type="button" className="goal-choice" aria-pressed={goalKeys.includes(entry.key)} onClick={() => toggleGoal(entry.key)}>
+                <span className="goal-choice-title">{t(`quickStart.goals.${entry.key}.title`)}</span>
+                <span className="goal-choice-detail">{t(`quickStart.goals.${entry.key}.example`)}</span>
+                <span className="goal-choice-check" aria-hidden="true">{goalKeys.includes(entry.key) ? "\u2713" : "+"}</span>
+              </button>
+              {entry.key === "promotion" && promotionSelected && <label className="goal-context-field goal-promotion-context">
+                {t("admin.goal.promotionDetailsLabel", { defaultValue: "What event, product, or offer do you want to promote?" })}
+                <textarea
+                  required
+                  maxLength={500}
+                  rows={3}
+                  value={goalContext}
+                  onChange={(event) => setGoalContext(event.target.value)}
+                  placeholder={t("admin.goal.promotionDetailsPlaceholder", { defaultValue: "Describe the event, product, or special offer. Include key details visitors should know." })}
+                />
+              </label>}
+            </div>)}
           </div>
         </section>)}
-        <label className="goal-context-field">{promotionSelected
-          ? t("admin.goal.promotionDetailsLabel", { defaultValue: "What event, product, or offer do you want to promote?" })
-          : t("admin.goal.contextLabel", { defaultValue: "What would success look like for this Egg? (optional)" })}
+        {!promotionSelected && <label className="goal-context-field">
+          {t("admin.goal.contextLabel", { defaultValue: "What would success look like for this Egg? (optional)" })}
           <textarea
-            required={promotionSelected}
             maxLength={500}
             rows={3}
             value={goalContext}
             onChange={(event) => setGoalContext(event.target.value)}
-            placeholder={promotionSelected
-              ? t("admin.goal.promotionDetailsPlaceholder", { defaultValue: "Describe the event, product, or special offer. Include key details visitors should know." })
-              : t("admin.goal.contextPlaceholder", { defaultValue: "Add a specific outcome or detail to guide the AI and help you interpret progress." })}
+            placeholder={t("admin.goal.contextPlaceholder", { defaultValue: "Add a specific outcome or detail to guide the AI and help you interpret progress." })}
           />
-        </label>
+        </label>}
       </fieldset>
       <fieldset disabled={!canManage || busy || !businessType}>
         <legend>{t("admin.goal.placementTitle", { defaultValue: "Name & location" })}</legend>

@@ -139,6 +139,8 @@
 .egg-goal-form fieldset { min-width: 0; }
 .egg-goal-form legend { display: flex; align-items: center; gap: .65rem; font-weight: 700; margin-bottom: .85rem; }
 .goal-multi-hint { margin: -.35rem 0 .85rem; color: var(--hub-muted); font-size: .85rem; }
+.goal-choice-item { display: grid; align-content: start; gap: .65rem; min-width: 0; }
+.goal-promotion-context { margin: 0; }
 .goal-benefits { padding: 1.2rem; border: 1px solid var(--hub-line); border-radius: 1rem; background: var(--rose-soft); }
 .goal-benefits-eyebrow { color: var(--hub-accent); font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .goal-benefits h3 { margin-top: .2rem; font-size: 1.15rem; font-weight: 700; }
