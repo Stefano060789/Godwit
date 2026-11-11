@@ -9,16 +9,18 @@ describe("Egg QR artwork and printing", () => {
     expect(paper.qrWidth).toBe(paper.artworkWidth * .75);
     expect(paper.artworkHeight).toBe(paper.artworkWidth * 1.2);
   });
-  it("generates a local vector QR with an Egg outline, larger logo and readable captions", async () => {
+  it("generates a large vector QR inside the Egg with only the gold bird mark and captions below", async () => {
     const artwork = await createEggQrArtwork("https://hellogodwit.com/qr/example?via=qr", {
       caption: '<script>alert("x")</script>', logoDataUrl: "data:image/png;base64,abc"
     });
     const svg = decodeURIComponent(artwork.split(",").slice(1).join(","));
     expect(svg).toContain('viewBox="0 0 400 480"');
     expect(svg).toContain('x="50" y="115" width="300" height="300"');
-    expect(svg).toContain('width="88" height="98"');
-    expect(svg).toContain('font-size="22" font-weight="700">&lt;script&gt;');
-    expect(svg).toContain('font-size="18" font-weight="700">hellogodwit.com</text>');
+    expect(svg).toContain('x="181" y="25" width="38" height="38"');
+    expect(svg).toContain('width="38" height="38"');
+    expect(svg).toContain('font-size="18" font-weight="700">&lt;script&gt;');
+    expect(svg).toContain('font-size="16" font-weight="700">hellogodwit.com</text>');
+    expect(svg.indexOf("&lt;script&gt;</text>")).toBeLessThan(svg.indexOf("hellogodwit.com"));
     expect(svg).toContain("&lt;script&gt;");
     expect(svg).not.toContain("<script>");
     expect(svg).not.toContain("api.qrserver.com");

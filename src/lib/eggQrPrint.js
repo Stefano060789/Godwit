@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import godwitMark from "../assets/godwit-mark.svg";
 
 export const EGG_PRINT_FORMATS = {
   a4: { label: "A4", width: 210, height: 297 },
@@ -25,12 +26,11 @@ export async function createEggQrArtwork(url, { caption, logoDataUrl }) {
   const qr = await QRCode.toString(url, { type: "svg", margin: 4, errorCorrectionLevel: "M", color: { dark: "#102e2b", light: "#ffffff" } });
   const qrData = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(qr)}`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1440" viewBox="0 0 400 480">
-    <defs><clipPath id="logo-clip"><ellipse cx="200" cy="55" rx="38" ry="43"/></clipPath></defs>
     <path d="M200 8C90 8 8 110 8 260C8 400 80 472 200 472C320 472 392 400 392 260C392 110 310 8 200 8Z" fill="#fffdf7" stroke="#ba985f" stroke-width="2"/>
-    <image href="${escape(logoDataUrl)}" x="156" y="6" width="88" height="98" clip-path="url(#logo-clip)"/>
+    <image href="${escape(logoDataUrl)}" x="181" y="25" width="38" height="38"/>
     <image href="${escape(qrData)}" x="50" y="115" width="300" height="300"/>
-    <text x="200" y="439" text-anchor="middle" fill="#284542" font-family="Arial,sans-serif" font-size="22" font-weight="700">${escape(caption)}</text>
-    <text x="200" y="464" text-anchor="middle" fill="#725326" font-family="Arial,sans-serif" font-size="18" font-weight="700">hellogodwit.com</text>
+    <text x="200" y="439" text-anchor="middle" fill="#284542" font-family="Arial,sans-serif" font-size="18" font-weight="700">${escape(caption)}</text>
+    <text x="200" y="464" text-anchor="middle" fill="#725326" font-family="Arial,sans-serif" font-size="16" font-weight="700">hellogodwit.com</text>
   </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
@@ -40,8 +40,8 @@ export async function loadEggQrArtwork(url, caption) {
 }
 
 async function loadLogo() {
-  const result = await fetch("/godwit-logo.png");
-  if (!result.ok) throw new Error("Unable to load Godwit logo.");
+  const result = await fetch(godwitMark);
+  if (!result.ok) throw new Error("Unable to load Godwit bird mark.");
   const blob = await result.blob();
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
