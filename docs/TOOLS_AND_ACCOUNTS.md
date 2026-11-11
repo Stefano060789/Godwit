@@ -21,6 +21,7 @@ See [the privacy/provider inventory](./PRIVACY_PROVIDER_INVENTORY.md) for source
 | --- | --- | --- | --- |
 | **Stripe** | Explicitly opted-in test subscription sandbox only, on shared account `acct_1UQsxxC5ufGRzg9R`. Donation/Connect flows and their webhook history processing remain blocked in the sandbox. | Stripe dashboard login is not recorded here. | `STRIPE_SECRET_KEY` must be test-only; `STRIPE_WEBHOOK_SECRET` must be Godwit's separate test endpoint secret. Both `BILLING_ENABLED=1` and `STRIPE_SANDBOX_ENABLED=1` are required. Public catalogue IDs are pinned in `lib/stripeSandbox.js`; see [STRIPE_SANDBOX.md](STRIPE_SANDBOX.md) for manual configuration. |
 | **Resend** | Transactional notifications/reports and consent-based lead follow-up. Code accepts only transactional-notification and consented-marketing purposes; cold/prospect outreach is blocked. | Resend account login is not recorded here. | `RESEND_API_KEY` and sender `REPORT_FROM_EMAIL`. This is separate from Gmail Creator outreach; provider configuration and sender verification are not confirmed here. |
+| **Twilio** | Optional SMS alerts for on-site Egg issue reports. | Twilio account login is not recorded here. | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` are server-only Vercel variables. SMS is provider-billed; configure only if the workspace wants SMS alerts. |
 | **Google Gemini** | Preferred provider for Creator outreach drafts, using available public business information to propose a business-specific feedback opportunity. | Google AI Studio account; the account owner is not recorded here. | Set `GEMINI_API_KEY` in Vercel. The app uses Gemini's OpenAI-compatible API; when both provider keys are configured, Gemini is preferred. Research does not create a sendable template; use Regenerate to create each draft. |
 | **OpenAI** | Optional AI-assisted sentiment classification and fallback provider for Creator outreach drafts. | OpenAI account login is not recorded here. | `OPENAI_API_KEY`. Used for outreach only when `GEMINI_API_KEY` is not configured. |
 | **Sentry** | Optional browser and server error monitoring. | Sentry organization/account login is not recorded here. | Client `VITE_SENTRY_DSN`; server `SENTRY_DSN`. |
@@ -60,6 +61,7 @@ Google Places is disabled in code; do not configure a new `GOOGLE_PLACES_API_KEY
 - Google Translate: `GOOGLE_TRANSLATE_API_KEY`
 - Stripe sandbox: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BILLING_ENABLED`, `STRIPE_SANDBOX_ENABLED`, `STRIPE_SANDBOX_SUPABASE_URL`, `STRIPE_SANDBOX_ISOLATED_STORAGE_ACK`; explicit isolated storage is required, tax automation is forced off, legacy price env overrides and Connect secrets are not used.
 - Resend: `RESEND_API_KEY`, `REPORT_FROM_EMAIL`
+- On-site issue-report SMS (optional): `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`
 - Gemini outreach: `GEMINI_API_KEY`
 - OpenAI sentiment classification and optional outreach fallback: `OPENAI_API_KEY`
 - Sentry: `VITE_SENTRY_DSN`, `SENTRY_DSN`

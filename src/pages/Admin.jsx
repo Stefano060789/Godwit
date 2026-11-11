@@ -10,6 +10,7 @@ import EggQrPreview from "../components/EggQrPreview";
 import DashboardHub from "../components/DashboardHub";
 import InteractionUsageNotice from "../components/InteractionUsageNotice";
 import BillingSettings from "../components/BillingSettings";
+import IssueAlertSettings from "../components/IssueAlertSettings";
 import EggGoal from "../components/EggGoal";
 import EggResults from "../components/EggResults";
 import BusinessProfile from "../components/BusinessProfile";
@@ -2489,6 +2490,7 @@ export default function Admin() {
         <p>{t("admin.settingsIntro", { defaultValue: "Manage your customer review links." })}</p>
       </header>
       <BillingSettings onUsageChange={setInteractionUsage} />
+      {workspaceUserId && permission.canManageWorkspace && <IssueAlertSettings workspaceId={workspaceUserId} canManage />}
       {DONATION_FEATURE_ENABLED && <details id="donation-settings" className="mb-6 border rounded bg-gray-900">
         <summary className="cursor-pointer p-4 text-xl font-bold">{t("admin.engagement.donations.title")}</summary>
         <div className="px-4 pb-4 space-y-3">

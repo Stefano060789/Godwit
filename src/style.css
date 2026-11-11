@@ -361,6 +361,74 @@ textarea {
   font-size: 0.92rem;
 }
 
+.issue-report-card {
+  border-color: #dfba73;
+}
+
+.issue-report-card .qr-portal-menu-item-title {
+  margin: 0;
+  color: #213d43;
+}
+
+.issue-report-card .qr-portal-menu-item-body {
+  margin: 6px 0 14px !important;
+}
+
+.issue-report-form {
+  display: grid;
+  gap: 12px;
+}
+
+.issue-report-form label {
+  display: grid;
+  gap: 6px;
+  color: #213d43;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.issue-report-form select,
+.issue-report-form textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #172b2b;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.issue-report-form textarea {
+  resize: vertical;
+}
+
+.issue-report-form button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 8px;
+  background: #213d43;
+  color: #fff;
+  font-weight: 700;
+}
+
+.issue-report-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.issue-report-success,
+.issue-report-preview-note {
+  margin: 12px 0 0 !important;
+  color: #166534 !important;
+  font-size: 0.9rem;
+}
+
+.issue-report-error {
+  margin: 12px 0 0 !important;
+  color: #b91c1c !important;
+  font-size: 0.9rem;
+}
+
 .qr-portal-menu-item-cta {
   display: inline-block;
   margin-top: 10px;

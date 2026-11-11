@@ -10,6 +10,7 @@ import { getContrastingTextColor, getPollBranding } from "../lib/pollBranding";
 import { dispatchWorkspaceWebhook } from "../lib/webhooks";
 import { isValidEmail } from "../lib/validators";
 import { isValidEggTrialSessionId } from "../lib/eggTrial";
+import IssueReportForm from "../components/IssueReportForm";
 
 const TRANSLATION_LANGUAGES = [
   { value: "original", label: "Original" },
@@ -427,6 +428,7 @@ function VoteContent() {
             {t("vote.alreadyVotedBody")}
           </p>
         </div>
+        {validCampaignId && <div className="mx-auto max-w-xl px-5 pb-6"><IssueReportForm campaignId={validCampaignId} branding={getPollBranding(poll ?? {})} /></div>}
       </Layout>
     );
   }
@@ -451,6 +453,7 @@ function VoteContent() {
             {t("vote.notStartedBody", { time: new Date(startsAt).toLocaleString() })}
           </p>
         </div>
+        {validCampaignId && <div className="mx-auto max-w-xl px-5 pb-6"><IssueReportForm campaignId={validCampaignId} branding={branding} /></div>}
       </Layout>
     );
   }
@@ -464,6 +467,7 @@ function VoteContent() {
             {t("vote.expiredBody")}
           </p>
         </div>
+        {validCampaignId && <div className="mx-auto max-w-xl px-5 pb-6"><IssueReportForm campaignId={validCampaignId} branding={branding} /></div>}
       </Layout>
     );
   }
@@ -486,6 +490,7 @@ function VoteContent() {
             <a href="/admin" className="text-blue-600 underline">{t("vote.backToWorkspace")}</a>
           </div>
         </div>
+        {validCampaignId && <div className="mx-auto max-w-xl px-5 pb-6"><IssueReportForm campaignId={validCampaignId} branding={branding} /></div>}
       </Layout>
     );
 
@@ -616,6 +621,10 @@ function VoteContent() {
           {selectedAnswers.length === 0 ? t("vote.selectAnswerToVote") : `${t("vote.submitVote")}${selectedAnswers.length > 1 ? ` (${selectedAnswers.length})` : ""}`}
         </button>
         {submitError && <p className="mt-3 text-sm text-red-700" role="alert">{submitError}</p>}
+
+        {validCampaignId && <div className="mt-6 border-t border-slate-600 pt-5">
+          <IssueReportForm campaignId={validCampaignId} branding={branding} />
+        </div>}
 
         <div className="mt-5 border-t border-slate-600 pt-4">
           <p className="text-sm font-semibold">{poll.raffle_enabled ? t("vote.prizeDrawTitle") : t("vote.keepInTouchTitle")}</p>

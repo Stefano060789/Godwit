@@ -12,6 +12,7 @@ import { normalizeEggAccessMethod } from "../lib/eggs";
 import { getEggTrialSessionId } from "../lib/eggTrial";
 import { useTranslation } from "react-i18next";
 import VisitorPreviewBar from "../components/VisitorPreviewBar";
+import IssueReportForm from "../components/IssueReportForm";
 
 export default function QrRedirect() {
   return <>
@@ -205,6 +206,20 @@ function QrRedirectContent() {
         return;
       }
 
+      if (campaign && !campaign.poll_id) {
+        setMenu({
+          campaignId: campaign.campaign_id,
+          portalTitle: campaign.portal_title,
+          portalMessage: campaign.portal_message,
+          items: [],
+          branding: getPollBranding(null),
+          trialSessionId,
+          aiEnabled: false,
+          aiPreview: false
+        });
+        return;
+      }
+
       const stableShortUrl = `${window.location.origin}/qr/${token}`;
       const { data, error } = await supabase
         .rpc("get_public_poll_by_qr", { target_url: stableShortUrl })
@@ -281,7 +296,7 @@ function QrRedirectContent() {
         <section className="qr-portal-card qr-portal-menu">
           {branding.logoUrl && <img src={branding.logoUrl} alt={`${branding.brandName || "Venue"} logo`} className="qr-portal-logo" />}
           <p className="qr-portal-brand" style={{ color: branding.primaryColor }}>{branding.brandName || "Godwit"}</p>
-          <h1>{portalTitle || (items.length === 0 && (aiEnabled || menu.aiPreview) ? t("eggAi.welcome", { defaultValue: "Welcome. How can I help?" }) : "Welcome! Choose an option below.")}</h1>
+          <h1>{portalTitle || (items.length === 0 && (aiEnabled || menu.aiPreview) ? t("eggAi.welcome", { defaultValue: "Welcome. How can I help?" }) : items.length === 0 ? t("issueReport.eggWelcome", { defaultValue: "Welcome" }) : "Welcome! Choose an option below.")}</h1>
           {portalMessage && <p>{portalMessage}</p>}
           <div className="qr-portal-menu-list">
             {(aiEnabled || menu.aiPreview) && (
@@ -360,6 +375,7 @@ function QrRedirectContent() {
                 </div>
               );
             })}
+            {menu.campaignId && <IssueReportForm campaignId={menu.campaignId} preview={isPreview} branding={branding} />}
           </div>
         </section>
       </main>

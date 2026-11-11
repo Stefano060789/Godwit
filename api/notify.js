@@ -8,6 +8,8 @@
 //     replaces) so the operator's inbox address is never visible in the page source.
 //   - "translate": official Google Cloud Translation Basic API proxy. This stays here to respect
 //     Vercel's 12-function Hobby limit instead of adding another serverless function.
+//   - "egg_issue": dispatch configured email/SMS alerts for an issue report claimed by a one-time
+//     token, keeping provider credentials and recipient selection on the server.
 import { captureError } from "../lib/errorReporting.js";
 import { isAllowedResendPurpose, sendResendEmail as sendResendRequest } from "../lib/resendEmail.js";
 
@@ -17,6 +19,23 @@ async function supabaseGet(path) {
   if (!url || !key) throw new Error("Supabase credentials are not configured.");
   const result = await fetch(`${url}/rest/v1/${path}`, { headers: { apikey: key, Authorization: `Bearer ${key}` } });
   if (!result.ok) throw new Error(`Supabase query failed (${result.status}).`);
+  return result.json();
+}
+
+async function supabasePost(path, body) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error("Supabase credentials are not configured.");
+  const result = await fetch(`${url}/rest/v1/${path}`, {
+    method: "POST",
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+  if (!result.ok) throw new Error(`Supabase request failed (${result.status}).`);
   return result.json();
 }
 
@@ -133,6 +152,91 @@ async function handleContentReport(request, response) {
   }
 }
 
+async function sendTwilioSms({ to, body }) {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const from = process.env.TWILIO_FROM_NUMBER;
+  if (!accountSid || !authToken || !from) return { sent: false, reason: "sms_not_configured" };
+
+  const credentials = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
+  const form = new URLSearchParams({ To: to, From: from, Body: body });
+  const result = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(accountSid)}/Messages.json`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: form
+  });
+  if (!result.ok) throw new Error(`Twilio request failed (${result.status}).`);
+  return { sent: true };
+}
+
+async function handleEggIssue(request, response) {
+  const issueId = Number(request.body?.issueId);
+  const dispatchToken = String(request.body?.dispatchToken || "");
+  if (!Number.isSafeInteger(issueId) || issueId <= 0 || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(dispatchToken)) {
+    return response.status(400).json({ error: "A valid issue report reference is required." });
+  }
+
+  try {
+    const [issue] = await supabasePost("rpc/claim_egg_issue_alert_delivery", {
+      target_issue_id: issueId,
+      target_dispatch_token: dispatchToken
+    });
+    if (!issue) return response.status(409).json({ error: "This issue report has already been processed or is unavailable." });
+
+    const appUrl = process.env.APP_URL || "https://hellogodwit.com";
+    const subject = `${issue.workspace_name || "Godwit"}: new on-site issue report`;
+    const message = `A visitor reported an issue at ${issue.campaign_name || "an Egg"}.\n\nCategory: ${issue.category}\nDetails: ${issue.description}\n\nOpen Godwit to review this report.`;
+    const results = {
+      notified: Boolean(issue.in_app_enabled),
+      email: { enabled: Boolean(issue.email_enabled), sent: false },
+      sms: { enabled: Boolean(issue.sms_enabled), sent: false }
+    };
+
+    if (issue.email_enabled) {
+      try {
+        if (!issue.recipient_email) {
+          results.email.reason = "recipient_not_configured";
+        } else {
+          Object.assign(results.email, await sendResendEmail({
+            to: issue.recipient_email,
+            subject,
+            text: `${message}\n\n${appUrl}/admin`
+          }));
+          results.notified ||= results.email.sent;
+        }
+      } catch (error) {
+        captureError("On-site issue email alert failed", error);
+        results.email.reason = "delivery_failed";
+      }
+    }
+
+    if (issue.sms_enabled) {
+      try {
+        if (!issue.recipient_phone) {
+          results.sms.reason = "recipient_not_configured";
+        } else {
+          Object.assign(results.sms, await sendTwilioSms({
+            to: issue.recipient_phone,
+            body: `${subject}. ${issue.category}: ${issue.description.slice(0, 900)}`
+          }));
+          results.notified ||= results.sms.sent;
+        }
+      } catch (error) {
+        captureError("On-site issue SMS alert failed", error);
+        results.sms.reason = "delivery_failed";
+      }
+    }
+
+    return response.status(200).json(results);
+  } catch (error) {
+    captureError("On-site issue alert dispatch failed", error);
+    return response.status(500).json({ error: "The issue was saved, but Godwit could not process its alerts. Please contact the business directly if this is urgent." });
+  }
+}
+
 const TRANSLATION_LANGUAGE_PATTERN = /^[a-z]{2,3}(?:-[A-Z]{2})?$/;
 
 async function handleTranslation(request, response) {
@@ -184,5 +288,6 @@ export default async function handler(request, response) {
   if (request.body?.type === "contact") return handleContactMessage(request, response);
   if (request.body?.type === "product_feedback") return handleProductFeedback(request, response);
   if (request.body?.type === "translate") return handleTranslation(request, response);
+  if (request.body?.type === "egg_issue") return handleEggIssue(request, response);
   return handleContentReport(request, response);
 }
