@@ -293,9 +293,9 @@
     }
   },
   "landing": {
-    "eyebrow": "A goal-directed AI agent for customer engagement",
-    "title": "Make every customer interaction more helpful.",
-    "lede": "Give Godwit a goal and trusted business information. Its AI helps answer questions, collect feedback, and guide customers to useful next steps through an Egg shared by QR or NFC. You stay in control; outcomes depend on your customers.",
+    "eyebrow": "AI customer engagement for local businesses and places",
+    "title": "Help customers find their next useful step.",
+    "lede": "Set a goal and share your business information. Godwit’s AI answers questions, gathers feedback, and guides customers through an Egg they open by QR code or NFC.",
     "workspaceDashboard": "Dashboard",
     "createWorkspace": "Get started with Godwit",
     "workspaceLogin": "Log in to Godwit",

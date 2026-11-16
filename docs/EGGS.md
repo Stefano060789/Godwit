@@ -97,9 +97,18 @@ a central **Eggs** circle with QR/NFC symbols, **Results** on the right, and
 legacy Overview links open Goal. Existing polls, actions, feedback, and
 connection URLs remain supported. **More tools** lives inside Settings.
 
-**Business Data** holds notes, imported website snapshots, and Instagram
-profile links shared with every Egg. Instagram content is not scraped or
-imported: add relevant information as notes. Managers can add or remove up to
+**Business Data** holds notes, imported website snapshots, and Instagram and
+Facebook links shared with every Egg. Only social links are saved; their
+profile content and posts are not fetched or automatically updated. Add relevant
+information as notes. Instagram and Facebook links copied
+with sharing parameters are saved as clean profile links. Some websites deny
+automated access; add their information as notes if importing is blocked.
+Alternatively, ask the website owner to allow Godwit's importer, or save a
+public page as HTML (up to 1 MB) and upload it with its HTTPS website address.
+The readable text from that single page is saved as a snapshot, not kept in
+sync; review it for accuracy and private information before uploading. Direct
+website imports are also snapshots; remove and reimport a source to update it.
+Managers can add or remove up to
 eight shared sources. Data is stored in Supabase, not just browser storage.
 
 **Results** summarizes private organizer messages by Egg, including the total
@@ -176,6 +185,14 @@ customer use, disclose AI processing in the product's privacy information and
 confirm the applicable provider/data-processing terms.
 
 ## Database migration
+
+Apply `supabase/20261114_workspace_facebook_sources.sql` to enable saving
+Facebook links. Existing sources and access policies remain unchanged.
+
+Apply `supabase/20261123_allow_duplicate_poll_questions.sql` in the Supabase
+SQL Editor so separate Eggs and businesses can use the same generated poll
+question. This removes the legacy global question-uniqueness constraint without
+changing existing polls, answers, or responses.
 
 Apply `supabase/20261019_eggs_nfc_attribution.sql` and
 `supabase/20261019_eggs_ai_assistant.sql` in the Supabase SQL Editor before

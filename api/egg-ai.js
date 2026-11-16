@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { getPublicBusinessWebsiteContext } from "../lib/cron/publicBusinessEmail.js";
+import { extractWebsiteText } from "../lib/cron/websiteText.js";
 import { captureError } from "../lib/errorReporting.js";
 import { BUSINESS_TYPES } from "../src/lib/personas.js";
 import { isRestrictedTopic } from "../src/lib/restrictedContent.js";
@@ -273,6 +274,14 @@ async function handleGenerateGoalSetup(request, response) {
   });
 }
 
+function websiteImportError(status, manualAdvice) {
+  if (status === "unsafe_website") return "That website address cannot be imported. Use a public HTTPS website.";
+  if (status === "website_blocked") return `The website denied access to the importer. ${manualAdvice}`;
+  if (status === "website_too_large") return `The website page is too large to import. ${manualAdvice}`;
+  if (status === "website_unavailable") return `The website could not be reached. Try again later. ${manualAdvice}`;
+  return `We couldn't extract readable information from that website. ${manualAdvice}`;
+}
+
 async function handleImportWebsite(request, response) {
   const campaignId = Number(request.body?.campaignId);
   const websiteUrl = String(request.body?.websiteUrl || "").trim();
@@ -309,9 +318,7 @@ async function handleImportWebsite(request, response) {
   const websiteContext = await getPublicBusinessWebsiteContext(websiteUrl);
   if (websiteContext.status !== "found" || !websiteContext.text) {
     return response.status(422).json({
-      error: websiteContext.status === "unsafe_website"
-        ? "That website address cannot be imported. Use a public HTTPS website."
-        : "We couldn't extract readable information from that website. You can add its FAQ or key details manually."
+      error: websiteImportError(websiteContext.status, "You can add its FAQ or key details manually.")
     });
   }
 
@@ -335,18 +342,32 @@ function isInstagramUrl(value) {
   return hostname === "instagram.com" || hostname.endsWith(".instagram.com");
 }
 
+function isFacebookUrl(value) {
+  const hostname = new URL(value).hostname.toLowerCase();
+  return hostname === "facebook.com" || hostname.endsWith(".facebook.com");
+}
+
 async function handleImportWorkspaceWebsite(request, response) {
   const workspaceId = String(request.body?.workspaceId || "");
   const websiteUrl = String(request.body?.websiteUrl || "").trim();
+  const isUpload = request.body?.action === "upload-workspace-website";
+  const html = request.body?.html;
   if (!WORKSPACE_PATTERN.test(workspaceId) || !websiteUrl || websiteUrl.length > 500) {
     return response.status(400).json({ error: "Provide a valid workspace and website URL." });
   }
   try {
-    if (new URL(websiteUrl).protocol !== "https:" || isInstagramUrl(websiteUrl)) {
-      return response.status(400).json({ error: "Use a public HTTPS website. Instagram links are saved separately and are not imported." });
+    const url = new URL(websiteUrl);
+    if (url.protocol !== "https:" || url.username || url.password || isInstagramUrl(websiteUrl) || isFacebookUrl(websiteUrl)) {
+      return response.status(400).json({ error: "Use a public HTTPS website. Instagram and Facebook links are saved separately and are not imported." });
     }
   } catch {
     return response.status(400).json({ error: "Provide a valid HTTPS website address." });
+  }
+  if (isUpload && (typeof html !== "string" || !/<(?:!doctype\s+html|html|body)\b/i.test(html))) {
+    return response.status(400).json({ error: "Choose a saved HTML webpage to upload." });
+  }
+  if (isUpload && Buffer.byteLength(html, "utf8") > 1_000_000) {
+    return response.status(413).json({ error: "The saved webpage must be no larger than 1 MB." });
   }
   const bearer = getBearer(request);
   if (!bearer) return response.status(401).json({ error: "Sign in to manage business information." });
@@ -361,17 +382,19 @@ async function handleImportWorkspaceWebsite(request, response) {
   if (existing.length >= 8) {
     return response.status(409).json({ error: "This workspace can have at most 8 shared information sources. Remove one before adding another." });
   }
-  const websiteContext = await getPublicBusinessWebsiteContext(websiteUrl);
+  const websiteContext = isUpload
+    ? { status: "found", text: extractWebsiteText(html), sourceUrl: websiteUrl }
+    : await getPublicBusinessWebsiteContext(websiteUrl);
   if (websiteContext.status !== "found" || !websiteContext.text) {
     return response.status(422).json({
-      error: websiteContext.status === "unsafe_website"
-        ? "That website address cannot be imported. Use a public HTTPS website."
-        : "We couldn't extract readable information from that website. Add the details as notes instead."
+      error: isUpload
+        ? "The saved page contains no readable information. Try another page or add notes instead."
+        : websiteImportError(websiteContext.status, "Ask the website owner to allow Godwit's importer, or upload a saved HTML page below.")
     });
   }
   const sourceUrl = websiteContext.sourceUrl || websiteUrl;
-  if (isInstagramUrl(sourceUrl)) {
-    return response.status(422).json({ error: "Instagram pages cannot be imported. Save the profile link instead." });
+  if (isInstagramUrl(sourceUrl) || isFacebookUrl(sourceUrl)) {
+    return response.status(422).json({ error: "Instagram and Facebook pages cannot be imported. Save the profile link instead." });
   }
   const sources = await supabaseRequest("/rest/v1/workspace_ai_sources", {
     key: anonKey,
@@ -380,7 +403,7 @@ async function handleImportWorkspaceWebsite(request, response) {
     body: {
       workspace_id: workspaceId,
       source_type: "website",
-      title: new URL(sourceUrl).hostname.slice(0, 120),
+      title: `${isUpload ? "Uploaded page: " : ""}${new URL(sourceUrl).hostname}`.slice(0, 120),
       source_url: sourceUrl,
       content: websiteContext.text.slice(0, 6000)
     }
@@ -480,7 +503,7 @@ async function handleChat(request, token, response) {
   }
 
   const formatSources = (entries, limit) => entries
-    .map((source) => `${source.source_type === "instagram" ? "Instagram profile link (profile content not imported)" : String(source.title || "Business information").slice(0, 120)}:\n${String(source.content || "").slice(0, 3000)}`)
+    .map((source) => `${source.source_type === "instagram" ? "Instagram profile link (profile content not imported)" : source.source_type === "facebook" ? "Facebook page or profile link (content not imported)" : String(source.title || "Business information").slice(0, 120)}:\n${String(source.content || "").slice(0, 3000)}`)
     .join("\n\n").slice(0, limit);
   const sectionLimit = sources.length && sharedSources.length ? (MAX_CONTEXT_LENGTH - 40) / 2 : MAX_CONTEXT_LENGTH - 40;
   const businessDescription = String(campaign.business_description || "").replace(/[<>]/g, "").slice(0, 500);
@@ -599,7 +622,7 @@ export default async function handler(request, response) {
       });
     }
   }
-  if (action === "import-workspace-website") {
+  if (action === "import-workspace-website" || action === "upload-workspace-website") {
     try {
       return await handleImportWorkspaceWebsite(request, response);
     } catch (error) {

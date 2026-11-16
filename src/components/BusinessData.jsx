@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  BUSINESS_SOURCE_LIMIT, addBusinessNotes, addInstagramLink, importBusinessWebsite,
+  BUSINESS_SOURCE_LIMIT, addBusinessNotes, addFacebookLink, addInstagramLink, importBusinessWebsite, uploadBusinessWebsite,
   listBusinessSources, removeBusinessSource
 } from "../lib/businessData";
 
@@ -14,7 +14,10 @@ export default function BusinessData({ workspaceId, canManage, t }) {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [website, setWebsite] = useState("");
+  const [websiteFile, setWebsiteFile] = useState(null);
+  const websiteFileInput = useRef(null);
   const [instagram, setInstagram] = useState("");
+  const [facebook, setFacebook] = useState("");
   const scope = useRef({ workspaceId, canManage, generation: 0 });
   if (scope.current.workspaceId !== workspaceId || scope.current.canManage !== canManage) {
     scope.current = { workspaceId, canManage, generation: scope.current.generation + 1 };
@@ -30,7 +33,10 @@ export default function BusinessData({ workspaceId, canManage, t }) {
     setTitle("");
     setNotes("");
     setWebsite("");
+    setWebsiteFile(null);
+    if (websiteFileInput.current) websiteFileInput.current.value = "";
     setInstagram("");
+    setFacebook("");
     if (!workspaceId || !canManage) {
       setLoading(false);
       return () => { active = false; };
@@ -50,11 +56,12 @@ export default function BusinessData({ workspaceId, canManage, t }) {
     return () => { active = false; };
   }, [workspaceId, canManage, reload]);
 
-  async function perform(operation, clear) {
+  async function perform(operation, clear, progress = "") {
     const generation = scope.current.generation;
     const isCurrent = () => scope.current.generation === generation && scope.current.canManage;
     setBusy(true);
-    setMessage("");
+    setIsError(false);
+    setMessage(progress);
     try {
       await operation();
       if (!isCurrent()) return;
@@ -106,6 +113,19 @@ export default function BusinessData({ workspaceId, canManage, t }) {
                 <input type="url" required maxLength={500} placeholder="https://example.com" value={website} onChange={(event) => setWebsite(event.target.value)} />
               </label>
               <button className="goal-button" type="submit" disabled={disabled}>{t("admin.businessData.importWebsite", { defaultValue: "Import website" })}</button>
+              <p>{t("admin.businessData.uploadWebsiteHint", { defaultValue: "If import is blocked, ask the website owner to allow Godwit's importer. Meanwhile, open the public page in your browser, save it as HTML (Webpage, HTML only), and upload it below. Only upload material you have permission to share; check that it contains no private information." })}</p>
+              <label>{t("admin.businessData.websiteFile", { defaultValue: "Saved webpage (.html or .htm, maximum 1 MB)" })}
+                <input ref={websiteFileInput} type="file" accept=".html,.htm,text/html" onChange={(event) => setWebsiteFile(event.target.files?.[0] || null)} />
+              </label>
+              <button className="goal-button" type="button" disabled={disabled || !websiteFile} onClick={(event) => {
+                if (!event.currentTarget.form.reportValidity()) return;
+                perform(() => uploadBusinessWebsite(workspaceId, website, websiteFile), () => {
+                  setWebsite("");
+                  setWebsiteFile(null);
+                  if (websiteFileInput.current) websiteFileInput.current.value = "";
+                }, t("admin.businessData.uploadingWebsite", { defaultValue: "Uploading the saved webpage..." }));
+              }}>{t("admin.businessData.uploadWebsite", { defaultValue: "Upload saved webpage" })}</button>
+              <p>{t("admin.businessData.uploadWebsiteSnapshot", { defaultValue: "Website imports are saved as snapshots and will not update automatically. Uploading saves readable text from the selected page only." })}</p>
             </form>
             <form className="business-data-form" onSubmit={(event) => {
               event.preventDefault();
@@ -116,6 +136,16 @@ export default function BusinessData({ workspaceId, canManage, t }) {
               </label>
               <p>{t("admin.businessData.instagramHint", { defaultValue: "Only the link is saved. Instagram content is not imported." })}</p>
               <button className="goal-button" type="submit" disabled={disabled}>{t("admin.businessData.saveInstagram", { defaultValue: "Save link" })}</button>
+            </form>
+            <form className="business-data-form" onSubmit={(event) => {
+              event.preventDefault();
+              perform(() => addFacebookLink(workspaceId, facebook), () => setFacebook(""));
+            }}>
+              <label>{t("admin.businessData.facebook", { defaultValue: "Facebook page or profile link" })}
+                <input type="url" required maxLength={500} placeholder="https://www.facebook.com/example" value={facebook} onChange={(event) => setFacebook(event.target.value)} />
+              </label>
+              <p>{t("admin.businessData.facebookHint", { defaultValue: "Only the link is saved. Facebook content is not imported." })}</p>
+              <button className="goal-button" type="submit" disabled={disabled}>{t("admin.businessData.saveFacebook", { defaultValue: "Save link" })}</button>
             </form>
             {loading && <p role="status">{t("admin.businessData.loading", { defaultValue: "Loading business information..." })}</p>}
             {loadFailed && <button className="goal-button" type="button" onClick={() => setReload((value) => value + 1)}>{t("admin.businessData.retry", { defaultValue: "Try again" })}</button>}

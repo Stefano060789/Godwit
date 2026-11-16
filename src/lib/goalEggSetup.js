@@ -31,7 +31,12 @@ export async function createGoalEggSetup({ campaign, workspaceId, userId, pollDr
       })
       .select()
       .single();
-    if (pollError) throw new Error(`Unable to create the generated poll: ${pollError.message}`);
+    if (pollError) {
+      if (pollError.code === "23505" && pollError.message?.includes("polls_question_key")) {
+        throw new Error("Unable to create this Egg because the database still restricts duplicate poll questions. An administrator needs to apply the latest database update.");
+      }
+      throw new Error(`Unable to create the generated poll: ${pollError.message}`);
+    }
     poll = createdPoll;
 
     const pollItem = await addQrCampaignPollItem(campaign.id, poll.id);

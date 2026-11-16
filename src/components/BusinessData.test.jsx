@@ -10,7 +10,12 @@ describe("BusinessData", () => {
     const markup = renderToStaticMarkup(createElement(BusinessData, { workspaceId: "workspace", canManage: true, t }));
     expect(markup).toContain("Business notes");
     expect(markup).toContain("Import website");
+    expect(markup).toContain("Upload saved webpage");
+    expect(markup).toContain("website owner");
+    expect(markup).toContain("will not update automatically");
     expect(markup).toContain("Instagram content is not imported");
+    expect(markup).toContain("Facebook page or profile link");
+    expect(markup).toContain("Facebook content is not imported");
     expect(markup).toContain("Every Egg can use it");
   });
 

@@ -409,11 +409,18 @@ describe("Egg AI API", () => {
         ai_feedback_topics: ["service", "quality"]
       }]);
       if (href.includes("/rest/v1/egg_ai_sources?campaign_id=")) return jsonResponse([]);
-      if (href.includes("/rest/v1/workspace_ai_sources?workspace_id=eq.workspace-1")) return jsonResponse([{ id: 1, title: "Notes", content: "Open daily.", source_type: "notes" }]);
+      if (href.includes("/rest/v1/workspace_ai_sources?workspace_id=eq.workspace-1")) return jsonResponse([
+        { id: 1, title: "Notes", content: "Open daily.", source_type: "notes" },
+        { id: 2, title: "Facebook page or profile", content: "https://www.facebook.com/example", source_type: "facebook" },
+        { id: 3, title: "Instagram profile", content: "https://www.instagram.com/example", source_type: "instagram" }
+      ]);
       if (href.includes("/rest/v1/rpc/get_public_qr_campaign_items") || href.includes("/rest/v1/rpc/get_public_woodpecker_portal") || href.includes("/rest/v1/rpc/get_public_qr_campaign")) return jsonResponse([]);
       if (href.includes("/rest/v1/rpc/reserve_egg_ai_turn")) return new Response(null, { status: 204 });
       if (href === "https://api.anthropic.com/v1/messages") {
-        expect(JSON.parse(options.body).system).toContain("Open daily.");
+        const system = JSON.parse(options.body).system;
+        expect(system).toContain("Open daily.");
+        expect(system).toContain("Facebook page or profile link (content not imported)");
+        expect(system).toContain("Instagram profile link (profile content not imported)");
         return jsonResponse({ content: [{ type: "text", text: '{"answer":"Open daily.","suggestions":[]}' }] });
       }
       throw new Error(`Unexpected request: ${href}`);
@@ -493,6 +500,93 @@ describe("Egg AI API", () => {
     expect(response.statusCode).toBe(201);
   });
 
+  it("saves readable text from a manually uploaded page using the manager's credentials", async () => {
+    configureEnvironment();
+    const workspaceId = "11111111-1111-4111-8111-111111111111";
+    const fetchMock = vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/rpc/is_workspace_manager")) return jsonResponse(true);
+      if (href.includes("/workspace_ai_sources?")) return jsonResponse([]);
+      if (href.endsWith("/workspace_ai_sources")) {
+        expect(options.headers.Authorization).toBe(["Bearer", "manager-token"].join(" "));
+        const source = JSON.parse(options.body);
+        expect(source).toMatchObject({
+          workspace_id: workspaceId, source_type: "website", title: "Uploaded page: example.com", source_url: "https://example.com/"
+        });
+        expect(source.content).toContain("Open daily");
+        expect(source.content).not.toContain("secret script");
+        return jsonResponse([source], 201);
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeRequest({
+      action: "upload-workspace-website", workspaceId, websiteUrl: "https://example.com/",
+      html: "<html><body><main>Open daily</main><script>secret script</script></body></html>"
+    }, "manager-token"), response);
+    expect(response.statusCode).toBe(201);
+    expect(vi.mocked(getPublicBusinessWebsiteContext)).not.toHaveBeenCalled();
+    expect(fetchMock.mock.calls.every(([url]) => String(url).startsWith("https://supabase.test/"))).toBe(true);
+  });
+
+  it("rejects invalid, oversized, empty and unauthorized uploads", async () => {
+    configureEnvironment();
+    const workspaceId = "11111111-1111-4111-8111-111111111111";
+    const body = { action: "upload-workspace-website", workspaceId, websiteUrl: "https://example.com", html: "<html><body>Text</body></html>" };
+    const fetchMock = vi.fn(async (url) => {
+      if (String(url).includes("/rpc/is_workspace_manager")) return jsonResponse(true);
+      if (String(url).includes("/workspace_ai_sources?")) return jsonResponse([]);
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    for (const [overrides, token, status] of [
+      [{ html: "not html" }, "manager-token", 400],
+      [{ html: `<html>${"a".repeat(1_000_000)}</html>` }, "manager-token", 413],
+      [{ html: "<html><body><script>only script</script></body></html>" }, "manager-token", 422],
+      [{}, "", 401]
+    ]) {
+      const response = makeResponse();
+      await handler(makeRequest({ ...body, ...overrides }, token), response);
+      expect(response.statusCode).toBe(status);
+    }
+    fetchMock.mockImplementationOnce(async () => jsonResponse(false));
+    const denied = makeResponse();
+    await handler(makeRequest(body, "member-token"), denied);
+    expect(denied.statusCode).toBe(403);
+    expect(vi.mocked(getPublicBusinessWebsiteContext)).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["website_blocked", "denied access"],
+    ["website_unavailable", "could not be reached"],
+    ["website_too_large", "too large"],
+    ["no_page_text", "couldn't extract readable information"],
+    ["unsafe_website", "cannot be imported"]
+  ])("reports %s on both website import flows without storing a source", async (status, message) => {
+    configureEnvironment();
+    const workspaceId = "11111111-1111-4111-8111-111111111111";
+    vi.mocked(getPublicBusinessWebsiteContext).mockResolvedValue({ status, text: "" });
+    const fetchMock = vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/qr_campaigns?id=eq.42")) return jsonResponse([{ id: 42, workspace_id: workspaceId }]);
+      if (href.includes("/rpc/is_workspace_manager")) return jsonResponse(true);
+      if (href.includes("/egg_ai_sources?") || href.includes("/workspace_ai_sources?")) return jsonResponse([]);
+      throw new Error(`Unexpected request: ${href} ${options.method || "GET"}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    for (const body of [
+      { action: "import-website", campaignId: 42, websiteUrl: "https://example.com" },
+      { action: "import-workspace-website", workspaceId, websiteUrl: "https://example.com" }
+    ]) {
+      const response = makeResponse();
+      await handler(makeRequest(body, "manager-token"), response);
+      expect(response.statusCode).toBe(422);
+      expect(response.body.error).toContain(message);
+    }
+    expect(fetchMock.mock.calls.every(([, options]) => options?.method !== "POST" || !String(options?.body).includes("source_type"))).toBe(true);
+  });
+
   it("rejects unauthorized shared imports and Instagram imports", async () => {
     configureEnvironment();
     const workspaceId = "11111111-1111-4111-8111-111111111111";
@@ -507,6 +601,9 @@ describe("Egg AI API", () => {
     const instagram = makeResponse();
     await handler(makeRequest({ ...body, websiteUrl: "https://www.instagram.com/example" }, "manager-token"), instagram);
     expect(instagram.statusCode).toBe(400);
+    const facebook = makeResponse();
+    await handler(makeRequest({ ...body, websiteUrl: "https://www.facebook.com/example" }, "manager-token"), facebook);
+    expect(facebook.statusCode).toBe(400);
     expect(vi.mocked(getPublicBusinessWebsiteContext)).not.toHaveBeenCalled();
   });
 

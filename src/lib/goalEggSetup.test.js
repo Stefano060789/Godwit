@@ -63,6 +63,49 @@ describe("goal-led Egg content creation", () => {
       workspace_id: "workspace-1"
     }));
   });
+
+  it("creates independent polls when different Eggs use the same question", async () => {
+    query.single.mockResolvedValueOnce({ data: { id: 11, question: "How was your visit?" }, error: null });
+    const pollDraft = { question: "How was your visit?", answers: ["Great", "Could improve"] };
+    const first = await createGoalEggSetup({
+      campaign: { id: 4 }, workspaceId: "workspace-1", userId: "user-1", pollDraft
+    });
+    const second = await createGoalEggSetup({
+      campaign: { id: 5 }, workspaceId: "workspace-2", userId: "user-2", pollDraft
+    });
+
+    expect(first.poll.id).toBe(8);
+    expect(second.poll.id).toBe(11);
+    expect(query.insert).toHaveBeenNthCalledWith(1, expect.objectContaining({ workspace_id: "workspace-1", question: pollDraft.question }));
+    expect(query.insert).toHaveBeenNthCalledWith(2, expect.objectContaining({ workspace_id: "workspace-2", question: pollDraft.question }));
+    expect(addQrCampaignPollItem).toHaveBeenNthCalledWith(1, 4, 8);
+    expect(addQrCampaignPollItem).toHaveBeenNthCalledWith(2, 5, 11);
+  });
+
+  it("explains the required database update if the legacy constraint still exists", async () => {
+    query.single.mockReset().mockResolvedValue({
+      data: null,
+      error: { code: "23505", message: 'duplicate key value violates unique constraint "polls_question_key"' }
+    });
+    await expect(createGoalEggSetup({
+      campaign: { id: 4 }, workspaceId: "workspace-1", userId: "user-1",
+      pollDraft: { question: "How was your visit?", answers: ["Great", "Could improve"] }
+    })).rejects.toThrow("An administrator needs to apply the latest database update.");
+    expect(addQrCampaignPollItem).not.toHaveBeenCalled();
+    expect(query.delete).not.toHaveBeenCalled();
+  });
+
+  it("preserves other database errors instead of treating them as duplicate questions", async () => {
+    query.single.mockReset().mockResolvedValue({
+      data: null,
+      error: { code: "23505", message: 'duplicate key value violates unique constraint "another_key"' }
+    });
+    await expect(createGoalEggSetup({
+      campaign: { id: 4 }, workspaceId: "workspace-1", userId: "user-1",
+      pollDraft: { question: "How was your visit?", answers: ["Great", "Could improve"] }
+    })).rejects.toThrow('Unable to create the generated poll: duplicate key value violates unique constraint "another_key"');
+  });
+
   it("validates the benefit before any write", async () => {
     await expect(createGoalEggSetup({ emailBenefit: { type: "voucher" } })).rejects.toThrow();
     expect(from).not.toHaveBeenCalled();

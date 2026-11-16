@@ -55,6 +55,11 @@ export default function Landing() {
           <p className="landing-eyebrow">{t("eyebrow")}</p>
           <h1 className="landing-hero-title">{t("title")}</h1>
           <p className="landing-lede">{t("lede")}</p>
+          <div className="landing-audience-preview" role="list" aria-label={t("useCasesTitle")}>
+            {audienceKeys.map((audience) => (
+              <span key={audience.key} role="listitem">{t(audience.titleKey)}</span>
+            ))}
+          </div>
           {isSignedIn ? (
             <div className="landing-actions">
               <Link to="/admin" className="landing-admin-action">{t("workspaceDashboard")}</Link>

@@ -1756,11 +1756,12 @@ textarea {
 
 .landing-hero {
   position: relative;
-  min-height: 620px;
+  min-height: calc(100svh - 70px);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 48px;
-  padding: 96px max(24px, calc((100vw - 1120px) / 2)) 88px;
+  gap: clamp(24px, 4vw, 48px);
+  padding: clamp(36px, 7svh, 72px) max(24px, calc((100vw - 1120px) / 2));
   background:
     radial-gradient(ellipse at 95% 60%, var(--rose-soft), transparent 65%),
     linear-gradient(160deg, var(--navy-deep) 0%, var(--navy) 62%, var(--sky) 100%);
@@ -1788,7 +1789,7 @@ textarea {
 .landing-hero-content {
   position: relative;
   z-index: 1;
-  max-width: 640px;
+  max-width: 600px;
   flex: 1 1 420px;
 }
 
@@ -1814,7 +1815,7 @@ textarea {
 }
 
 .landing-hero-visual img {
-  width: min(100%, 420px);
+  width: min(100%, 360px);
   height: auto;
   filter: drop-shadow(0 12px 20px rgba(87, 61, 30, 0.16));
 }
@@ -1872,11 +1873,29 @@ textarea {
 }
 
 .landing-lede {
-  max-width: 600px;
-  margin: 24px 0;
+  max-width: 560px;
+  margin: 18px 0;
   color: #f4ebda;
-  font-size: 1.15rem;
-  line-height: 1.65;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.landing-audience-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.landing-audience-preview span {
+  padding: 6px 11px;
+  border: 1px solid rgba(255, 248, 232, 0.34);
+  border-radius: 999px;
+  color: #fff8e8;
+  background: rgba(15, 33, 48, 0.22);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .landing-actions {
@@ -3118,13 +3137,13 @@ textarea {
 
 @media (max-width: 720px) {
   .landing-hero {
-    min-height: 0;
+    min-height: calc(100svh - 64px);
     flex-direction: column;
-    align-items: stretch;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    padding-top: 56px;
-    padding-bottom: 48px;
-    gap: 32px;
+    padding: clamp(20px, 4svh, 34px) 24px;
+    gap: clamp(12px, 2.5svh, 22px);
   }
 
   .landing-hero::before {
@@ -3135,16 +3154,46 @@ textarea {
     max-width: none;
   }
 
+  .landing-lede {
+    margin: 14px auto;
+    font-size: 0.98rem;
+  }
+
+  .landing-audience-preview {
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .landing-audience-preview span {
+    padding: 5px 9px;
+    font-size: 0.72rem;
+  }
+
   .landing-actions {
     justify-content: center;
   }
 
   .landing-hero-visual img {
-    width: min(100%, 280px);
+    width: min(100%, 160px);
   }
 
   .landing-hero-visual .landing-brand-lockup img {
-    width: min(82%, 250px);
+    width: min(82%, 130px);
+  }
+
+  .landing-hero-visual {
+    flex-basis: auto;
+    padding: 0;
+  }
+
+  .landing-actions > a,
+  .landing-actions .landing-admin-action {
+    flex: 1 1 150px;
+    min-width: 0;
+    min-height: 46px;
+    padding: 0 14px;
+    font-size: 0.9rem;
   }
 
   .landing-hero h1 {
