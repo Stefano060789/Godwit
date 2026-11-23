@@ -26,6 +26,45 @@ Google Places prospect research and reputation refresh are disabled in code. The
 
 ## Release gates requiring owner confirmation
 
+### Optional AI continuation after voting
+
+Visitors can opt into **Continue with AI** after a saved vote. The notice states that selected
+predefined choices will be shared with the AI to provide a relevant next step; free-text poll answers
+are not included. No AI request is triggered merely by voting. The server validates the poll's
+Egg/session association and checks choices against the public poll before sending its question and
+selected choices to Claude. This transfer serves the visitor's requested guidance and the configured
+Egg goal, not advertising, training or contact collection. The owner must document the legal basis
+and ensure the visitor-facing AI/provider notice remains accurate.
+After the visitor chooses to share, up to three selected predefined poll responses are retained in
+the open page's memory and may be sent again to Claude with later visitor-initiated chat requests
+in the same conversation. They are not sent merely because a vote was cast, nor added to persistent
+chat storage by this feature. Reloading or leaving the page clears this in-memory context. Existing
+vote and poll-session records have their own retention rules.
+AI interest-poll session hashes remain server-only, acquire a 30-day expiry, and are deleted by
+the authenticated daily `purge-egg-ai-sessions` cron. New multi-select votes reuse the existing
+vote storage and retention; this change does not introduce new identity fields.
+
+### Manager-only business research
+
+Optional Gemini Search grounding sends only the public business name, manager-specified public location,
+selected topic and (for artwork research) public artwork/artist identity. This purpose is helping an adult
+workspace manager inspect public business information, not profiling visitors or reusing customer conversations.
+Activation requires `GOOGLE_RESEARCH_PROVIDER_APPROVED=1` after the owner documents the legal basis,
+paid-provider DPA/terms, transfers/regions and notice. This flag records a deployment prerequisite, not legal clearance.
+No visitor chat, feedback, issue report, manager email or account token is sent to Google.
+The result is returned with `Cache-Control: no-store`, displayed with citations and search suggestions to the
+requesting manager, and not saved, cached as business knowledge, or forwarded to Claude.
+Component state is discarded when cleared/unmounted. Google's Search grounding terms retain grounding inputs
+and output for 30 days even with stateless interaction storage. Confirm current terms before enabling.
+
+`business_research_usage` stores workspace UUID, UTC week, request count and creation/expiry timestamps
+solely for billing-abuse protection, with server-only access and 56-day retention.
+The daily authenticated cron deletes expired counters, and deleting a workspace cascades deletion.
+The existing account export/delete flows must continue to cover workspace deletion; this feature introduces
+no new visitor or manager identifiers. Monitor cleanup failures through the existing cron error channel.
+Shared business notes/imports remain under their existing storage controls; do not paste Google grounded
+results into them to build a reusable database.
+
 Before commercial release, the owner must verify and record for every provider that will be enabled:
 
 - The correct contracting entity, controller/processor roles, current DPA, subprocessor list, and any required cross-border transfer terms.

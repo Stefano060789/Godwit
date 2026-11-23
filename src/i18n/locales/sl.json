@@ -82,6 +82,7 @@
     "signIn": "Prijava",
     "install": "Namesti Godwit",
     "billing": "Obračunavanje",
+    "about": "O Godwitu",
     "moderation": "Moderiranje",
     "shareFeedback": "Pošlji povratne informacije",
     "account": "Račun",
@@ -719,7 +720,7 @@
       },
       "review": {
         "title": "Deli svojo izkušnjo",
-        "hint": "Oceni v eni minuti"
+        "hint": "Kaj ste opazili? Pošljite zasebno sporočilo ekipi."
       },
       "donate": {
         "title": "Podpri nas",

@@ -1754,6 +1754,23 @@ textarea {
   color: #f4ebda;
 }
 
+#root:has(.landing-home) {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+#root:has(.landing-home) .landing-home {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+#root:has(.landing-home) .landing-hero {
+  flex: 1;
+  min-height: 0;
+}
+
 .landing-hero {
   position: relative;
   min-height: calc(100svh - 70px);
@@ -2004,7 +2021,7 @@ textarea {
     linear-gradient(145deg, var(--surface-soft), var(--rose-soft));
 }
 
-.landing-egg h2 {
+.landing-egg h1 {
   max-width: 18ch;
   margin: 0;
   color: var(--ink);
@@ -2959,7 +2976,7 @@ textarea {
     linear-gradient(145deg, var(--surface), var(--surface-soft));
 }
 
-:root[data-theme="dark"] .landing-egg h2,
+:root[data-theme="dark"] .landing-egg h1,
 :root[data-theme="dark"] .landing-egg-feature h3 {
   color: var(--ink);
 }
@@ -3033,6 +3050,15 @@ textarea {
 
   .site-nav-actions {
     gap: 6px;
+    flex: 1 1 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+    padding: 6px 0;
+  }
+
+  .site-nav-actions > a {
+    white-space: nowrap;
   }
 
   .site-nav-brand {
@@ -3369,6 +3395,19 @@ textarea {
 .egg-guide-panel .qr-portal-poll-answer span { display: inline; margin: 0; color: inherit; }
 .egg-guide-panel .qr-portal-menu-item.qr-portal-ai-assistant { border-top-color: var(--egg-brand); }
 .egg-guide-panel .qr-portal-ai-heading { display: none; }
+.egg-guide [hidden] { display: none !important; }
+.egg-feedback-card { padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.egg-feedback-card h3 { margin-top: 0; }
+.egg-feedback-starters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.egg-feedback-starters button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); color: var(--ink); font: inherit; cursor: pointer; }
+.egg-feedback-card label { display: block; font-weight: 700; margin-bottom: 6px; }
+.egg-feedback-card .qr-portal-ai-submit { margin-top: 12px; }
+.business-data-source > a { display: block; margin-top: 6px; }
+.business-research-consent { display: flex !important; align-items: flex-start; gap: 10px; margin: 12px 0; }
+.business-research-consent input { width: auto; margin-top: 5px; flex: none; }
+.business-research-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.business-research-result { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
+.business-research-suggestions { display: block; width: 100%; min-height: 200px; border: 0; margin: 12px 0; }
 .egg-guide-panel .qr-portal-ai-content { margin-top: 0; }
 .egg-guide-panel .qr-portal-poll-done { background: var(--teal-soft); }
 .egg-guide-panel .qr-portal-poll-thanks { color: var(--ink); }

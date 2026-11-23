@@ -38,7 +38,7 @@ const audienceKeys = [
   { key: "shops", titleKey: "useCases.shopsTitle", detailKey: "useCases.shopsDetail" }
 ];
 
-export default function Landing() {
+export default function Landing({ about = false }) {
   const { t } = useTranslation("translation", { keyPrefix: "landing" });
   const [isSignedIn, setIsSignedIn] = useState(false);
 
@@ -49,8 +49,8 @@ export default function Landing() {
   }, []);
 
   return (
-    <main className="landing-page">
-      <section className="landing-hero">
+    <main className={`landing-page${about ? "" : " landing-home"}`}>
+      {!about && <section className="landing-hero">
         <div className="landing-hero-content">
           <p className="landing-eyebrow">{t("eyebrow")}</p>
           <h1 className="landing-hero-title">{t("title")}</h1>
@@ -77,12 +77,13 @@ export default function Landing() {
             <img src="/godwit-logo.png" alt="" />
           </div>
         </div>
-      </section>
+      </section>}
 
+      {about && <>
       <section className="landing-egg" aria-labelledby="egg-feature-title">
         <div className="landing-egg-copy">
           <p className="landing-eyebrow">{t("eggFeatures.eyebrow")}</p>
-          <h2 id="egg-feature-title">{t("eggFeatures.title")}</h2>
+          <h1 id="egg-feature-title">{t("eggFeatures.title")}</h1>
           <p className="landing-egg-lede">{t("eggFeatures.lede")}</p>
           <div className="landing-egg-access" aria-label={t("eggFeatures.accessibilityLabel")}>
             <span>QR</span>
@@ -165,6 +166,7 @@ export default function Landing() {
           )}
         </div>
       </section>
+      </>}
     </main>
   );
 }

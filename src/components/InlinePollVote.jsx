@@ -15,7 +15,7 @@ export function hasOptionalPollExtras(poll) {
 // Renders one "poll" QR-campaign item directly inline in the QR menu: the question and its
 // answer options are shown open, right there, so a voter can answer without clicking through to
 // a separate page. Optional follow-up features remain available on the full poll when configured.
-export default function InlinePollVote({ item, branding, preview = false, onSubmitted }) {
+export default function InlinePollVote({ item, branding, preview = false, onSubmitted, showGodwitLink = true }) {
   const { t } = useTranslation();
   const [poll, setPoll] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -98,7 +98,7 @@ export default function InlinePollVote({ item, branding, preview = false, onSubm
 
     if (!user) localStorage.setItem(`voted_${item.poll_id}`, "true");
     setSubmitted(true);
-    onSubmitted?.();
+    onSubmitted?.({ pollId: Number(item.poll_id), question: poll.question, answers: [...selected] });
   }
 
   if (loading) {
@@ -125,10 +125,10 @@ export default function InlinePollVote({ item, branding, preview = false, onSubm
       <div className="qr-portal-menu-item qr-portal-menu-poll qr-portal-poll-done" style={{ borderColor: branding.primaryColor }}>
         <span className="qr-portal-menu-item-title">{poll.question}</span>
         <p className="qr-portal-poll-thanks">{duplicate ? t("vote.alreadyAnsweredInline") : t("vote.thanksInline")}</p>
-        <div className="qr-portal-learn">
+        {showGodwitLink && <div className="qr-portal-learn">
           <p>{t("vote.learnFromGodwit")}</p>
           <Link to="/" className="qr-portal-learn-link">{t("vote.seeGodwitFeatures")}</Link>
-        </div>
+        </div>}
       </div>
     );
   }
@@ -138,6 +138,9 @@ export default function InlinePollVote({ item, branding, preview = false, onSubm
   return (
     <div className="qr-portal-menu-item qr-portal-menu-poll" style={{ borderColor: branding.primaryColor }}>
       <span className="qr-portal-menu-item-title">{poll.question}</span>
+      <p className="qr-portal-menu-item-body">{isMultiple
+        ? t("vote.selectMultiple", { defaultValue: "Choose all the answers that apply." })
+        : t("vote.selectOne", { defaultValue: "Choose one answer." })}</p>
       <div className="qr-portal-poll-answers">
         {poll.answers.map((answer) => (
           <label key={answer} className="qr-portal-poll-answer">

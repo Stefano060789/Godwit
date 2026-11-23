@@ -71,6 +71,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Suspense fallback={<PageLoading />}>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/about" element={<Landing about />} />
         <Route path="/essentials" element={<Essentials />} />
         <Route path="/create" element={<CreatePoll />} />
         <Route path="/vote/:pollId" element={<Vote />} />

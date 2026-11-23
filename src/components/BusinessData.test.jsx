@@ -10,6 +10,9 @@ describe("BusinessData", () => {
     const markup = renderToStaticMarkup(createElement(BusinessData, { workspaceId: "workspace", canManage: true, t }));
     expect(markup).toContain("Business notes");
     expect(markup).toContain("Import website");
+    expect(markup).toContain("Save link without importing");
+    expect(markup).toContain("weekly request limits");
+    expect(markup).toContain("not saved, imported, or reused");
     expect(markup).toContain("Upload saved webpage");
     expect(markup).toContain("website owner");
     expect(markup).toContain("will not update automatically");

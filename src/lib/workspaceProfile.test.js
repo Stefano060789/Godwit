@@ -43,6 +43,25 @@ describe("workspace business profile persistence", () => {
     expect(from).not.toHaveBeenCalled();
   });
 
+  it("requires and persists a business name with the business profile", async () => {
+    await expect(saveWorkspaceBusinessType("workspace-id", "cafe-pub", "", "  Green Garden Cafe  ")).resolves.toEqual({
+      companyName: "Green Garden Cafe",
+      businessType: "cafe-pub",
+      businessDescription: ""
+    });
+
+    expect(update).toHaveBeenCalledWith({
+      name: "Green Garden Cafe",
+      business_type: "cafe-pub",
+      business_description: null
+    });
+  });
+
+  it("rejects an empty business name before writing", async () => {
+    await expect(saveWorkspaceBusinessType("workspace-id", "cafe-pub", "", "   ")).rejects.toThrow("Enter your business name");
+    expect(from).not.toHaveBeenCalled();
+  });
+
   it("rejects unknown categories before writing", async () => {
     await expect(saveWorkspaceBusinessType("workspace-id", "unknown")).rejects.toThrow("valid business type");
     expect(from).not.toHaveBeenCalled();

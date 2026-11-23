@@ -82,6 +82,7 @@
     "signIn": "Accedi",
     "install": "Installa Godwit",
     "billing": "Fatturazione",
+    "about": "Scopri Godwit",
     "moderation": "Moderazione",
     "shareFeedback": "Invia un feedback sul prodotto",
     "account": "Account",
@@ -1349,7 +1350,7 @@
       },
       "review": {
         "title": "Condividi la tua esperienza",
-        "hint": "Lascia una recensione in un minuto"
+        "hint": "Cosa ti ha colpito? Invia una nota privata al team."
       },
       "donate": {
         "title": "Sostienici",

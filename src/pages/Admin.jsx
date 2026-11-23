@@ -1395,6 +1395,7 @@ export default function Admin() {
 
       {activeTab === "your-business" && workspaceUserId && <BusinessProfile
         workspaceId={workspaceUserId}
+        companyName={workspaceProfile.companyName}
         businessType={workspaceProfile.businessType}
         businessDescription={workspaceProfile.businessDescription}
         canManage={permission.canManageWorkspace}

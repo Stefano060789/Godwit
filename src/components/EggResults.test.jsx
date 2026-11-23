@@ -10,7 +10,7 @@ describe("Egg-specific results", () => {
   it("shows Egg identity and customer message summary without poll, action, or visit analytics", () => {
     const labels = {
       "quickStart.goals.feedback.title": "Feedback",
-      "quickStart.goals.answers.title": "Answers"
+      "quickStart.goals.help-and-guide.title": "Answers"
     };
     const t = (key, options = {}) => labels[key] || options.defaultValue || key;
     const markup = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(EggResults, {

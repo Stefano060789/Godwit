@@ -36,6 +36,22 @@ describe("Business profile setup", () => {
     expect(markup).toContain('type="submit" class="goal-primary-action" disabled=""');
   });
 
+  it("requires a business name and leaves the default workspace name blank", () => {
+    const markup = renderToStaticMarkup(createElement(BusinessProfile, {
+      workspaceId: "workspace-id",
+      companyName: "My workspace",
+      businessType: "cafe-pub",
+      canManage: true,
+      onSaved: () => {},
+      t
+    }));
+
+    expect(markup).toContain("Business name");
+    expect(markup).toContain('required=""');
+    expect(markup).toContain('placeholder="For example: The Green Garden Cafe"');
+    expect(markup).toContain('type="submit" class="goal-primary-action" disabled=""');
+  });
+
   it("shows a required custom description for an unlisted business", () => {
     const markup = renderToStaticMarkup(createElement(BusinessProfile, {
       workspaceId: "workspace-id",

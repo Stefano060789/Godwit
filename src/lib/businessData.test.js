@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { addBusinessNotes, addFacebookLink, addInstagramLink, importBusinessWebsite, listBusinessSources, normalizeFacebookUrl, normalizeInstagramUrl, removeBusinessSource, uploadBusinessWebsite } from "./businessData";
+import { addBusinessNotes, addFacebookLink, addInstagramLink, addWebsiteLink, importBusinessWebsite, listBusinessSources, normalizeFacebookUrl, normalizeInstagramUrl, removeBusinessSource, uploadBusinessWebsite } from "./businessData";
 import { supabase } from "./supabase";
 
 vi.mock("./supabase", () => ({
@@ -33,6 +33,24 @@ describe("business data", () => {
       workspace_id: "workspace", source_type: "instagram", title: "Instagram profile",
       source_url: "https://www.instagram.com/example", content: "https://www.instagram.com/example"
     });
+
+  });
+
+  it("saves a website link without attempting an import", async () => {
+    const insert = vi.fn().mockResolvedValue({ error: null });
+    const fetchMock = vi.fn();
+    supabase.from.mockReturnValue({ insert });
+    vi.stubGlobal("fetch", fetchMock);
+    await addWebsiteLink("workspace", " https://example.org/menu ");
+    expect(insert).toHaveBeenCalledWith({
+      workspace_id: "workspace", source_type: "website", title: "example.org",
+      source_url: "https://example.org/menu", content: "Website link only (page content not imported): https://example.org/menu"
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+    for (const value of ["http://example.org", "javascript:alert(1)", "https://user:password@example.org", "https://127.0.0.1", "https://app.internal", "https://localhost.", "https://10.0.0.1."]) {
+      await expect(addWebsiteLink("workspace", value)).rejects.toThrow("public HTTPS");
+    }
+    expect(insert).toHaveBeenCalledTimes(1);
   });
 
   it("normalizes Facebook page and profile links without tracking parameters", () => {

@@ -114,6 +114,7 @@
 .egg-workspace button:focus-visible, .egg-workspace a:focus-visible, .egg-workspace summary:focus-visible { outline: 3px solid var(--hub-accent); outline-offset: 4px; }
 .hub-page-heading { margin-bottom: 1.5rem; }
 .business-profile-custom { display: grid; gap: .4rem; margin-top: 1rem; color: var(--hub-ink); font-size: .9rem; font-weight: 600; }
+.business-profile-custom input,
 .business-profile-custom textarea,
 .goal-context-field textarea { width: 100%; border: 1px solid var(--hub-line); border-radius: .75rem; padding: .75rem; background: var(--hub-surface); color: var(--hub-ink); font: inherit; }
 .goal-context-field { display: grid; gap: .45rem; margin: .5rem 0 1rem; color: var(--hub-ink); font-size: .9rem; font-weight: 600; }

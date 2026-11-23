@@ -22,8 +22,12 @@ import { runResearchGodwitProspects } from "../lib/cron/researchGodwitProspectsJ
 import { runAdaptiveEggPolls } from "../lib/cron/adaptiveEggPollJob.js";
 import { getSystemStatus } from "../lib/cron/systemStatus.js";
 import { captureError } from "../lib/errorReporting.js";
+import { runPurgeBusinessResearch } from "../lib/cron/purgeBusinessResearchJob.js";
+import { runPurgeEggAiSessions } from "../lib/cron/purgeEggAiSessionsJob.js";
 
 const JOBS = {
+  "purge-egg-ai-sessions": { run: runPurgeEggAiSessions, methods: ["GET"] },
+  "purge-business-research": { run: runPurgeBusinessResearch, methods: ["GET"] },
   "weekly-report": { run: runWeeklyReport, methods: ["GET"] },
   "check-anomalies": { run: runAnomalyCheck, methods: ["GET", "POST"] },
   "purge-old-votes": { run: runPurgeOldVotes, methods: ["GET", "POST"] },

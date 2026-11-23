@@ -45,7 +45,7 @@ describe("public landing donation messaging", () => {
       createElement(
         I18nextProvider,
         { i18n },
-        createElement(MemoryRouter, null, createElement(Landing))
+        createElement(MemoryRouter, null, createElement(Landing, { about: true }))
       )
     );
     const renderedCopy = markup.replaceAll("&#x27;", "'");
@@ -72,30 +72,34 @@ describe("public landing donation messaging", () => {
       resources: { en: { translation: en } },
       interpolation: { escapeValue: false }
     });
-    const markup = renderToStaticMarkup(
+    const renderPage = (about) => renderToStaticMarkup(
       createElement(
         I18nextProvider,
         { i18n },
-        createElement(MemoryRouter, null, createElement(Landing))
+        createElement(MemoryRouter, null, createElement(Landing, { about }))
       )
     ).replaceAll("&#x27;", "'");
+    const markup = renderPage(false);
+    const aboutMarkup = renderPage(true);
 
     expect(markup).toContain(en.landing.eyebrow);
     expect(markup).toContain(en.landing.title);
     expect(markup).toContain(en.landing.lede);
-    expect(markup).toContain(en.landing.eggFeatures.title);
-    expect(markup).toContain(en.landing.eggFeatures.accessDetail);
-    expect(markup).toContain(en.landing.eggFeatures.assistantDetail);
-    expect(markup).toContain(en.landing.eggFeatures.guidanceDetail);
-    expect(markup).toContain(en.landing.useCases.artsDetail);
-    expect(markup).toContain(en.landing.useCases.hospitalityDetail);
+    expect(markup).not.toContain(en.landing.eggFeatures.title);
+    expect(aboutMarkup).toContain(`<h1 id="egg-feature-title">${en.landing.eggFeatures.title}</h1>`);
+    expect(aboutMarkup).not.toContain('class="landing-hero"');
+    expect(aboutMarkup).toContain(en.landing.eggFeatures.accessDetail);
+    expect(aboutMarkup).toContain(en.landing.eggFeatures.assistantDetail);
+    expect(aboutMarkup).toContain(en.landing.eggFeatures.guidanceDetail);
+    expect(aboutMarkup).toContain(en.landing.useCases.artsDetail);
+    expect(aboutMarkup).toContain(en.landing.useCases.hospitalityDetail);
     expect(en.landing.useCases.hospitalityTitle).toContain("Cafes, pubs");
     expect(en.landing.useCases.hospitalityDetail).toContain("Cafes, pubs");
-    expect(markup).toContain(en.landing.useCases.placesDetail);
-    expect(markup).toContain(en.landing.useCases.eventsDetail);
-    expect(markup).toContain(en.landing.useCases.shopsDetail);
-    expect(markup).toContain("Keep any benefit separate from public reviews.");
-    expect(markup).toContain('href="/register"');
+    expect(aboutMarkup).toContain(en.landing.useCases.placesDetail);
+    expect(aboutMarkup).toContain(en.landing.useCases.eventsDetail);
+    expect(aboutMarkup).toContain(en.landing.useCases.shopsDetail);
+    expect(aboutMarkup).toContain("Keep any benefit separate from public reviews.");
+    expect(aboutMarkup).toContain('href="/register"');
     expect(markup).toContain('href="/essentials"');
   });
 });

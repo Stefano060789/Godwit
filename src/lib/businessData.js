@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { safeBusinessUrl } from "./businessLinks";
 
 export const BUSINESS_SOURCE_LIMIT = 8;
 
@@ -64,6 +65,16 @@ export async function addBusinessNotes(workspaceId, title, content) {
   throwStorageError(error);
 }
 
+export async function addWebsiteLink(workspaceId, value) {
+  const url = safeBusinessUrl(value);
+  if (!url) throw new Error("Enter a public HTTPS website URL without credentials.");
+  const { error } = await supabase.from("workspace_ai_sources").insert({
+    workspace_id: workspaceId, source_type: "website", title: new URL(url).hostname,
+    source_url: url, content: `Website link only (page content not imported): ${url}`
+  });
+  throwStorageError(error);
+}
+
 export async function addInstagramLink(workspaceId, value) {
   const url = normalizeInstagramUrl(value);
   const { error } = await supabase.from("workspace_ai_sources").insert({
@@ -111,4 +122,18 @@ export async function uploadBusinessWebsite(workspaceId, websiteUrl, file) {
   if (file.size > 1_000_000) throw new Error("The saved webpage must be no larger than 1 MB.");
   const html = await file.text();
   return submitBusinessWebsite({ action: "upload-workspace-website", workspaceId, websiteUrl: websiteUrl.trim(), html });
+}
+
+export async function researchBusinessInformation(workspaceId, { location, topic, artwork, consent }) {
+  const { data, error } = await supabase.auth.getSession();
+  throwStorageError(error);
+  if (!data.session?.access_token) throw new Error("Sign in to research business information.");
+  const response = await fetch("/api/egg-ai", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session.access_token}` },
+    body: JSON.stringify({ action: "research-workspace", workspaceId, location, topic, artwork, consent })
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "Unable to research this business.");
+  return result;
 }

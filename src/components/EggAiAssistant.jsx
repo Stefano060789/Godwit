@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import InlinePollVote from "./InlinePollVote";
 import { supabase } from "../lib/supabase";
-import { submitEggReviewFeedback } from "../lib/goalProgress";
+import EggReviewFeedback from "./EggReviewFeedback";
+import { safeBusinessUrl } from "../lib/businessLinks";
 
 const GOAL_PROMPTS = {
   "help-and-guide": ["askQuestion", "findNextStep"],
@@ -57,7 +58,7 @@ function createSessionId() {
   }
 }
 
-export default function EggAiAssistant({ token, campaignId, trialSessionId, branding, preview = false, initiallyExpanded = true, onAnswered }) {
+export default function EggAiAssistant({ token, campaignId, trialSessionId, branding, preview = false, initiallyExpanded = true, onAnswered, onFinished, onSelectOption, showPrivateFeedback = true, initialPollResponse, onContinuationStarted }) {
   const { t } = useTranslation("translation", { keyPrefix: "eggAi" });
   const [enabled, setEnabled] = useState(preview);
   const [expanded, setExpanded] = useState(initiallyExpanded);
@@ -65,13 +66,13 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
   const [feedbackTopics, setFeedbackTopics] = useState([]);
   const [goalKeys, setGoalKeys] = useState([]);
   const [input, setInput] = useState("");
-  const [reviewFeedback, setReviewFeedback] = useState("");
-  const [reviewStatus, setReviewStatus] = useState("");
-  const [reviewError, setReviewError] = useState("");
-  const [submittingReview, setSubmittingReview] = useState(false);
   const [sessionId] = useState(createSessionId);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [pollResponses, setPollResponses] = useState({});
+  const [retryPollResponse, setRetryPollResponse] = useState(null);
+  const [sharedPollResponses, setSharedPollResponses] = useState([]);
+  const consumedResponse = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,13 +90,17 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
           setEnabled(result.enabled === true);
           setFeedbackTopics(Array.isArray(result.feedbackTopics) ? result.feedbackTopics : []);
           setGoalKeys(Array.isArray(result.goalKeys) ? result.goalKeys : []);
+          if (result.enabled !== true) setError(t("assistantUnavailable", { defaultValue: "The AI guide is unavailable. You can still use the other Egg options." }));
         }
       })
-      .catch((loadError) => console.error("Unable to load Egg AI settings:", loadError));
+      .catch((loadError) => {
+        console.error("Unable to load Egg AI settings:", loadError);
+        if (!cancelled) setError(t("assistantUnavailable", { defaultValue: "The AI guide is unavailable. You can still use the other Egg options." }));
+      });
     return () => { cancelled = true; };
   }, [token]);
 
-  async function sendMessage(messageText) {
+  async function sendMessage(messageText, pollResponse = null) {
     const message = messageText.trim();
     if (!message || sending || message.length > 600) return;
     setSending(true);
@@ -117,7 +122,11 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
           sessionId,
           trialSessionId,
           message,
-          history: messages.slice(-4).map(({ role, content }) => ({ role, content }))
+          ...(pollResponse ? { pollResponse: { pollId: pollResponse.pollId, answers: pollResponse.answers } } : {}),
+          ...(sharedPollResponses.length ? { sharedPollResponses } : {}),
+          history: messages.slice(-4).map(({ role, content, poll }) => ({
+            role, content: poll ? `${content}\nPoll shown: ${poll.question}` : content
+          }))
         })
       });
       const result = await response.json();
@@ -129,7 +138,7 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
             : t("assistantError"));
       }
       const poll = result.poll && Number.isSafeInteger(Number(result.poll.id)) && Array.isArray(result.poll.answers)
-        ? { id: Number(result.poll.id), campaignId, answers: result.poll.answers }
+        ? { id: Number(result.poll.id), campaignId, question: result.poll.question, answers: result.poll.answers }
         : null;
       setMessages((current) => [
         ...current,
@@ -137,49 +146,45 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
         {
           role: "assistant",
           content: result.answer,
+          businessLinks: Array.isArray(result.businessLinks) ? result.businessLinks.filter((link) => safeBusinessUrl(link.url)) : [],
           suggestions: result.suggestions || [],
+          followUps: Array.isArray(result.followUps) ? result.followUps : [],
           poll: poll && current.some((entry) => entry.poll?.id === poll.id) ? null : poll,
           pollUnavailable: result.pollUnavailable === true
         }
       ]);
+      setRetryPollResponse(null);
+      if (pollResponse) setSharedPollResponses((current) => [
+        ...current.filter((entry) => entry.pollId !== pollResponse.pollId),
+        { pollId: pollResponse.pollId, answers: pollResponse.answers }
+      ].slice(-3));
       onAnswered?.();
     } catch (sendError) {
       setInput(message);
+      setRetryPollResponse(pollResponse);
       setError(sendError.message || t("assistantError"));
     } finally {
       setSending(false);
     }
   }
 
+  useEffect(() => {
+    if (!enabled || sending || !initialPollResponse || consumedResponse.current === initialPollResponse) return;
+    consumedResponse.current = initialPollResponse;
+    onContinuationStarted?.();
+    void sendMessage(t("continueAfterVoteMessage", { defaultValue: "Based on my selected answers, what would be useful next for my visit?" }), initialPollResponse);
+  }, [enabled, sending, initialPollResponse]);
+
   function handleFormSubmit(event) {
     event.preventDefault();
-    void sendMessage(input);
-  }
-
-  async function handleReviewSubmit(event) {
-    event.preventDefault();
-    const feedback = reviewFeedback.trim();
-    if (feedback.length < 10 || feedback.length > 1200 || submittingReview) return;
-    setSubmittingReview(true);
-    setReviewError("");
-    setReviewStatus("");
-    try {
-      const submitted = await submitEggReviewFeedback(campaignId, trialSessionId, feedback);
-      setReviewStatus(submitted ? "submitted" : "alreadySubmitted");
-      setReviewFeedback("");
-    } catch (failure) {
-      console.error("Unable to submit visitor review feedback:", failure);
-      setReviewError(failure.message || t("reviewError"));
-    } finally {
-      setSubmittingReview(false);
-    }
+    void sendMessage(input, retryPollResponse);
   }
 
   function getSuggestionHref(suggestion) {
     return `#egg-option-${encodeURIComponent(suggestion.id)}`;
   }
 
-  if (!enabled) return null;
+  if (!enabled) return error ? <p role="alert" className="qr-portal-ai-error">{error}</p> : null;
   const guidedPrompts = buildGuidedPrompts(goalKeys, feedbackTopics, t);
   return (
     <section className="qr-portal-menu-item qr-portal-ai-assistant" aria-label="AI business assistant">
@@ -196,7 +201,7 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
       {expanded && (
         <div className="qr-portal-ai-content">
           {preview && <p className="qr-portal-ai-preview-note">{t("previewHint")}</p>}
-          <p className="qr-portal-ai-privacy">{t("privacyHint")}</p>
+          <p className="qr-portal-ai-privacy">{t("privacyHint")}{" "}{t("providerPrivacyHint", { defaultValue: "Messages are sent to Anthropic's AI service. Poll choices are shared only if you choose Continue with AI, and may be included in later questions in this conversation." })}</p>
           <div className="qr-portal-ai-messages" aria-live="polite">
             {messages.map((message, index) => (
               <div key={`${message.role}-${index}`}>
@@ -204,15 +209,32 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
                   <strong>{message.role === "user" ? t("you") : t("assistant")}</strong>
                   {message.content}
                 </p>
+                {message.businessLinks?.length > 0 && <div className="qr-portal-ai-suggestions">
+                  <p>{t("businessLinks", { defaultValue: "Links supplied by the business" })}</p>
+                  {message.businessLinks.map((link) => <a key={link.url} href={safeBusinessUrl(link.url)}
+                    target="_blank" rel="noopener noreferrer" className="qr-portal-ai-suggestion">{link.title} →</a>)}
+                </div>}
                 {message.poll && (
                   <div className="mt-2">
                     <InlinePollVote
                       item={{ poll_id: message.poll.id, campaign_id: message.poll.campaignId, trial_session_id: trialSessionId }}
                       branding={branding}
                       preview={preview}
+                      showGodwitLink={false}
+                      onSubmitted={(response) => {
+                        if (response.answers.length) setPollResponses((current) => ({ ...current, [response.pollId]: response }));
+                      }}
                     />
                   </div>
                 )}
+                {pollResponses[message.poll?.id] && <div className="qr-portal-ai-prompts">
+                  <p>{t("continueAfterVotePrivacy", { defaultValue: "Optional: share your selected answers with Anthropic's AI for a useful next step. They may also be used for your later questions in this conversation." })}</p>
+                  <button type="button" disabled={sending} className="qr-portal-ai-prompt" onClick={() => {
+                    const response = pollResponses[message.poll.id];
+                    setPollResponses((current) => { const next = { ...current }; delete next[message.poll.id]; return next; });
+                    void sendMessage(t("continueAfterVoteMessage", { defaultValue: "Based on my selected answers, what would be useful next for my visit?" }), response);
+                  }}>{t("continueAfterVote", { defaultValue: "Continue with AI" })}</button>
+                </div>}
                 {message.pollUnavailable && <p className="qr-portal-ai-status">{t("pollUnavailable")}</p>}
                 {message.suggestions?.length > 0 && (
                   <div className="qr-portal-ai-suggestions">
@@ -221,9 +243,10 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
                       <a
                         key={`${suggestion.type}-${suggestion.id}`}
                         href={getSuggestionHref(suggestion)}
+                        onClick={onSelectOption ? (event) => { event.preventDefault(); onSelectOption(suggestion.id); } : undefined}
                         className="qr-portal-ai-suggestion"
                       >
-                        {t(`optionTypes.${suggestion.type}`)}: {suggestion.title} →
+                        {t(`optionTypes.${suggestion.type}`, { defaultValue: suggestion.type === "report" ? "Report an issue" : "See offer" })}: {suggestion.title} →
                       </a>
                     ))}
                   </div>
@@ -231,35 +254,14 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
               </div>
             ))}
           </div>
-          {goalKeys.includes("reviews") && !preview && (
-            <form onSubmit={handleReviewSubmit} className="qr-portal-ai-review-form">
-              <h3>{t("reviewTitle")}</h3>
-              <p>{t("reviewDescription")}</p>
-              <label className="sr-only" htmlFor="egg-ai-review">{t("reviewLabel")}</label>
-              <textarea
-                id="egg-ai-review"
-                rows={3}
-                minLength={10}
-                maxLength={1200}
-                value={reviewFeedback}
-                onChange={(event) => setReviewFeedback(event.target.value)}
-                placeholder={t("reviewPlaceholder")}
-                className="qr-portal-ai-input"
-                disabled={submittingReview || reviewStatus === "submitted" || reviewStatus === "alreadySubmitted"}
-              />
-              <div>
-                <button
-                  type="submit"
-                  disabled={submittingReview || reviewFeedback.trim().length < 10 || reviewStatus === "submitted" || reviewStatus === "alreadySubmitted"}
-                  className="qr-portal-ai-submit"
-                >
-                  {submittingReview ? t("reviewSubmitting") : t("reviewSubmit")}
-                </button>
-              </div>
-              {reviewStatus && <p role="status" className="qr-portal-ai-status">{t(`review${reviewStatus === "submitted" ? "Submitted" : "AlreadySubmitted"}`)}</p>}
-              {reviewError && <p role="alert" className="qr-portal-ai-error">{reviewError}</p>}
-            </form>
+          {showPrivateFeedback && goalKeys.includes("reviews") && !preview && (
+            <EggReviewFeedback campaignId={campaignId} trialSessionId={trialSessionId} />
           )}
+          {messages.at(-1)?.followUps?.length > 0 && <div className="qr-portal-ai-prompts">
+            <p>{t("continueConversation", { defaultValue: "Explore a useful next step — or ask your own question." })}</p>
+            {messages.at(-1).followUps.map((entry, index) => <button key={index} type="button"
+              disabled={sending} className="qr-portal-ai-prompt" onClick={() => sendMessage(entry.message)}>{entry.label}</button>)}
+          </div>}
           {messages.length === 0 && guidedPrompts.length > 0 && (
             <div className="qr-portal-ai-prompts">
               <p>{t("guidedPromptLabel")}</p>
@@ -296,6 +298,9 @@ export default function EggAiAssistant({ token, campaignId, trialSessionId, bran
             </div>
           </form>
           {error && <p role="alert" className="qr-portal-ai-error">{error}</p>}
+          {onFinished && messages.length > 0 && <button type="button" className="egg-guide-back" disabled={sending} onClick={onFinished}>
+            {t("finishConversation", { defaultValue: "I'm done — show other options" })}
+          </button>}
         </div>
       )}
     </section>

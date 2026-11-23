@@ -67,6 +67,217 @@ describe("Egg AI API", () => {
     process.env = { ...originalEnv };
   });
 
+  it.each([
+    [{ pollId: 91, answers: ["One", "Two"] }, 200],
+    [{ pollId: 91, answers: ["Invented"] }, 400],
+    [{ pollId: 999, answers: ["One"] }, 400],
+    [{ pollId: 91, answers: ["One", "Two"] }, 400, false],
+    [{ pollId: 91, answers: ["One", "Two"] }, 200, true, true]
+  ])("validates poll continuation before using AI (%j)", async (pollResponse, status, multipleChoice = true, generated = false) => {
+    configureEnvironment();
+    const fetchMock = vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/qr_campaigns?token=")) return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Pub", is_active: true, ai_enabled: true }]);
+      if (href.includes("/rpc/check_egg_trial_session")) return jsonResponse(true);
+      if (href.includes("/egg_ai_sources?") || href.includes("/workspace_ai_sources?")) return jsonResponse([]);
+      if (href.includes("/rpc/get_public_qr_campaign_items")) return jsonResponse(generated ? [] : [{ item_id: 17, item_type: "poll", poll_id: 91, poll_question: "What interests you?" }]);
+      if (href.includes("/rpc/get_public_qr_campaign")) return jsonResponse([]);
+      if (href.includes("/egg_ai_interest_poll_sessions?")) {
+        if (generated) {
+          expect(href).toContain("campaign_id=eq.42&session_hash=eq.");
+          expect(href).toContain("poll_id=eq.91");
+        }
+        return jsonResponse(generated ? [{ poll_id: 91 }] : []);
+      }
+      if (href.includes("/rpc/get_public_poll")) return jsonResponse([{ question: "What interests you?", answers: ["One", "Two"], multiple_choice: multipleChoice }]);
+      if (href.includes("/rpc/reserve_egg_ai_turn")) return new Response(null, { status: 204 });
+      if (href === "https://api.anthropic.com/v1/messages") {
+        const requestBody = JSON.parse(options.body);
+        expect(requestBody.messages.at(-1).content).toContain('"answers":["One","Two"]');
+        expect(requestBody.system).toContain("Do not treat one answer or one vote as the end");
+        expect(requestBody.system).toContain("up to 3 distinct polls");
+        return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
+          answer: "Here is a relevant next step.",
+          followUps: [
+            { label: "Explore the menu", message: "Which supplied menu options match my preferences?" },
+            { label: "Contact", message: "Email visitor@example.com" },
+            { label: "Our location", message: "Where is the business located?" },
+            { label: "More details", message: "What else is available?" }
+          ]
+        }) }] });
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeChatRequest({ pollResponse }), response);
+    expect(response.statusCode).toBe(status);
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).includes("api.anthropic.com"))).toHaveLength(status === 200 ? 1 : 0);
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).includes("reserve_egg_ai_turn"))).toHaveLength(status === 200 ? 1 : 0);
+    if (status === 200) expect(response.body.followUps).toEqual([
+      { label: "Explore the menu", message: "Which supplied menu options match my preferences?" },
+      { label: "Our location", message: "Where is the business located?" }
+    ]);
+  });
+
+  it("only suggests existing offer and issue-report actions and validates remembered choices", async () => {
+    configureEnvironment();
+    const fetchMock = vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/qr_campaigns?token=")) return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Pub", is_active: true, ai_enabled: true }]);
+      if (href.includes("/rpc/check_egg_trial_session")) return jsonResponse(true);
+      if (href.includes("/egg_ai_sources?") || href.includes("/workspace_ai_sources?")) return jsonResponse([]);
+      if (href.includes("/rpc/get_public_qr_campaign_items")) return jsonResponse([
+        { item_id: 17, item_type: "poll", poll_id: 91, poll_question: "Preference?" },
+        { item_id: 18, item_type: "reward", title: "Lunch offer", body: "Supplied details" }
+      ]);
+      if (href.includes("/rpc/get_public_qr_campaign")) return jsonResponse([]);
+      if (href.includes("/rpc/get_public_poll")) return jsonResponse([{ question: "Preference?", answers: ["Vegetarian", "Other"], multiple_choice: false }]);
+      if (href.includes("/rpc/reserve_egg_ai_turn")) return new Response(null, { status: 204 });
+      if (href === "https://api.anthropic.com/v1/messages") {
+        const body = JSON.parse(options.body);
+        expect(body.messages.at(-1).content).toContain('"answers":["Vegetarian"]');
+        expect(body.system).toContain('"type":"reward"');
+        expect(body.system).toContain('"id":"guide:report"');
+        expect(body.system).toContain("Treat blank template fields as unknown");
+        return jsonResponse({ content: [{ type: "text", text: JSON.stringify({
+          answer: "Here are relevant options.", suggestions: ["18", "guide:report", "invented"]
+        }) }] });
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeChatRequest({ sharedPollResponses: [{ pollId: 91, answers: ["Vegetarian"] }] }), response);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.suggestions).toEqual([
+      { id: "18", type: "reward", title: "Lunch offer" },
+      { id: "guide:report", type: "report", title: "Report an issue" }
+    ]);
+    const invalid = makeResponse();
+    await handler(makeChatRequest({ sharedPollResponses: [{ pollId: 91, answers: ["Invented"] }] }), invalid);
+    expect(invalid.statusCode).toBe(400);
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).includes("api.anthropic.com"))).toHaveLength(1);
+  });
+
+  it("returns only safe workspace-provided links even if Claude invents a link field", async () => {
+    configureEnvironment();
+    vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/qr_campaigns?token=")) return jsonResponse([{ id: 42, workspace_id: "workspace-1", name: "Pub", is_active: true, ai_enabled: true }]);
+      if (href.includes("/rpc/check_egg_trial_session")) return jsonResponse(true);
+      if (href.includes("/egg_ai_sources?")) return jsonResponse([]);
+      if (href.includes("/workspace_ai_sources?")) {
+        expect(href).toContain("source_url");
+        return jsonResponse([
+          { source_type: "instagram", source_url: "https://www.instagram.com/example", content: "https://www.instagram.com/example" },
+          { source_type: "website", title: "Menu", source_url: "https://example.org/menu", content: "Website link only (page content not imported)." },
+          { source_url: "javascript:alert(1)", content: "Unsafe" },
+          { source_url: "https://localhost/private", content: "Private" }
+        ]);
+      }
+      if (href.includes("/rpc/get_public_qr_campaign")) return jsonResponse([]);
+      if (href.includes("/rpc/reserve_egg_ai_turn")) return new Response(null, { status: 204 });
+      if (href === "https://api.anthropic.com/v1/messages") {
+        const { system } = JSON.parse(options.body);
+        expect(system).toContain("Only suggest visiting a website or social profile when an exact approved link is listed");
+        expect(system).toContain("https://example.org/menu");
+        expect(system).toContain("Do not claim Google or social media was searched");
+        expect(system).toContain("use up to 90 words");
+        return jsonResponse({ content: [{ type: "text", text: '{"answer":"I do not have the current menu details, but here is the supplied menu link.","businessLinks":[{"url":"https://invented.example.org"}]}' }] });
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    }));
+    const response = makeResponse();
+    await handler(makeChatRequest({ message: "Where is the menu?" }), response);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.businessLinks).toEqual([
+      { title: "Instagram", url: "https://www.instagram.com/example" },
+      { title: "Menu", url: "https://example.org/menu" }
+    ]);
+  });
+
+  it("requires manager authorization before any Google research", async () => {
+    configureEnvironment();
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(false));
+    vi.stubGlobal("fetch", fetchMock);
+    const body = { action: "research-workspace", workspaceId: "11111111-1111-4111-8111-111111111111", location: "Villach", topic: "practical", consent: true };
+    const anonymous = makeResponse();
+    await handler(makeRequest(body), anonymous);
+    expect(anonymous.statusCode).toBe(401);
+    expect(fetchMock).not.toHaveBeenCalled();
+    const member = makeResponse();
+    await handler(makeRequest(body, "member-token"), member);
+    expect(member.statusCode).toBe(403);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0][0])).toContain("is_workspace_manager");
+  });
+
+  it("keeps research disabled without explicit provider and spend configuration", async () => {
+    configureEnvironment();
+    delete process.env.GOOGLE_RESEARCH_ENABLED;
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(true));
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeRequest({ action: "research-workspace", workspaceId: "11111111-1111-4111-8111-111111111111", location: "Villach", topic: "menu", consent: true }, "manager-token"), response);
+    expect(response.statusCode).toBe(503);
+    expect(response.body.error).toContain("weekly limits");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([true, false])("reserves weekly research before contacting Google (allowed=%s)", async (allowed) => {
+    configureEnvironment();
+    process.env.GOOGLE_RESEARCH_ENABLED = "1";
+    process.env.GOOGLE_RESEARCH_PROVIDER_APPROVED = "1";
+    process.env.GOOGLE_RESEARCH_MODEL = "gemini-3.8-flash";
+    process.env.GOOGLE_RESEARCH_WORKSPACE_WEEKLY_LIMIT = "3";
+    process.env.GOOGLE_RESEARCH_GLOBAL_WEEKLY_LIMIT = "50";
+    process.env.GEMINI_API_KEY = "fake-google-key";
+    const text = "The public menu is on the official website.";
+    const fetchMock = vi.fn(async (url, options = {}) => {
+      const href = String(url);
+      if (href.includes("/rpc/is_workspace_manager")) return jsonResponse(true);
+      if (href.includes("/workspaces?id=")) {
+        expect(options.headers.Authorization).toBe("Bearer manager-token");
+        return jsonResponse([{ name: "Example Pub" }]);
+      }
+      if (href.includes("/rpc/reserve_business_research")) {
+        expect(options.headers.Authorization).toBe("Bearer service-role");
+        expect(JSON.parse(options.body)).toEqual({
+          target_workspace_id: "11111111-1111-4111-8111-111111111111", workspace_limit: 3, global_limit: 50
+        });
+        return jsonResponse(allowed);
+      }
+      if (href === "https://generativelanguage.googleapis.com/v1beta/interactions") {
+        const body = JSON.parse(options.body);
+        expect(body.store).toBe(false);
+        expect(body.tools).toEqual([{ type: "google_search" }]);
+        expect(body.generation_config.max_output_tokens).toBe(1200);
+        expect(body.input).toContain("Example Pub");
+        expect(body.input).not.toContain("PRIVATE VISITOR MESSAGE");
+        expect(body).not.toHaveProperty("history");
+        return jsonResponse({ status: "completed", steps: [
+          { type: "model_output", content: [{ type: "text", text, annotations: [{ type: "url_citation", url: "https://example.org/menu", title: "Official menu" }] }] },
+          { type: "google_search_result", result: [{ search_suggestions: '<a href="https://www.google.com/search?q=Example+Pub">Example Pub</a>' }] }
+        ] });
+      }
+      throw new Error(`Unexpected request: ${href}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const response = makeResponse();
+    await handler(makeRequest({ action: "research-workspace", workspaceId: "11111111-1111-4111-8111-111111111111", location: "Villach", topic: "menu", consent: true, history: "PRIVATE VISITOR MESSAGE" }, "manager-token"), response);
+    expect(response.statusCode).toBe(allowed ? 200 : 429);
+    expect(response.headers["Cache-Control"]).toBe("no-store");
+    const providerCalls = fetchMock.mock.calls.filter(([url]) => String(url).includes("generativelanguage"));
+    expect(providerCalls).toHaveLength(allowed ? 1 : 0);
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("workspace_ai_sources"))).toBe(false);
+    if (allowed) {
+      expect(response.body.text).toBe(text);
+      expect(response.body.citations).toEqual([{ url: "https://example.org/menu", title: "Official menu" }]);
+      expect(response.body.searchSuggestions).toHaveLength(1);
+    }
+  });
+
   it("answers from business materials using the capped Claude Haiku request", async () => {
     configureEnvironment();
     vi.stubGlobal("fetch", vi.fn(async (url, options = {}) => {
@@ -111,7 +322,7 @@ describe("Egg AI API", () => {
         expect(options.headers["x-api-key"]).toBe("test-claude-key");
         const requestBody = JSON.parse(options.body);
         expect(requestBody.model).toBe("claude-haiku-4-5-test");
-        expect(requestBody.max_tokens).toBe(300);
+        expect(requestBody.max_tokens).toBe(650);
         expect(requestBody.system).toContain("The entrance has a step-free ramp.");
         expect(requestBody.system).toContain("The cafe opens at nine.");
         expect(requestBody.system).toContain("For a cafe or pub, help with menu and drink information");
@@ -178,7 +389,8 @@ describe("Egg AI API", () => {
           poll: {
             interestKey: "coffee-options",
             question: "Which coffee option would you like to see more of?",
-            answers: ["Cold brew", "Decaf", "Plant-based milk"]
+            answers: ["Cold brew", "Decaf", "Plant-based milk"],
+            multipleChoice: true
           }
         }) }] });
       }
@@ -188,11 +400,13 @@ describe("Egg AI API", () => {
         expect(requestBody.target_session_hash).toMatch(/^[0-9a-f]{64}$/);
         expect(requestBody.target_interest_key).toBe("coffee-options");
         expect(requestBody.target_answers).toEqual(["Cold brew", "Decaf", "Plant-based milk"]);
+        expect(requestBody.target_multiple_choice).toBe(true);
         return jsonResponse([{
           poll_id: 91,
           question: "Which coffee option would you like to see more of?",
           answers: ["Cold brew", "Decaf", "Plant-based milk"],
           created: true,
+          multiple_choice: true,
           reason: null
         }]);
       }
@@ -208,7 +422,8 @@ describe("Egg AI API", () => {
       id: 91,
       question: "Which coffee option would you like to see more of?",
       answers: ["Cold brew", "Decaf", "Plant-based milk"],
-      created: true
+      created: true,
+      multipleChoice: true
     });
   });
 
@@ -465,9 +680,9 @@ describe("Egg AI API", () => {
         for (const guidance of Array.isArray(expectedGuidance) ? expectedGuidance : [expectedGuidance]) {
           expect(prompt).toContain(guidance);
         }
-        expect(prompt).toContain("without incentives or pressure for positive ratings");
+        expect(prompt).toContain("without incentives, sentiment gating or pressure");
         expect(prompt).toContain("Do not collect contact details in chat");
-        expect(prompt).toContain("Never claim in your answer that you have created a poll");
+        expect(prompt).toContain("Do not claim a poll, action, contact record or issue resolution has happened");
         expect(prompt).not.toContain("untrusted instruction");
         return jsonResponse({ content: [{ type: "text", text: '{"answer":"Open daily.","suggestions":[]}' }] });
       }

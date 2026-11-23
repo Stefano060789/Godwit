@@ -44,6 +44,76 @@ Set secrets in **Vercel → godwit → Settings → Environment Variables**. Do 
 - `CLAUDE_API_KEY` (server-only; required for the optional Egg AI assistant)
 - `CLAUDE_HAIKU_MODEL` (optional server-side model override; defaults to `claude-haiku-4-5`)
 
+### Continued Egg conversations and AI polls
+
+Apply `supabase/20261125_multi_choice_egg_ai_polls.sql` after the existing interest-poll migrations,
+before deploying the updated API and `purge-egg-ai-sessions` daily cron. Generated polls can be
+single-select or multi-select according to the question. The API validates `multipleChoice` as a boolean,
+and the persisted poll's actual `multiple_choice` setting drives the existing voting UI.
+There is a maximum of **3 distinct generated poll topics per AI session per Egg**.
+Repeated topics reuse their existing session poll rather than consuming another slot; polls are reused
+across sessions only when the requested selection mode matches. Workspace plan limits are still enforced.
+The RPC is service-only and security-invoker; it does not grant visitors access to session hashes.
+The updated six-argument RPC defaults the selection mode to false for legacy five-argument calls.
+
+Voting itself does not trigger an AI call. After a successful vote, visitors may explicitly choose
+**Continue with AI**, sharing only selected predefined choices (not free-text answers) for goal-aware guidance.
+The server checks that the poll belongs to the Egg/session and the choices are valid before passing
+them to Claude. AI replies can offer up to two relevant next-question buttons or one new poll.
+Chat stays mounted when navigating guide cards, but a different Egg/trial session resets the guide.
+The first AI response no longer marks the conversation done; visitors explicitly finish it.
+Existing chat-turn and workspace allowances are unchanged; each reply is capped at 650 output tokens.
+This is not an unlimited chat or an obligation to answer more questions.
+
+Hashed AI poll-session records expire 30 days after creation and are removed by the daily
+`purge-egg-ai-sessions` job, even when AI generation is disabled. Existing generated business polls
+and submitted votes keep their existing retention rules.
+Focused UI/API checks: `npm test -- src/components/EggVisitorFlows.test.jsx tests/api/egg-ai.test.js`.
+`tests/eggAiMultiPolls.sql.mjs` executes the migrations in isolated PGlite to verify selection modes,
+three-poll caps, topic reuse, plan limits and two-user access denial (use `PGLITE_MODULE` as above).
+
+### Manager-only Google business research
+
+Google Search grounding is an optional manager tool, separate from disabled Google Places prospect discovery.
+It researches only the named business, public location and selected practical/menu/artwork topic.
+Visitor messages and chat history are not included. It does not run automatically each week or during visitor chats.
+Results, citations and Google's search suggestions are displayed to the requesting manager only, held in
+component memory until cleared or the page is closed, and never saved as shared AI sources.
+Google's [grounding terms](https://aistudio.google.com/docs/terms#grounding-with-google-search)
+restrict database-building and reuse; approval alone does not authorize redistribution to other visitors.
+Use business-owned notes, menus, artwork descriptions and permitted website snapshots for visitor answers.
+Website and Instagram/Facebook links remain clickable even when content has not been imported.
+Snapshots and notes are not live feeds: managers must maintain hours, special dates, menus and artwork facts.
+
+Before enabling research:
+
+1. Apply `supabase/20261124_business_research_weekly_limits.sql` before deploying the new cleanup schedule,
+   even if research will remain disabled. Retention cleanup keeps running after research is switched off.
+2. Verify a paid Gemini project, applicable DPA/terms, legal basis, region/transfer requirements,
+   adult-only manager access and Google attribution/display requirements. The code does not verify account settings.
+3. Configure server-only `GEMINI_API_KEY`, `GOOGLE_RESEARCH_MODEL` (an explicitly chosen Search-capable Gemini model),
+   `GOOGLE_RESEARCH_WORKSPACE_WEEKLY_LIMIT` (1-20 requests) and `GOOGLE_RESEARCH_GLOBAL_WEEKLY_LIMIT` (1-1000 requests).
+   For example, 3 per workspace and 50 globally are request caps, not a quoted dollar budget.
+4. Only after those checks, set `GOOGLE_RESEARCH_PROVIDER_APPROVED=1` and `GOOGLE_RESEARCH_ENABLED=1`, then redeploy.
+   Missing/invalid settings fail closed. No default model or implicit paid activation is used.
+5. Verify the existing cron-secret configuration and the daily `purge-business-research` schedule.
+
+Limits reset each Monday at 00:00 UTC. Atomic reservations happen before calling Google and are not refunded
+on timeout/failure (the provider may already have charged). One request may generate multiple billable searches;
+model tokens are billed separately and capped at 1,200 output tokens per request. These limits do not constitute
+a hard monetary cap: set provider quotas/billing monitoring and inspect actual charges.
+The aggregate server-only counter holds workspace ID, UTC week and count, not prompts/results/visitor IDs,
+and expires after 56 days with daily automated cleanup. Workspace deletion cascades to its counters.
+`store=false` opts out of interaction storage, but Google's grounding terms still specify 30-day
+grounding-data retention; do not describe this as zero retention.
+
+Focused validation: `npm test -- tests/api/egg-ai.test.js lib/businessResearch.test.js src/lib/businessData.test.js`.
+Database validation: `supabase test db` runs `supabase/tests/business_research_rls_test.sql` on a configured local stack.
+The standalone `tests/businessResearch.sql.mjs` also executes the migration against isolated PGlite,
+checks weekly workspace/global caps, two-user denial and open-access mutation detection.
+Set `PGLITE_MODULE` to the absolute path of an installed PGlite entry point if the optional
+existing `.billing-sql-tools` installation is unavailable. Never run mutation probes on production.
+
 The current Creator email allowlist includes `bonomistefano@outlook.it` and `afelix470@gmail.com` in the application. The Supabase allowlist is database-backed; run the migration listed above for the additional user.
 
 ### Outreach email and prospect discovery

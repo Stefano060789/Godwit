@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { BUSINESS_TYPES } from "../lib/personas";
 import { saveWorkspaceBusinessType } from "../lib/workspaceProfile";
 
-export default function BusinessProfile({ workspaceId, businessType, businessDescription = "", canManage, onSaved, t }) {
+function initialBusinessName(name) {
+  return ["", "My workspace"].includes(String(name || "").trim()) ? "" : name;
+}
+
+export default function BusinessProfile({ workspaceId, companyName = "", businessType, businessDescription = "", canManage, onSaved, t }) {
+  const [businessName, setBusinessName] = useState(initialBusinessName(companyName));
   const [selectedType, setSelectedType] = useState(businessType || "");
   const [customDescription, setCustomDescription] = useState(businessDescription);
   const [saving, setSaving] = useState(false);
@@ -10,15 +15,21 @@ export default function BusinessProfile({ workspaceId, businessType, businessDes
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
+    setBusinessName(initialBusinessName(companyName));
     setSelectedType(businessType || "");
     setCustomDescription(businessDescription || "");
-  }, [businessType, businessDescription, workspaceId]);
+  }, [companyName, businessType, businessDescription, workspaceId]);
 
   useEffect(() => setMessage(""), [workspaceId]);
 
   async function submit(event) {
     event.preventDefault();
     if (!workspaceId || !canManage || saving || !selectedType) return;
+    if (!businessName.trim()) {
+      setIsError(true);
+      setMessage(t("admin.businessProfile.nameRequired", { defaultValue: "Enter your business name." }));
+      return;
+    }
     if (selectedType === "other" && !customDescription.trim()) {
       setIsError(true);
       setMessage(t("admin.businessProfile.otherRequired", { defaultValue: "Describe your business or organization." }));
@@ -27,7 +38,12 @@ export default function BusinessProfile({ workspaceId, businessType, businessDes
     setSaving(true);
     setMessage("");
     try {
-      const profile = await saveWorkspaceBusinessType(workspaceId, selectedType, selectedType === "other" ? customDescription : "");
+      const profile = await saveWorkspaceBusinessType(
+        workspaceId,
+        selectedType,
+        selectedType === "other" ? customDescription : "",
+        businessName
+      );
       onSaved(profile);
       setIsError(false);
       setMessage(t("admin.businessProfile.saved", { defaultValue: "Business type saved." }));
@@ -49,6 +65,21 @@ export default function BusinessProfile({ workspaceId, businessType, businessDes
       {!workspaceId ? <p className="hub-notice">{t("admin.businessProfile.selectWorkspace", { defaultValue: "Select a workspace first." })}</p>
         : !canManage ? <p className="hub-notice">{t("admin.businessProfile.managerOnly", { defaultValue: "A workspace owner or editor can update this profile." })}</p>
           : <form onSubmit={submit}>
+            <label className="business-profile-custom">
+              {t("admin.businessProfile.nameLabel", { defaultValue: "Business name" })}
+              <input
+                type="text"
+                required
+                maxLength={120}
+                disabled={saving}
+                value={businessName}
+                onChange={(event) => {
+                  setBusinessName(event.target.value);
+                  setMessage("");
+                }}
+                placeholder={t("admin.businessProfile.namePlaceholder", { defaultValue: "For example: The Green Garden Cafe" })}
+              />
+            </label>
             <fieldset className="business-profile-options" disabled={saving}>
               <legend className="goal-multi-hint">{t("admin.businessProfile.choose", { defaultValue: "What kind of business or place is this?" })}</legend>
               <div className="business-profile-grid">
@@ -84,7 +115,7 @@ export default function BusinessProfile({ workspaceId, businessType, businessDes
                 />
               </label>}
             </fieldset>
-            <button type="submit" className="goal-primary-action" disabled={saving || !selectedType || (selectedType === businessType && (selectedType !== "other" || customDescription === businessDescription))}>
+            <button type="submit" className="goal-primary-action" disabled={saving || !businessName.trim() || !selectedType || (businessName.trim() === companyName && selectedType === businessType && (selectedType !== "other" || customDescription === businessDescription))}>
               {saving
                 ? t("admin.businessProfile.saving", { defaultValue: "Saving..." })
                 : t("admin.businessProfile.save", { defaultValue: "Save business profile" })}

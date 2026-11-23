@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import DonationCard from "./DonationCard";
 import EggAiAssistant from "./EggAiAssistant";
+import EggReviewFeedback from "./EggReviewFeedback";
 import InlinePollVote from "./InlinePollVote";
 import IssueReportForm from "./IssueReportForm";
 import { accessibilityTagIcon, accessibilityTagLabel } from "../lib/accessibilityTags";
@@ -43,26 +44,41 @@ export default function EggGuide({ token, menu, goalKeys = [], preview = false, 
   const [currentId, setCurrentId] = useState(intents.length === 1 ? intents[0].id : null);
   const [doneIds, setDoneIds] = useState([]);
   const [skippedIds, setSkippedIds] = useState([]);
+  const [assistantOpened, setAssistantOpened] = useState(currentId === "ask");
+  const [pendingPollResponse, setPendingPollResponse] = useState(null);
+  const [continuationRequest, setContinuationRequest] = useState(null);
   const brand = getReadableBrandColor(branding.primaryColor);
   const brandInk = getContrastingTextColor(brand);
   const current = intents.find((intent) => intent.id === currentId) || null;
   const next = pickNextIntent(intents, [...doneIds, ...skippedIds]) || pickNextIntent(intents, doneIds);
   const label = (kind, part) => t(`eggGuide.intents.${kind}.${part}`, { defaultValue: DEFAULT_COPY[kind][part === "title" ? 0 : 1] });
-  const progress = intents.length ? Math.round((doneIds.length / intents.length) * 100) : 0;
 
   function markDone(id) {
     setDoneIds((existing) => existing.includes(id) ? existing : [...existing, id]);
   }
 
   function renderPanel(intent) {
-    if (intent.kind === "ask" || intent.kind === "review") {
+    if (intent.kind === "review") {
+      return <EggReviewFeedback campaignId={campaignId} trialSessionId={trialSessionId} preview={preview}
+        onSubmitted={() => markDone(intent.id)} />;
+    }
+    if (intent.kind === "ask") {
       return <EggAiAssistant
         token={token}
         campaignId={campaignId}
         trialSessionId={trialSessionId}
         branding={branding}
         preview={menu.aiPreview}
-        onAnswered={() => markDone(intent.id)}
+        onFinished={() => { markDone(intent.id); setCurrentId(null); }}
+        initialPollResponse={continuationRequest}
+        onContinuationStarted={() => { setContinuationRequest(null); setPendingPollResponse(null); }}
+        showPrivateFeedback={false}
+        onSelectOption={(id) => {
+          const target = intents.find((entry) => entry.items.some((item) => String(item.item_id) === id)
+            || (id === `default-${campaignId}` && entry.kind === "poll")
+            || (id === "guide:report" && entry.kind === "report"));
+          if (target) setCurrentId(target.id);
+        }}
       />;
     }
     if (intent.kind === "report") {
@@ -70,7 +86,10 @@ export default function EggGuide({ token, menu, goalKeys = [], preview = false, 
     }
     return intent.items.map((item) => {
       if (item.item_type === "poll") {
-        return <InlinePollVote key={item.item_id} item={item} branding={branding} preview={preview} onSubmitted={() => markDone(intent.id)} />;
+        return <InlinePollVote key={item.item_id} item={item} branding={branding} preview={preview} showGodwitLink={false} onSubmitted={(response) => {
+          markDone(intent.id);
+          if (response.answers.length) setPendingPollResponse(response);
+        }} />;
       }
       if (item.item_type === "donation") return <DonationCard key={item.item_id} item={item} campaignToken={token} />;
       return <div key={item.item_id} className="qr-portal-menu-item qr-portal-menu-info">
@@ -95,14 +114,7 @@ export default function EggGuide({ token, menu, goalKeys = [], preview = false, 
     <header className="egg-guide-header">
       {branding.logoUrl && <img src={branding.logoUrl} alt={`${branding.brandName || "Venue"} logo`} className="egg-guide-logo" />}
       <p className="egg-guide-brand">{branding.brandName || "Godwit"}</p>
-      {intents.length > 1 && <div
-        className="egg-guide-progress"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={progress}
-        aria-label={t("eggGuide.progress", { defaultValue: "Your progress" })}
-      ><span style={{ width: `${Math.max(progress, 6)}%` }} /></div>}
+      {intents.length > 1 && <p>{t("eggGuide.optionalOptions", { defaultValue: "Choose what is useful to you. Everything is optional." })}</p>}
     </header>
 
     {!current && <section className="egg-guide-body">
@@ -121,7 +133,7 @@ export default function EggGuide({ token, menu, goalKeys = [], preview = false, 
             key={intent.id}
             type="button"
             className={`egg-guide-option${suggested ? " is-suggested" : ""}${done ? " is-done" : ""}`}
-            onClick={() => setCurrentId(intent.id)}
+            onClick={() => { if (intent.kind === "ask") setAssistantOpened(true); setCurrentId(intent.id); }}
           >
             <span className="egg-guide-option-icon" aria-hidden="true">{done ? "✓" : INTENT_ICONS[intent.kind]}</span>
             <span className="egg-guide-option-text">
@@ -134,13 +146,24 @@ export default function EggGuide({ token, menu, goalKeys = [], preview = false, 
       </div>
     </section>}
 
-    {current && <section className="egg-guide-body">
+    {(current || assistantOpened) && <section className="egg-guide-body" hidden={!current}>
       {intents.length > 1 && <button type="button" className="egg-guide-back" onClick={() => setCurrentId(null)}>
         ← {t("eggGuide.back", { defaultValue: "Back" })}
       </button>}
-      <h1>{label(current.kind, "title")}</h1>
-      <div className="egg-guide-panel">{renderPanel(current)}</div>
-      {intents.length > 1 && <div className="egg-guide-footer">
+      {current && <h1>{label(current.kind, "title")}</h1>}
+      <div className="egg-guide-panel">
+        {assistantOpened && intents.some((intent) => intent.kind === "ask") && <div hidden={current?.kind !== "ask"}>{renderPanel(intents.find((intent) => intent.kind === "ask"))}</div>}
+        {current && current.kind !== "ask" && renderPanel(current)}
+        {current?.kind === "poll" && pendingPollResponse && aiAvailable && !preview && <div className="qr-portal-ai-prompts">
+          <p>{t("eggAi.continueAfterVotePrivacy", { defaultValue: "Optional: share your selected answers with Anthropic's AI for a useful next step. They may also be used for your later questions in this conversation." })}</p>
+          <button type="button" className="egg-guide-continue" onClick={() => {
+            setContinuationRequest(pendingPollResponse); setAssistantOpened(true); setCurrentId("ask");
+          }}>
+            {t("eggAi.continueAfterVote", { defaultValue: "Continue with AI" })}
+          </button>
+        </div>}
+      </div>
+      {current && intents.length > 1 && <div className="egg-guide-footer">
         <button type="button" className="egg-guide-continue" onClick={() => {
           if (!doneIds.includes(current.id)) setSkippedIds((existing) => [...existing, current.id]);
           setCurrentId(null);

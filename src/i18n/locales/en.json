@@ -5,6 +5,7 @@
     "signIn": "Sign in",
     "install": "Install Godwit",
     "billing": "Billing",
+    "about": "About Godwit",
     "moderation": "Moderation",
     "shareFeedback": "Share product feedback",
     "account": "Account",
@@ -1693,7 +1694,7 @@
       },
       "review": {
         "title": "Share your experience",
-        "hint": "Leave a review in a minute"
+        "hint": "What stood out? Send a private note to the team."
       },
       "donate": {
         "title": "Support us",

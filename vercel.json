@@ -1,6 +1,14 @@
 {
   "crons": [
     {
+      "path": "/api/cron?job=purge-egg-ai-sessions",
+      "schedule": "20 5 * * *"
+    },
+    {
+      "path": "/api/cron?job=purge-business-research",
+      "schedule": "15 5 * * *"
+    },
+    {
       "path": "/api/cron?job=weekly-report",
       "schedule": "0 13 * * 1"
     },

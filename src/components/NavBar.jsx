@@ -94,6 +94,14 @@ export default function NavBar() {
           >
             {t("nav.billing")}
           </Link>
+          <Link
+            to="/about"
+            onClick={closeMenu}
+            className={`site-nav-billing ${location.pathname === "/about" ? "is-active" : ""}`}
+            aria-current={location.pathname === "/about" ? "page" : undefined}
+          >
+            {t("nav.about")}
+          </Link>
           {!displayUser && (
             <Link to="/login" onClick={closeMenu} className="site-nav-signin">
               {t("nav.signIn")}

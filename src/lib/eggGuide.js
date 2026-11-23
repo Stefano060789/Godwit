@@ -34,7 +34,7 @@ export function buildGuideIntents({ goalKeys = [], items = [], aiEnabled = false
   const donations = items.filter((item) => item.item_type === "donation");
   const available = {
     ask: aiEnabled ? [] : null,
-    review: aiEnabled && goalKeys.map(normalizeGoalKey).includes("reviews") ? [] : null,
+    review: canReport && goalKeys.map(normalizeGoalKey).includes("reviews") ? [] : null,
     poll: polls.length ? polls : null,
     info: infos.length ? infos : null,
     offer: offers.length ? offers : null,

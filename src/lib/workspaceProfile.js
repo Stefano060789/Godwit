@@ -136,16 +136,23 @@ export async function loadWorkspaceTrial(workspaceId) {
   return data || null;
 }
 
-export async function saveWorkspaceBusinessType(workspaceId, businessType, businessDescription = "") {
+export async function saveWorkspaceBusinessType(workspaceId, businessType, businessDescription = "", companyName) {
   if (!workspaceId) throw new Error("A workspace is required.");
   if (!isBusinessType(businessType)) throw new Error("Choose a valid business type.");
   const description = String(businessDescription || "").trim();
   if (description.length > 500) throw new Error("Business description must be 500 characters or fewer.");
   if (businessType === "other" && !description) throw new Error("Describe your business or organization.");
+  const name = companyName === undefined ? undefined : String(companyName || "").trim();
+  if (name !== undefined && !name) throw new Error("Enter your business name.");
+  if (name?.length > 120) throw new Error("Business name must be 120 characters or fewer.");
 
   const { error } = await supabase
     .from("workspaces")
-    .update({ business_type: businessType, business_description: description || null })
+    .update({
+      ...(name === undefined ? {} : { name }),
+      business_type: businessType,
+      business_description: description || null
+    })
     .eq("id", workspaceId);
   if (error && (error.code === "42703" || error.message?.includes("business_type") || error.message?.includes("business_description"))) {
     throw new Error("Business type settings are unavailable until the workspace business profile migration is applied.");
@@ -154,9 +161,14 @@ export async function saveWorkspaceBusinessType(workspaceId, businessType, busin
 
   const profiles = readAllProfiles();
   const key = String(workspaceId);
-  profiles[key] = { ...(profiles[key] ?? {}), businessType, businessDescription: description };
+  profiles[key] = {
+    ...(profiles[key] ?? {}),
+    ...(name === undefined ? {} : { companyName: name }),
+    businessType,
+    businessDescription: description
+  };
   writeAllProfiles(profiles);
-  return { businessType, businessDescription: description };
+  return { ...(name === undefined ? {} : { companyName: name }), businessType, businessDescription: description };
 }
 
 export async function saveWorkspaceProfile(workspaceId, patch = {}) {

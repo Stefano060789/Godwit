@@ -296,7 +296,7 @@ function QrRedirectContent() {
       void recordEggPromotionLinkClick(menu.campaignId, itemId, trialSessionId)
         .catch((failure) => console.error("Unable to record promotion link click:", failure));
     };
-    return <EggGuide token={token} menu={menu} goalKeys={guideGoalKeys} preview={isPreview} onLinkClick={trackPromotionClick} />;
+    return <EggGuide key={`${token}:${menu.trialSessionId}`} token={token} menu={menu} goalKeys={guideGoalKeys} preview={isPreview} onLinkClick={trackPromotionClick} />;
   }
 
   if (errorMessage) return <main className="p-6 text-center" role="alert">{errorMessage}</main>;
