@@ -98,6 +98,30 @@ export default function BusinessData({ workspaceId, canManage, t }) {
       {!workspaceId ? <p>{t("admin.businessData.selectWorkspace", { defaultValue: "Select a workspace first." })}</p>
         : !canManage ? <p>{t("admin.businessData.managerOnly", { defaultValue: "A workspace manager can manage business information." })}</p>
           : <>
+            <section className="business-data-sources" aria-labelledby="business-data-sources-title">
+              <div className="business-data-sources-heading">
+                <div>
+                  <h3 id="business-data-sources-title">{t("admin.businessData.sources", { defaultValue: "Shared sources" })}</h3>
+                  <p>{t("admin.businessData.sourcesDescription", { defaultValue: "Business information and links shared with your Eggs. Check these regularly and remove outdated details." })}</p>
+                </div>
+                {!loading && !loadFailed && <span className="business-data-source-count">{sources.length} / {BUSINESS_SOURCE_LIMIT}</span>}
+              </div>
+              {loading && <p role="status">{t("admin.businessData.loading", { defaultValue: "Loading business information..." })}</p>}
+              {status.key === "sources" && status.message && <p className="business-data-message" role={status.isError ? "alert" : "status"}>{status.message}</p>}
+              {loadFailed && <button className="goal-button" type="button" onClick={() => setReload((value) => value + 1)}>{t("admin.businessData.retry", { defaultValue: "Try again" })}</button>}
+              {!loading && !loadFailed && !sources.length && <p>{t("admin.businessData.noSources", { defaultValue: "No shared sources yet. Add business notes or links below." })}</p>}
+              {!loading && sources.length >= BUSINESS_SOURCE_LIMIT && <p>{t("admin.businessData.limit", { defaultValue: "Maximum 8 shared sources. Remove one to add another." })}</p>}
+              {sources.map((source) => <div className="business-data-source" key={source.id}>
+                <strong>{source.title}</strong>
+                {safeBusinessUrl(source.source_url) && <a href={safeBusinessUrl(source.source_url)} target="_blank" rel="noopener noreferrer">
+                  {t("admin.businessData.openSource", { defaultValue: "Open source" })}
+                </a>}
+                <p>{source.content}</p>
+                <button type="button" className="goal-button" disabled={busy || loading || loadFailed} onClick={() => perform(() => removeBusinessSource(workspaceId, source.id), () => {}, "sources")}>
+                  {t("admin.businessData.remove", { defaultValue: "Remove" })}
+                </button>
+              </div>)}
+            </section>
             <form className="business-data-form" onSubmit={(event) => {
               event.preventDefault();
               perform(() => addBusinessNotes(workspaceId, title, notes), () => { setTitle(""); setNotes(""); }, "notes");
@@ -170,24 +194,6 @@ export default function BusinessData({ workspaceId, canManage, t }) {
               {status.key === "facebook" && <p className="business-data-message" role={status.isError ? "alert" : "status"}>{status.message}</p>}
             </form>
             <BusinessResearch key={workspaceId} workspaceId={workspaceId} t={t} />
-            {loading && <p role="status">{t("admin.businessData.loading", { defaultValue: "Loading business information..." })}</p>}
-            {status.key === "sources" && sources.length === 0 && <p className="business-data-message" role={status.isError ? "alert" : "status"}>{status.message}</p>}
-            {loadFailed && <button className="goal-button" type="button" onClick={() => setReload((value) => value + 1)}>{t("admin.businessData.retry", { defaultValue: "Try again" })}</button>}
-            {!loading && sources.length >= BUSINESS_SOURCE_LIMIT && <p>{t("admin.businessData.limit", { defaultValue: "Maximum 8 shared sources. Remove one to add another." })}</p>}
-            {sources.length > 0 && <div className="business-data-sources">
-              <h3>{t("admin.businessData.sources", { defaultValue: "Shared sources" })}</h3>
-              {sources.map((source) => <div className="business-data-source" key={source.id}>
-                <strong>{source.title}</strong>
-                {safeBusinessUrl(source.source_url) && <a href={safeBusinessUrl(source.source_url)} target="_blank" rel="noopener noreferrer">
-                  {t("admin.businessData.openSource", { defaultValue: "Open source" })}
-                </a>}
-                <p>{source.content}</p>
-                <button type="button" className="goal-button" disabled={busy || loading || loadFailed} onClick={() => perform(() => removeBusinessSource(workspaceId, source.id), () => {}, "sources")}>
-                  {t("admin.businessData.remove", { defaultValue: "Remove" })}
-                </button>
-              </div>)}
-              {status.key === "sources" && status.message && <p className="business-data-message" role={status.isError ? "alert" : "status"}>{status.message}</p>}
-            </div>}
           </>}
     </section>
   );

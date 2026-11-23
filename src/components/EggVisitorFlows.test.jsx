@@ -292,6 +292,9 @@ describe("Egg visitor interactions", () => {
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({ source_url: "https://example.org/menu", source_type: "website" }));
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(host.querySelector(".business-data-source a").href).toBe("https://example.org/menu");
+    const sourcesSection = host.querySelector(".business-data-sources");
+    expect(sourcesSection.textContent).toContain("1 / 8");
+    expect(sourcesSection.compareDocumentPosition(website.closest("form")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("keeps Google research consent-based, manager-only and unsaved, with clearable attribution", async () => {
@@ -306,7 +309,12 @@ describe("Egg visitor interactions", () => {
     expect(fetchMock).not.toHaveBeenCalled();
     expect(button("Research with Google").disabled).toBe(true);
     await fill(host.querySelector('input:not([type="checkbox"])'), "Villach");
-    await click(host.querySelector('input[type="checkbox"]'));
+    const consent = host.querySelector(".business-research-consent");
+    expect(consent.textContent).toContain("I am 18 or older");
+    expect(consent.textContent).toContain("30 days");
+    expect(consent.querySelector('input[type="checkbox"]').required).toBe(true);
+    await click(consent);
+    expect(consent.querySelector('input[type="checkbox"]').checked).toBe(true);
     await submit(host.querySelector("form"));
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
       action: "research-workspace", workspaceId: "11111111-1111-4111-8111-111111111111", location: "Villach", topic: "practical", artwork: "", consent: true

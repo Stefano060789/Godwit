@@ -3402,12 +3402,6 @@ textarea {
 .egg-feedback-starters button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); color: var(--ink); font: inherit; cursor: pointer; }
 .egg-feedback-card label { display: block; font-weight: 700; margin-bottom: 6px; }
 .egg-feedback-card .qr-portal-ai-submit { margin-top: 12px; }
-.business-data-source > a { display: block; margin-top: 6px; }
-.business-research-consent { display: flex !important; align-items: flex-start; gap: 10px; margin: 12px 0; }
-.business-research-consent input { width: auto; margin-top: 5px; flex: none; }
-.business-research-text { white-space: pre-wrap; overflow-wrap: anywhere; }
-.business-research-result { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
-.business-research-suggestions { display: block; width: 100%; min-height: 200px; border: 0; margin: 12px 0; }
 .egg-guide-panel .qr-portal-ai-content { margin-top: 0; }
 .egg-guide-panel .qr-portal-poll-done { background: var(--teal-soft); }
 .egg-guide-panel .qr-portal-poll-thanks { color: var(--ink); }

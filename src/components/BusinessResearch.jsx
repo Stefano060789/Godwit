@@ -51,7 +51,7 @@ export default function BusinessResearch({ workspaceId, t }) {
       </label>}
       <label className="business-research-consent">
         <input type="checkbox" required checked={consent} disabled={busy} onChange={(event) => setConsent(event.target.checked)} />
-        {t("admin.businessData.researchConsent", { defaultValue: "I am 18 or older and authorize sending this public business identity, location and selected topic to Google. I will not include visitor data or private details. Google may retain grounding data for 30 days. Requests may incur search and model charges; one request can run multiple searches." })}
+        <span>{t("admin.businessData.researchConsent", { defaultValue: "I am 18 or older and authorize sending this public business identity, location and selected topic to Google. I will not include visitor data or private details. Google may retain grounding data for 30 days. Requests may incur search and model charges; one request can run multiple searches." })}</span>
       </label>
       <button className="goal-button" disabled={busy || !consent} type="submit">
         {busy ? t("admin.businessData.researching", { defaultValue: "Researching..." }) : t("admin.businessData.researchButton", { defaultValue: "Research with Google" })}
