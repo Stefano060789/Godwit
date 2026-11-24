@@ -18,6 +18,7 @@ describe("public navigation", () => {
     expect(markup).toContain('href="/dashboard-demo"');
     expect(markup).toContain(">Dashboard</a>");
     expect(markup).toContain('href="/about"');
+    expect(markup).toContain(">About</a>");
     expect(markup.indexOf('href="/billing"')).toBeLessThan(markup.indexOf('href="/about"'));
     expect(markup.indexOf('href="/about"')).toBeLessThan(markup.indexOf('href="/login"'));
   });
